@@ -1,0 +1,12 @@
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.idea/
+.vscode/
+docs/reference/
+site/
+*.env*
+!.env.example
+!tests.env
+.coverage
+.dmypy.json

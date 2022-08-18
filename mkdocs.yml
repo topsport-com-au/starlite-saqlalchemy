@@ -1,0 +1,66 @@
+site_name: starlite-lib
+repo_url: https://github.com/topsport-com-au/starlite-lib
+nav:
+  - index.md
+  - Reference: reference/
+watch:
+  - src/starlite_lib
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.top
+    - navigation.expand
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - search.share
+markdown_extensions:
+  - admonition
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - tables
+plugins:
+  - search
+  - gen-files:
+      scripts:
+        - docs/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - section-index
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          import:
+          - https://docs.python.org/3/objects.inv
+          - https://docs.sqlalchemy.org/en/20/objects.inv
+          - https://redis-py.readthedocs.io/en/stable/objects.inv
+          - https://starlite-api.github.io/starlite/objects.inv
+          options:
+            docstring_style: numpy
+            docstring_options:
+              ignore_init_summary: yes
+            line_length: 100
+            merge_init_into_class: yes
+            separate_signature: yes
+            show_source: no
+            show_root_full_path: no
+            show_root_toc_entry: no
+  - autorefs
