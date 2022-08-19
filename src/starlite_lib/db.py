@@ -6,6 +6,7 @@ from uuid import UUID
 from orjson import dumps, loads
 from sqlalchemy import event
 from sqlalchemy.ext.asyncio import (
+    AsyncSession,
     async_scoped_session,
     async_sessionmaker,
     create_async_engine,
@@ -35,7 +36,7 @@ engine = create_async_engine(
 serializer to use `orjson`. See [`create_async_engine()`][sqlalchemy.ext.asyncio.create_async_engine]
 for detailed instructions.
 """
-async_session_factory = async_sessionmaker(engine, expire_on_commit=False)
+async_session_factory = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 """
 Database session factory. See [`async_sessionmaker()`][sqlalchemy.ext.asyncio.async_sessionmaker].
 """
