@@ -39,6 +39,10 @@ class Queue(saq.Queue):
         super().__init__(*args, **kwargs)
 
 
+async def _after_process(_: Any) -> None:
+    await AsyncScopedSession.remove()
+
+
 class Worker(saq.Worker):
     """
     [SAQ worker](https://github.com/tobymao/saq/blob/master/saq/worker.py).
@@ -61,7 +65,7 @@ class Worker(saq.Worker):
     SIGNALS: list[str] = []
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        kwargs.setdefault("after_process", AsyncScopedSession.remove)
+        kwargs.setdefault("after_process", _after_process)
         super().__init__(*args, **kwargs)
 
 
