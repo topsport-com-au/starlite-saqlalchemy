@@ -4,6 +4,8 @@ All configuration is via environment variables.
 Take not of the environment variable prefixes required for each settings class, except
 [`AppSettings`][starlite_lib.config.AppSettings].
 """
+from typing import Literal
+
 from pydantic import AnyUrl, BaseSettings, PostgresDsn
 
 
@@ -123,6 +125,7 @@ class DatabaseSettings(BaseSettings):
         case_sensitive = True
 
     ECHO: bool
+    ECHO_POOL: bool | Literal["debug"]
     URL: PostgresDsn
 
 

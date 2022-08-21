@@ -30,6 +30,7 @@ def _default(val: Any) -> str:
 engine = create_async_engine(
     db_settings.URL,
     echo=db_settings.ECHO,
+    echo_pool=db_settings.ECHO_POOL,
     json_serializer=partial(dumps, default=_default),
 )
 """Configure via [DatabaseSettings][starlite_lib.config.DatabaseSettings]. Overrides default JSON 
