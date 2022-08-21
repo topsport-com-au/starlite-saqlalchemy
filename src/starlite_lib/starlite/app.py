@@ -65,15 +65,19 @@ class Starlite(starlite.Starlite):
         if after_request is not None and is_async_callable(after_request):
 
             async def _after_request(response: starlite.Response) -> starlite.Response:
-                response = await hooks.session_after_request(response)
-                response = await after_request(response)  # type:ignore[misc]
+                try:
+                    response = await hooks.session_after_request(response)
+                finally:
+                    response = await after_request(response)  # type:ignore[misc]
                 return response
 
         elif after_request is not None and not is_async_callable(after_request):
 
             async def _after_request(response: starlite.Response) -> starlite.Response:
-                response = await hooks.session_after_request(response)
-                response = after_request(response)  # type:ignore[misc,assignment]
+                try:
+                    response = await hooks.session_after_request(response)
+                finally:
+                    response = after_request(response)  # type:ignore[misc,assignment]
                 return response
 
         else:
