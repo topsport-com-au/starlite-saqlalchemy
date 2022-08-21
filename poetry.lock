@@ -89,7 +89,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "charset-normalizer"
-version = "2.1.0"
+version = "2.1.1"
 description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
 category = "dev"
 optional = false
@@ -452,7 +452,7 @@ mkdocs = ">=1.0.3,<2.0.0"
 
 [[package]]
 name = "mkdocs-material"
-version = "8.4.0"
+version = "8.4.1"
 description = "Documentation that simply works"
 category = "dev"
 optional = false
@@ -969,7 +969,7 @@ sqlcipher = ["sqlcipher3-binary"]
 type = "git"
 url = "https://github.com/sqlalchemy/sqlalchemy.git"
 reference = "main"
-resolved_reference = "9bf0b0c974eeabde2e5bfa11ddf6723319a0b453"
+resolved_reference = "f55ae66f70d6b28fbccd75ac9089f11e951c4c39"
 
 [[package]]
 name = "starlette"
@@ -987,7 +987,7 @@ full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests"]
 
 [[package]]
 name = "starlite"
-version = "1.11.1"
+version = "1.13.0"
 description = "Light-weight and flexible ASGI API Framework"
 category = "main"
 optional = false
@@ -1020,7 +1020,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "types-redis"
-version = "4.3.14"
+version = "4.3.16"
 description = "Typing stubs for redis"
 category = "dev"
 optional = false
@@ -1136,8 +1136,8 @@ certifi = [
     {file = "certifi-2022.6.15.tar.gz", hash = "sha256:84c85a9078b11105f04f3036a9482ae10e4621616db313fe045dd24743a0820d"},
 ]
 charset-normalizer = [
-    {file = "charset-normalizer-2.1.0.tar.gz", hash = "sha256:575e708016ff3a5e3681541cb9d79312c416835686d054a23accb873b254f413"},
-    {file = "charset_normalizer-2.1.0-py3-none-any.whl", hash = "sha256:5189b6f22b01957427f35b6a08d9a0bc45b46d3788ef5a92e978433c7a35f8a5"},
+    {file = "charset-normalizer-2.1.1.tar.gz", hash = "sha256:5a3d016c7c547f69d6f81fb0db9449ce888b418b5b9952cc5e6e66843e9dd845"},
+    {file = "charset_normalizer-2.1.1-py3-none-any.whl", hash = "sha256:83e9a75d1911279afd89352c68b45348559d1fc0506b054b346651b5e7fee29f"},
 ]
 click = [
     {file = "click-8.1.3-py3-none-any.whl", hash = "sha256:bb4d8133cb15a609f44e8213d9b391b0809795062913b383c62be0ee95b1db48"},
@@ -1423,8 +1423,8 @@ mkdocs-autorefs = [
 mkdocs-gen-files = []
 mkdocs-literate-nav = []
 mkdocs-material = [
-    {file = "mkdocs-material-8.4.0.tar.gz", hash = "sha256:6c0a6e6cda8b43956e0c562374588160af8110584a1444f422b1cfd91930f9c7"},
-    {file = "mkdocs_material-8.4.0-py2.py3-none-any.whl", hash = "sha256:ef6641e1910d4f217873ac376b4594f3157dca3949901b88b4991ba8e5477577"},
+    {file = "mkdocs-material-8.4.1.tar.gz", hash = "sha256:92c70f94b2e1f8a05d9e05eec1c7af9dffc516802d69222329db89503c97b4f3"},
+    {file = "mkdocs_material-8.4.1-py2.py3-none-any.whl", hash = "sha256:319a6254819ce9d864ff79de48c43842fccfdebb43e4e6820eef75216f8cfb0a"},
 ]
 mkdocs-material-extensions = [
     {file = "mkdocs-material-extensions-1.0.3.tar.gz", hash = "sha256:bfd24dfdef7b41c312ede42648f9eb83476ea168ec163b613f9abd12bbfddba2"},
@@ -1694,16 +1694,16 @@ starlette = [
     {file = "starlette-0.20.4.tar.gz", hash = "sha256:42fcf3122f998fefce3e2c5ad7e5edbf0f02cf685d646a83a08d404726af5084"},
 ]
 starlite = [
-    {file = "starlite-1.11.1-py3-none-any.whl", hash = "sha256:0526bbdf0eb34ee2cee7ffed240eed012be8b554e32ef645f779e67016ba108a"},
-    {file = "starlite-1.11.1.tar.gz", hash = "sha256:da4eb9aa072221ced6bc5b75ca4bec5874b31229b586e925a10dd95e94185f14"},
+    {file = "starlite-1.13.0-py3-none-any.whl", hash = "sha256:19b3fd56f21d6ec1aaea23a5460b7cab728d0c5adedd29e2c80f80fded06ecdf"},
+    {file = "starlite-1.13.0.tar.gz", hash = "sha256:98749db4d72bc2881ca544c503f211bb287ecf47cc2d28c0109886e2c7f03ff1"},
 ]
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
 types-redis = [
-    {file = "types-redis-4.3.14.tar.gz", hash = "sha256:aa5955ff5f10b87a9021c031eb002a544a41a0a6280084ec0758a8a812a375c4"},
-    {file = "types_redis-4.3.14-py3-none-any.whl", hash = "sha256:c5518f14df81f2070bb075b292309331b1be283f1927adf3f04983eeb05e2f98"},
+    {file = "types-redis-4.3.16.tar.gz", hash = "sha256:ed53e35eac4303ef70cf7f5c205e210f2238b7fdd9306b7f8676669c1070943e"},
+    {file = "types_redis-4.3.16-py3-none-any.whl", hash = "sha256:41da87dc80f39573a71873e4265f181d9628b0a2a862e850ecc896a0cd6cacd2"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.3.0-py3-none-any.whl", hash = "sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02"},
