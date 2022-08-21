@@ -56,7 +56,7 @@ log_config = LoggingConfig(
         "uvicorn.error": {
             "propagate": True,
         },
-        "sqlalchemy.engine": {
+        "sqlalchemy": {
             "propagate": True,
         },
         "starlite": {
