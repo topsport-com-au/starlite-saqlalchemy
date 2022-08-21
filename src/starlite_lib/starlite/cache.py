@@ -9,26 +9,6 @@ from starlite_lib.config import api_settings, app_settings
 from starlite_lib.redis import redis
 
 
-class RedisAsyncioBackend(CacheBackendProtocol):  # pragma: no cover
-    async def get(self, key: str) -> Awaitable[Any]:
-        """
-        Retrieve a valued from cache corresponding to the given key
-        """
-        return await redis.get(key)  # type:ignore[return-value]
-
-    async def set(self, key: str, value: Any, expiration: int) -> Awaitable[Any]:
-        """
-        Set a value in cache for a given key with a given expiration in seconds
-        """
-        return await redis.set(key, value, expiration)  # type:ignore[return-value]
-
-    async def delete(self, key: str) -> Awaitable[Any]:
-        """
-        Remove a value from the cache for a given key
-        """
-        return await redis.delete(key)  # type:ignore[return-value]
-
-
 def cache_key_builder(request: Request) -> str:
     """
     App name prefixed cache key builder.
@@ -47,7 +27,7 @@ def cache_key_builder(request: Request) -> str:
 
 
 config = CacheConfig(
-    backend=RedisAsyncioBackend(),
+    backend=redis,
     expiration=api_settings.CACHE_EXPIRATION,
     cache_key_builder=cache_key_builder,
 )
