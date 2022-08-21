@@ -46,7 +46,7 @@ log_config = LoggingConfig(
     },
     formatters={"standard": {"format": "%(levelname)s - %(asctime)s - %(name)s - %(message)s"}},
     loggers={
-        "app": {
+        "starlite_lib": {
             "propagate": True,
         },
         "uvicorn.access": {

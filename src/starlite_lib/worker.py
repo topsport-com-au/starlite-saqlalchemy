@@ -1,3 +1,4 @@
+import logging
 from collections import abc
 from functools import partial
 from typing import Any
@@ -14,6 +15,8 @@ __all__ = [
     "WorkerFunction",
     "queue",
 ]
+
+logger = logging.getLogger(__name__)
 
 
 WorkerFunction = abc.Callable[..., abc.Awaitable[Any]]
@@ -39,7 +42,8 @@ class Queue(saq.Queue):
         super().__init__(*args, **kwargs)
 
 
-async def _after_process(_: Any) -> None:
+async def _after_process(ctx: Any) -> None:
+    logger.debug("After process called with %s", ctx)
     await AsyncScopedSession.remove()
 
 
