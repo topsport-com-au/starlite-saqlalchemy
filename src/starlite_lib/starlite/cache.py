@@ -1,8 +1,5 @@
-from collections.abc import Awaitable
-from typing import Any
-
 from starlite import CacheConfig
-from starlite.config import CacheBackendProtocol, default_cache_key_builder
+from starlite.config.cache import default_cache_key_builder
 from starlite.connection import Request
 
 from starlite_lib.config import api_settings, app_settings
