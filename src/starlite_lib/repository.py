@@ -1,4 +1,3 @@
-import functools
 from collections import abc
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -13,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import Executable
 from sqlalchemy.sql.selectable import TypedReturnsRows
 
-from . import db, orm
+from . import orm
 
 __all__ = [
     "BeforeAfter",

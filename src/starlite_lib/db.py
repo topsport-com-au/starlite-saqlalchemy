@@ -1,4 +1,3 @@
-import asyncio
 from functools import partial
 from typing import Any
 from uuid import UUID
