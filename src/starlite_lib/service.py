@@ -1,5 +1,7 @@
 from typing import Any, Generic, TypeVar
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from . import repository, schema
 
 T = TypeVar("T")
@@ -13,6 +15,9 @@ class Base(Generic[T_repository, T_schema]):
 
     Parameters
     ----------
+    session : AsyncSession
+        Users should be careful to call the [`AsyncSession.close()`][sqlalchemy.ext.asyncio.AsyncSession.close]
+        method once service object no longer needed.
     id_ : Any, optional
         ID of specific instance that the service object should operate on.
     id_filter : repository.CollectionFilter | None, optional
@@ -41,6 +46,7 @@ class Base(Generic[T_repository, T_schema]):
 
     def __init__(
         self,
+        session: AsyncSession,
         *,
         id_: Any | None = None,
         id_filter: repository.CollectionFilter | None = None,
@@ -51,6 +57,7 @@ class Base(Generic[T_repository, T_schema]):
         **kwargs: Any,
     ) -> None:
         self.repository = self.repository_type(
+            session=session,
             id_=id_,
             id_filter=id_filter,
             created_filter=created_filter,

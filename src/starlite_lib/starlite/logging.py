@@ -44,7 +44,11 @@ log_config = LoggingConfig(
             "path_re": f"^{api_settings.HEALTH_PATH}$",
         }
     },
-    formatters={"standard": {"format": "%(levelname)s - %(asctime)s - %(name)s - %(message)s"}},
+    formatters={
+        "standard": {
+            "format": "%(levelname)s - %(asctime)s - %(name)s - %(funcName)s - %(message)s"
+        }
+    },
     loggers={
         "starlite_lib": {
             "propagate": True,

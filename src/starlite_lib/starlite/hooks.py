@@ -1,6 +1,6 @@
 from starlite.response import Response
 
-from starlite_lib.db import AsyncScopedSession
+from .db import AsyncScopedSession
 
 
 async def session_after_request(response: Response) -> Response:

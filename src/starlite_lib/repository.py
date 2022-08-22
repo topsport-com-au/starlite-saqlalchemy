@@ -100,11 +100,16 @@ class Base(Generic[T_model]):
 
     Attributes
     ----------
+    session : AsyncSession
+        ORM database connection interface.
     select : Select
         [Select][sqlalchemy.sql.expression.Select] for [`model_type`][starlite_lib.repository.Base.model_type].
 
     Parameters
     ----------
+    session : AsyncSession
+        Users should be careful to call the [`AsyncSession.close()`][sqlalchemy.ext.asyncio.AsyncSession.close]
+        method once repository no longer needed.
     id_ : UUID | None, optional
         Filter the query for a single identity, by default filtered on attribute named "id" but can
         be configured using the `id_key` parameter.
@@ -143,6 +148,7 @@ class Base(Generic[T_model]):
 
     def __init__(
         self,
+        session: AsyncSession,
         id_: UUID | None = None,
         id_filter: CollectionFilter[UUID] | None = None,
         created_filter: BeforeAfter | None = None,
@@ -150,6 +156,7 @@ class Base(Generic[T_model]):
         limit_offset: LimitOffset | None = None,
         **kwargs: Any,
     ) -> None:
+        self.session = session
         self.select = select(self.model_type)
         if id_:
             kwargs.update({self.id_key: id_})
@@ -194,18 +201,6 @@ class Base(Generic[T_model]):
         """
         for k, v in kwargs.items():
             self.select = self.select.where(getattr(self.model_type, k) == v)
-
-    @functools.cached_property
-    def session(self) -> AsyncSession:
-        """
-        Database session object that is scoped to the async task ID.
-
-        Returns
-        -------
-        AsyncSession
-            Session instance bound to the value of [asyncio.current_task()][asyncio.current_task].
-        """
-        return db.AsyncScopedSession()
 
     @overload
     async def execute(self, statement: TypedReturnsRows[T_row], **kwargs: Any) -> Result[T_row]:

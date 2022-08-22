@@ -5,19 +5,13 @@ from uuid import UUID
 
 from orjson import dumps, loads
 from sqlalchemy import event
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    async_scoped_session,
-    async_sessionmaker,
-    create_async_engine,
-)
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from .config import db_settings
 
 __all__ = [
     "engine",
     "async_session_factory",
-    "AsyncScopedSession",
 ]
 
 
@@ -40,16 +34,6 @@ for detailed instructions.
 async_session_factory = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 """
 Database session factory. See [`async_sessionmaker()`][sqlalchemy.ext.asyncio.async_sessionmaker].
-"""
-AsyncScopedSession = async_scoped_session(async_session_factory, scopefunc=asyncio.current_task)
-"""
-Scopes [`AsyncSession`][sqlalchemy.ext.asyncio.AsyncSession] instance to current task using
-[`asyncio.current_task()`][asyncio.current_task].
-
-Care must be taken that [`AsyncScopedSession.remove()`][sqlalchemy.ext.asyncio.async_scoped_session.remove] 
-is called as late as possible during each task. This is managed by the 
-[`Starlite.after_request`][starlite.app.Starlite] lifecycle hook, and the 
-[`Worker.after_process()`][starlite_lib.worker.Worker] callback.
 """
 
 

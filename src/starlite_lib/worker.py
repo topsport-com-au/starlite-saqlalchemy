@@ -1,13 +1,16 @@
 import logging
 from collections import abc
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import orjson
 import saq
 
-from .db import AsyncScopedSession
+from .db import async_session_factory
 from .redis import redis
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession  # noqa:F401
 
 __all__ = [
     "Queue",
@@ -42,9 +45,22 @@ class Queue(saq.Queue):
         super().__init__(*args, **kwargs)
 
 
-async def _after_process(ctx: Any) -> None:
-    logger.debug("After process called with %s", ctx)
-    await AsyncScopedSession.remove()
+async def _before_process(ctx: dict) -> None:
+    ctx["session"] = async_session_factory()
+    logger.debug("'session' to `ctx`: `%s`", ctx)
+
+
+async def _after_process(ctx: dict) -> None:
+    session = ctx.get("session")
+    if session:
+        logger.debug("closing session: `%s`", session)
+        await session.close()
+    else:
+        logger.debug("no `'session'` in `ctx`: `%s`", ctx)
+
+
+def get_session_from_context(ctx: dict) -> "AsyncSession":
+    return ctx["session"]  # type:ignore[no-any-return]
 
 
 class Worker(saq.Worker):
@@ -69,6 +85,7 @@ class Worker(saq.Worker):
     SIGNALS: list[str] = []
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        kwargs.setdefault("before_process", _before_process)
         kwargs.setdefault("after_process", _after_process)
         super().__init__(*args, **kwargs)
 
