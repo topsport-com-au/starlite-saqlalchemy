@@ -4,7 +4,7 @@ import pydantic.fields
 import starlite
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
-from starlite.utils import is_async_callable
+from starlite.utils import AsyncCallable
 
 from starlite_lib import sentry
 from starlite_lib.client import HttpClient
@@ -62,22 +62,14 @@ class Starlite(starlite.Starlite):
         tags: list[str] | None = None,
         worker_functions: list[WorkerFunction | tuple[str, WorkerFunction]] | None = None,
     ):
-        if after_request is not None and is_async_callable(after_request):
+        if after_request is not None:
+            async_after_request = AsyncCallable(after_request)  # type:ignore[arg-type]
 
             async def _after_request(response: starlite.Response) -> starlite.Response:
                 try:
                     response = await hooks.session_after_request(response)
                 finally:
-                    response = await after_request(response)  # type:ignore[misc]
-                return response
-
-        elif after_request is not None and not is_async_callable(after_request):
-
-            async def _after_request(response: starlite.Response) -> starlite.Response:
-                try:
-                    response = await hooks.session_after_request(response)
-                finally:
-                    response = after_request(response)  # type:ignore[misc,assignment]
+                    response = await async_after_request(response)  # type:ignore[assignment]
                 return response
 
         else:
