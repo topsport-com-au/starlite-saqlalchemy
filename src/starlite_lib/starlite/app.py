@@ -2,17 +2,16 @@ import asyncio
 
 import pydantic.fields
 import starlite
-from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
-from starlite.utils import AsyncCallable
 
 from starlite_lib import sentry
 from starlite_lib.client import HttpClient
 from starlite_lib.db import engine
 from starlite_lib.redis import redis
+from starlite_lib.starlite.middleware import DBSessionMiddleware
 from starlite_lib.worker import Worker, WorkerFunction, queue
 
-from . import compression, health, hooks, logging, openapi
+from . import compression, health, logging, openapi
 from .dependencies import filters
 from .exceptions import logging_exception_handler
 from .response import Response
@@ -37,10 +36,10 @@ class Starlite(starlite.Starlite):
     def __init__(
         self,
         *,
-        after_request: starlite.types.AfterRequestHandler | None = None,
-        after_response: starlite.types.AfterResponseHandler | None = None,
+        after_request: starlite.types.AfterRequestHookHandler | None = None,
+        after_response: starlite.types.AfterResponseHookHandler | None = None,
         allowed_hosts: list[str] | None = None,
-        before_request: starlite.types.BeforeRequestHandler | None = None,
+        before_request: starlite.types.BeforeRequestHookHandler | None = None,
         cors_config: starlite.config.CORSConfig | None = None,
         csrf_config: starlite.config.CSRFConfig | None = None,
         dependencies: dict[str, starlite.Provide] | None = None,
@@ -48,8 +47,8 @@ class Starlite(starlite.Starlite):
         | None = None,
         guards: list[starlite.types.Guard] | None = None,
         middleware: list[starlite.types.Middleware] | None = None,
-        on_shutdown: list[starlite.types.LifeCycleHandler] | None = None,
-        on_startup: list[starlite.types.LifeCycleHandler] | None = None,
+        on_shutdown: list[starlite.types.LifeSpanHandler] | None = None,
+        on_startup: list[starlite.types.LifeSpanHandler] | None = None,
         parameters: dict[str, pydantic.fields.FieldInfo] | None = None,
         plugins: list[starlite.plugins.PluginProtocol] | None = None,
         response_cookies: list[starlite.datastructures.Cookie] | None = None,
@@ -62,18 +61,6 @@ class Starlite(starlite.Starlite):
         tags: list[str] | None = None,
         worker_functions: list[WorkerFunction | tuple[str, WorkerFunction]] | None = None,
     ):
-        if after_request is not None:
-            async_after_request = AsyncCallable(after_request)  # type:ignore[arg-type]
-
-            async def _after_request(response: starlite.Response) -> starlite.Response:
-                try:
-                    response = await hooks.session_after_request(response)
-                finally:
-                    response = await async_after_request(response)  # type:ignore[assignment]
-                return response
-
-        else:
-            _after_request = hooks.session_after_request
 
         dependencies = dependencies or {}
         dependencies.setdefault("filters", starlite.Provide(filters))
@@ -81,9 +68,7 @@ class Starlite(starlite.Starlite):
         exception_handlers = exception_handlers or {}
         exception_handlers.setdefault(HTTP_500_INTERNAL_SERVER_ERROR, logging_exception_handler)
 
-        middleware = middleware or []
-        # noinspection PyTypeChecker
-        middleware.append(SentryAsgiMiddleware)
+        middleware = [DBSessionMiddleware] + (middleware or [])  # type:ignore
 
         on_shutdown = on_shutdown or []
         on_shutdown.extend([HttpClient.close, engine.dispose, redis.close])
@@ -106,7 +91,7 @@ class Starlite(starlite.Starlite):
         route_handlers.append(health.health_check)
 
         super().__init__(
-            after_request=_after_request,
+            after_request=after_request,
             after_response=after_response,
             allowed_hosts=allowed_hosts,
             before_request=before_request,
