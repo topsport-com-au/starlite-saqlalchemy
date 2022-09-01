@@ -41,7 +41,7 @@ def created_filter(
     after : datetime | None
         Filter for records updated after this date/time.
     """
-    return BeforeAfter("created_date", before, after)
+    return BeforeAfter("created", before, after)
 
 
 def updated_filter(
@@ -57,7 +57,7 @@ def updated_filter(
     after : datetime | None
         Filter for records updated after this date/time.
     """
-    return BeforeAfter("updated_date", before, after)
+    return BeforeAfter("updated", before, after)
 
 
 def limit_offset_pagination(
