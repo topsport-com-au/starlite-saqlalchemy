@@ -126,6 +126,10 @@ class DatabaseSettings(BaseSettings):
 
     ECHO: bool
     ECHO_POOL: bool | Literal["debug"]
+    POOL_DISABLE: bool
+    POOL_MAX_OVERFLOW: int
+    POOL_SIZE: int
+    POOL_TIMEOUT: int
     URL: PostgresDsn
 
 

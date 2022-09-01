@@ -5,6 +5,7 @@ from uuid import UUID
 from orjson import dumps, loads
 from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
 
 from .config import db_settings
 
@@ -25,6 +26,10 @@ engine = create_async_engine(
     echo=db_settings.ECHO,
     echo_pool=db_settings.ECHO_POOL,
     json_serializer=partial(dumps, default=_default),
+    max_overflow=db_settings.POOL_MAX_OVERFLOW,
+    pool_size=db_settings.POOL_SIZE,
+    pool_timeout=db_settings.POOL_TIMEOUT,
+    poolclass=NullPool if db_settings.POOL_DISABLE else None,
 )
 """Configure via [DatabaseSettings][starlite_lib.config.DatabaseSettings]. Overrides default JSON 
 serializer to use `orjson`. See [`create_async_engine()`][sqlalchemy.ext.asyncio.create_async_engine]
