@@ -1,12 +1,16 @@
-from typing import Any, Generic, TypeVar
+from collections import abc
+from contextlib import asynccontextmanager
+from typing import Any, Generic, ParamSpec, TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from . import repository, schema
+from . import db, repository, schema
 
+P = ParamSpec("P")
 T = TypeVar("T")
 T_repository = TypeVar("T_repository", bound=repository.Base)
 T_schema = TypeVar("T_schema", bound=schema.Base)
+T_service = TypeVar("T_service", bound="Base")
 
 
 class Base(Generic[T_repository, T_schema]):
@@ -191,3 +195,10 @@ class Base(Generic[T_repository, T_schema]):
         """
         model = await self.repository.delete()
         return self.schema_type.from_orm(model)
+
+    @classmethod
+    @asynccontextmanager
+    async def with_session(cls: type[T_service], **kwargs: Any) -> abc.AsyncIterator[T_service]:
+        async with db.async_session_factory() as session:
+            async with session.begin():
+                yield cls(session, **kwargs)
