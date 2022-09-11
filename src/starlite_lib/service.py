@@ -200,5 +200,4 @@ class Base(Generic[T_repository, T_schema]):
     @asynccontextmanager
     async def with_session(cls: type[T_service], **kwargs: Any) -> abc.AsyncIterator[T_service]:
         async with db.async_session_factory() as session:
-            async with session.begin():
-                yield cls(session, **kwargs)
+            yield cls(session, **kwargs)
