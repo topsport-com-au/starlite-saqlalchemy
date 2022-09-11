@@ -453,8 +453,8 @@ class Base(Generic[T_model]):
         Base.base_error_type
             If `self.select` returns more than a single row.
         """
-        model = await self.scalar()
-        return await self.add_flush_refresh(self.update_model(model, data))
+        model = await self.scalar(session)
+        return await self.add_flush_refresh(session, self.update_model(model, data))
 
     async def upsert(self, session: AsyncSession, data: dict[str, Any]) -> T_model:
         """
@@ -512,7 +512,7 @@ class Base(Generic[T_model]):
             If `self.select` returns more than a single row.
         """
         with self.catch_sqlalchemy_exception():
-            instance = await self.scalar()
+            instance = await self.scalar(session)
             await session.delete(instance)
             await session.flush()
             return instance
