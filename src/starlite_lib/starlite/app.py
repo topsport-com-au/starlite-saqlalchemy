@@ -12,7 +12,7 @@ from starlite_lib.starlite.middleware import DBSessionMiddleware
 from starlite_lib.worker import Worker, WorkerFunction, queue
 
 from . import compression, health, logging, openapi
-from .dependencies import filters
+from .dependencies import filters, session
 from .exceptions import logging_exception_handler
 from .response import Response
 
@@ -64,6 +64,7 @@ class Starlite(starlite.Starlite):
 
         dependencies = dependencies or {}
         dependencies.setdefault("filters", starlite.Provide(filters))
+        dependencies.setdefault("session", starlite.Provide(session))
 
         exception_handlers = exception_handlers or {}
         exception_handlers.setdefault(HTTP_500_INTERNAL_SERVER_ERROR, logging_exception_handler)

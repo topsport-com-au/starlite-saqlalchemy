@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 from typing import Any
 
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlite import Dependency
 
 from starlite_lib.repository import BeforeAfter, CollectionFilter, LimitOffset
+
+from .db import AsyncScopedSession
 
 
 @dataclass
@@ -75,3 +78,7 @@ def filters(
         updated=updated_filter,
         limit_offset=limit_offset,
     )
+
+
+def session() -> AsyncSession:
+    return AsyncScopedSession()
