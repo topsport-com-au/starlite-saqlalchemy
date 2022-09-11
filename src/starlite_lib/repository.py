@@ -147,7 +147,6 @@ class Base(Generic[T_model]):
 
     def __init__(
         self,
-        session: AsyncSession,
         id_: UUID | None = None,
         id_filter: CollectionFilter[UUID] | None = None,
         created_filter: BeforeAfter | None = None,
@@ -155,7 +154,6 @@ class Base(Generic[T_model]):
         limit_offset: LimitOffset | None = None,
         **kwargs: Any,
     ) -> None:
-        self.session = session
         self.select = select(self.model_type)
         if id_:
             kwargs.update({self.id_key: id_})
@@ -202,19 +200,21 @@ class Base(Generic[T_model]):
             self.select = self.select.where(getattr(self.model_type, k) == v)
 
     @overload
-    async def execute(self, statement: TypedReturnsRows[T_row], **kwargs: Any) -> Result[T_row]:
+    async def execute(self, session: AsyncSession, statement: TypedReturnsRows[T_row], **kwargs: Any) -> Result[T_row]:
         ...
 
     @overload
-    async def execute(self, statement: Executable, **kwargs: Any) -> Result[Any]:
+    async def execute(self, session: AsyncSession, statement: Executable, **kwargs: Any) -> Result[Any]:
         ...
 
-    async def execute(self, statement: Executable, **kwargs: Any) -> Result[Any]:
+    async def execute(self, session: AsyncSession, statement: Executable, **kwargs: Any) -> Result[Any]:
         """
         Execute `statement` with [`self.session`][starlite_lib.repository.Base.session].
 
         Parameters
         ----------
+        session : AsyncSession
+            The SQLAlchemy session object, that represents a transaction for this execution.
         statement : Executable
             Any SQLAlchemy executable type.
         **kwargs : Any
@@ -226,14 +226,16 @@ class Base(Generic[T_model]):
             A set of database results.
         """
         with self.catch_sqlalchemy_exception():
-            return await self.session.execute(statement, **kwargs)
+            return await session.execute(statement, **kwargs)
 
-    async def add_flush_refresh(self, instance: T_base) -> T_base:
+    async def add_flush_refresh(self, session: AsyncSession, instance: T_base) -> T_base:
         """
         Adds `instance` to `self.session`, flush changes, refresh `instance`.
 
         Parameters
         ----------
+        session : AsyncSession
+            A SQLAlchemy Session instance.
         instance : T_base
             A sqlalchemy model.
 
@@ -243,16 +245,10 @@ class Base(Generic[T_model]):
             `instance`
         """
         with self.catch_sqlalchemy_exception():
-            self.session.add(instance)
-            await self.session.flush()
-            await self.session.refresh(instance)
+            session.add(instance)
+            await session.flush()
+            await session.refresh(instance)
             return instance
-
-    async def commit(self) -> None:
-        await self.session.commit()
-
-    async def rollback(self) -> None:
-        await self.session.rollback()
 
     # create
 
@@ -270,12 +266,14 @@ class Base(Generic[T_model]):
         """
         return self.model_type(**data)
 
-    async def create(self, data: dict[str, Any]) -> T_model:
+    async def create(self, session: AsyncSession, data: dict[str, Any]) -> T_model:
         """
         Create an instance of type `self.model`, add to session, and flush to db. Does not commit.
 
         Parameters
         ----------
+        session : AsyncSession
+            SQLAlchemy session instance.
         data : dict[str, Any]
             Unstructured representation of `T_model`.
 
@@ -284,7 +282,7 @@ class Base(Generic[T_model]):
         T_model
             A session-attached instance that has been flushed to the database, and refreshed.
         """
-        return await self.add_flush_refresh(self.parse_obj(data))
+        return await self.add_flush_refresh(session, self.parse_obj(data))
 
     # read
 
@@ -328,13 +326,15 @@ class Base(Generic[T_model]):
                 getattr(self.model_type, data.field_name).in_(data.values)
             )
 
-    async def scalars(self, **kwargs: Any) -> ScalarResult[T_model]:
+    async def scalars(self, session: AsyncSession, **kwargs: Any) -> ScalarResult[T_model]:
         """
         Executes the repository select query, and returns response from
         [`AsyncResult.scalars()`][sqlalchemy.ext.asyncio.AsyncResult.scalars].
 
         Parameters
         ----------
+        session : AsyncSession
+            A SQLAlchemy session instance.
         **kwargs : Any
             Passed as kwargs to [`execute()`][starlite_lib.repository.Base.execute].
 
@@ -344,7 +344,7 @@ class Base(Generic[T_model]):
             Iterable of `T_model` instances.
         """
         with self.catch_sqlalchemy_exception():
-            result = await self.execute(self.select, **kwargs)
+            result = await self.execute(session, self.select, **kwargs)
             # noinspection PyUnresolvedReferences
             return result.scalars()
 
@@ -374,7 +374,7 @@ class Base(Generic[T_model]):
             raise self.not_found_error_type
         return instance_or_none
 
-    async def scalar(self, **kwargs: Any) -> T_model:
+    async def scalar(self, session: AsyncSession, **kwargs: Any) -> T_model:
         """
         Get a scalar result from `self.select`.
 
@@ -382,6 +382,8 @@ class Base(Generic[T_model]):
 
         Parameters
         ----------
+        session : AsyncSession
+            A SQLAlchemy session instance.
         **kwargs : Any
             Passed through to `execute()`.
 
@@ -399,7 +401,7 @@ class Base(Generic[T_model]):
             If `self.select` returns more than a single row.
         """
         with self.catch_sqlalchemy_exception():
-            result = await self.execute(self.select, **kwargs)
+            result = await self.execute(session, self.select, **kwargs)
             # this will raise for multiple results if the select hasn't been filtered to only return
             # a single result by this point.
             # noinspection PyUnresolvedReferences
@@ -428,12 +430,14 @@ class Base(Generic[T_model]):
             setattr(model, k, v)
         return model
 
-    async def update(self, data: abc.Mapping[str, Any]) -> T_model:
+    async def update(self, session: AsyncSession, data: abc.Mapping[str, Any]) -> T_model:
         """
         Update the model returned from `self.select` with key/val pairs from `data`.
 
         Parameters
         ----------
+        session : AsyncSession
+            A SQLAlchemy session instance.
         data : Mapping[str, Any]
             Key/value pairs used to set attribute vals on result of `self.select`.
 
@@ -452,13 +456,15 @@ class Base(Generic[T_model]):
         model = await self.scalar()
         return await self.add_flush_refresh(self.update_model(model, data))
 
-    async def upsert(self, data: dict[str, Any]) -> T_model:
+    async def upsert(self, session: AsyncSession, data: dict[str, Any]) -> T_model:
         """
         Update the model returned from `self.select` but if the instance doesn't exist create
         it and populate from ``data``.
 
         Parameters
         ----------
+        session : AsyncSession
+            A SQLAlchemy session instance.
         data : Mapping[str, Any]
             Key/value pairs used to set attribute vals on result of `self.select`, or new instance
             of `self.model`.
@@ -474,19 +480,24 @@ class Base(Generic[T_model]):
             If `self.select` returns more than a single row.
         """
         try:
-            model = await self.scalar()
+            model = await self.scalar(session)
         except self.not_found_error_type:
-            model = await self.create(data)
+            model = await self.create(session, data)
         else:
             self.update_model(model, data)
-            await self.add_flush_refresh(model)
+            await self.add_flush_refresh(session, model)
         return model
 
     # delete
 
-    async def delete(self) -> T_model:
+    async def delete(self, session: AsyncSession) -> T_model:
         """
         Delete and return the instance returned from `self.scalar()`.
+
+        Parameters
+        ----------
+        session : AsyncSession
+            A SQLAlchemy session instance.
 
         Returns
         -------
@@ -502,6 +513,6 @@ class Base(Generic[T_model]):
         """
         with self.catch_sqlalchemy_exception():
             instance = await self.scalar()
-            await self.session.delete(instance)
-            await self.session.flush()
+            await session.delete(instance)
+            await session.flush()
             return instance

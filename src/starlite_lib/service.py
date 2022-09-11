@@ -1,10 +1,8 @@
-from collections import abc
-from contextlib import asynccontextmanager
 from typing import Any, Generic, ParamSpec, TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from . import db, repository, schema
+from . import repository, schema
 
 P = ParamSpec("P")
 T = TypeVar("T")
@@ -50,7 +48,6 @@ class Base(Generic[T_repository, T_schema]):
 
     def __init__(
         self,
-        session: AsyncSession,
         *,
         id_: Any | None = None,
         id_filter: repository.CollectionFilter | None = None,
@@ -61,7 +58,6 @@ class Base(Generic[T_repository, T_schema]):
         **kwargs: Any,
     ) -> None:
         self.repository = self.repository_type(
-            session=session,
             id_=id_,
             id_filter=id_filter,
             created_filter=created_filter,
@@ -72,18 +68,6 @@ class Base(Generic[T_repository, T_schema]):
         self.id = id_
         if exclude_keys is not None:
             self.exclude_keys = self.exclude_keys.union(exclude_keys)
-
-    async def commit(self) -> None:
-        """
-        Convenience method to commit the underlying repository session.
-        """
-        await self.repository.commit()
-
-    async def rollback(self) -> None:
-        """
-        Convenience method to roll back the underlying repository session.
-        """
-        await self.repository.rollback()
 
     def serialize(self, data: T_schema) -> dict[str, Any]:
         """
@@ -103,12 +87,14 @@ class Base(Generic[T_repository, T_schema]):
         """
         return data.dict(exclude=self.exclude_keys)
 
-    async def create(self, data: T_schema) -> T_schema:
+    async def create(self, session: AsyncSession, data: T_schema) -> T_schema:
         """
         Wraps repository instance creation.
 
         Parameters
         ----------
+        session : AsyncSession
+            SQLAlchemy session instance.
         data : T_schema
             Representation to be created.
 
@@ -117,27 +103,35 @@ class Base(Generic[T_repository, T_schema]):
         T_schema
             Representation of created instance.
         """
-        model = await self.repository.create(self.serialize(data))
+        model = await self.repository.create(session, self.serialize(data))
         return self.schema_type.from_orm(model)
 
-    async def list(self) -> list[T_schema]:
+    async def list(self, session: AsyncSession) -> list[T_schema]:
         """
         Wraps repository scalars operation.
+
+        Parameters
+        ----------
+        session : AsyncSession
+            SQLAlchemy session instance.
 
         Returns
         -------
         list[T_schema]
             Return value of `self.repository.scalars()` parsed to `T_schema`.
         """
-        models = await self.repository.scalars()
+        models = await self.repository.scalars(session)
         return [self.schema_type.from_orm(i) for i in models]
 
-    async def update(self, data: T_schema) -> T_schema:
+    async def update(self, session: AsyncSession, data: T_schema) -> T_schema:
         """
         Wraps repository update operation.
 
         Parameters
         ----------
+        session : AsyncSession
+            SQLAlchemy session instance.
+
         data : T_schema
             Representation to be updated.
 
@@ -146,15 +140,18 @@ class Base(Generic[T_repository, T_schema]):
         T_schema
             Refreshed after insert.
         """
-        model = await self.repository.update(self.serialize(data))
+        model = await self.repository.update(session, self.serialize(data))
         return self.schema_type.from_orm(model)
 
-    async def upsert(self, data: T_schema) -> T_schema:
+    async def upsert(self, session: AsyncSession, data: T_schema) -> T_schema:
         """
         Wraps repository upsert operation.
 
         Parameters
         ----------
+        session : AsyncSession
+            SQLAlchemy session instance.
+
         data : T_schema
             Representation for upsert.
 
@@ -163,41 +160,45 @@ class Base(Generic[T_repository, T_schema]):
         T_schema
             Refreshed after insert.
         """
-        model = await self.repository.upsert(self.serialize(data))
+        model = await self.repository.upsert(session, self.serialize(data))
         return self.schema_type.from_orm(model)
 
-    async def show(self) -> T_schema:
+    async def show(self, session: AsyncSession) -> T_schema:
         """
         Wraps repository scalar operation.
 
         This method will throw an exception if the query hasn't been filtered to only return one
         instance before calling.
 
+        Parameters
+        ----------
+        session : AsyncSession
+            SQLAlchemy session instance.
+
         Returns
         -------
         T_schema
             Representation of instance.
         """
-        model = await self.repository.scalar()
+        model = await self.repository.scalar(session)
         return self.schema_type.from_orm(model)
 
-    async def destroy(self) -> T_schema:
+    async def destroy(self, session: AsyncSession) -> T_schema:
         """
         Wraps repository delete operation.
 
         Will raise an exception if the query hasn't been filtered to only return one instance before
         calling.
 
+        Parameters
+        ----------
+        session : AsyncSession
+            SQLAlchemy session instance.
+
         Returns
         -------
         T_schema
             Representation of the deleted instance.
         """
-        model = await self.repository.delete()
+        model = await self.repository.delete(session)
         return self.schema_type.from_orm(model)
-
-    @classmethod
-    @asynccontextmanager
-    async def with_session(cls: type[T_service], **kwargs: Any) -> abc.AsyncIterator[T_service]:
-        async with db.async_session_factory() as session:
-            yield cls(session, **kwargs)
