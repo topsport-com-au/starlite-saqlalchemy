@@ -3,7 +3,7 @@ from typing import Any
 import requests
 from starlite.testing import TestClient
 
-from starlite_lib.starlite import Starlite
+from starlite_lib.init_plugin import Starlite
 
 
 def make_test_client_request(

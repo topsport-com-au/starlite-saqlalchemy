@@ -1,18 +1,12 @@
 from typing import TYPE_CHECKING
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
-from starlite_lib.starlite import Starlite, get, middleware
+from starlite_lib.init_plugin import db, get
 
 from ..utils import make_test_client_request
 
 if TYPE_CHECKING:
     from pytest import MonkeyPatch
-
-
-def test_middleware_inserted() -> None:
-    middleware_mock = MagicMock()
-    app = Starlite(route_handlers=[], middleware=[middleware_mock])
-    assert app.middleware == [middleware.DBSessionMiddleware, middleware_mock]
 
 
 def test_session_commit_called_after_success(monkeypatch: "MonkeyPatch") -> None:
@@ -21,7 +15,7 @@ def test_session_commit_called_after_success(monkeypatch: "MonkeyPatch") -> None
         pass
 
     session_mock = AsyncMock()
-    monkeypatch.setattr(middleware, "AsyncScopedSession", session_mock)
+    monkeypatch.setattr(db, "AsyncScopedSession", session_mock)
     r = make_test_client_request([handler], "/")
     assert r.status_code == 200
     session_mock.commit.assert_called_once()
@@ -34,7 +28,7 @@ def test_session_rollback_called_after_error(monkeypatch: "MonkeyPatch") -> None
         pass
 
     session_mock = AsyncMock()
-    monkeypatch.setattr(middleware, "AsyncScopedSession", session_mock)
+    monkeypatch.setattr(db, "AsyncScopedSession", session_mock)
     r = make_test_client_request([handler], "/")
     assert r.status_code == 500
     session_mock.rollback.assert_called_once()
@@ -47,7 +41,7 @@ def test_session_rollback_called_after_exception(monkeypatch: "MonkeyPatch") -> 
         raise RuntimeError
 
     session_mock = AsyncMock()
-    monkeypatch.setattr(middleware, "AsyncScopedSession", session_mock)
+    monkeypatch.setattr(db, "AsyncScopedSession", session_mock)
     r = make_test_client_request([handler], "/")
     assert r.status_code == 500
     session_mock.rollback.assert_called_once()

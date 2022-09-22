@@ -1,4 +1,5 @@
 import asyncio
+from collections import abc
 
 import pydantic.fields
 import starlite
@@ -8,10 +9,9 @@ from starlite_lib import sentry
 from starlite_lib.client import HttpClient
 from starlite_lib.db import engine
 from starlite_lib.redis import redis
-from starlite_lib.starlite.middleware import DBSessionMiddleware
 from starlite_lib.worker import Worker, WorkerFunction, queue
 
-from . import compression, health, logging, openapi
+from . import compression, db, health, logging, openapi
 from .dependencies import filters, session
 from .exceptions import logging_exception_handler
 from .response import Response
@@ -40,13 +40,15 @@ class Starlite(starlite.Starlite):
         after_response: starlite.types.AfterResponseHookHandler | None = None,
         allowed_hosts: list[str] | None = None,
         before_request: starlite.types.BeforeRequestHookHandler | None = None,
+        before_send: list[starlite.types.BeforeMessageSendHookHandler]
+        | starlite.types.BeforeMessageSendHookHandler
+        | None = None,
         cors_config: starlite.config.CORSConfig | None = None,
         csrf_config: starlite.config.CSRFConfig | None = None,
         dependencies: dict[str, starlite.Provide] | None = None,
         exception_handlers: dict[int | type[Exception], starlite.types.ExceptionHandler]
         | None = None,
         guards: list[starlite.types.Guard] | None = None,
-        middleware: list[starlite.types.Middleware] | None = None,
         on_shutdown: list[starlite.types.LifeSpanHandler] | None = None,
         on_startup: list[starlite.types.LifeSpanHandler] | None = None,
         parameters: dict[str, pydantic.fields.FieldInfo] | None = None,
@@ -69,7 +71,14 @@ class Starlite(starlite.Starlite):
         exception_handlers = exception_handlers or {}
         exception_handlers.setdefault(HTTP_500_INTERNAL_SERVER_ERROR, logging_exception_handler)
 
-        middleware = [DBSessionMiddleware] + (middleware or [])  # type:ignore
+        if not before_send:
+            # empty or None
+            before_send = []
+        else:
+            if not isinstance(before_send, abc.Sequence):
+                # assuming this can't be a string due to typing constraints.
+                before_send = [before_send]
+        before_send.append(db.transaction_manager)
 
         on_shutdown = on_shutdown or []
         on_shutdown.extend([HttpClient.close, engine.dispose, redis.close])
@@ -96,13 +105,13 @@ class Starlite(starlite.Starlite):
             after_response=after_response,
             allowed_hosts=allowed_hosts,
             before_request=before_request,
+            before_send=before_send,
             compression_config=compression.config,
             cors_config=cors_config,
             csrf_config=csrf_config,
             dependencies=dependencies,
             exception_handlers=exception_handlers,
             guards=guards,
-            middleware=middleware,
             on_shutdown=on_shutdown,
             on_startup=on_startup,
             openapi_config=openapi.config,

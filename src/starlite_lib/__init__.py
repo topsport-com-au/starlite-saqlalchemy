@@ -16,6 +16,6 @@ __all__ = [
     "schema",
     "sentry",
     "service",
-    "starlite",
+    "init_plugin",
     "worker",
 ]

@@ -200,14 +200,20 @@ class Base(Generic[T_model]):
             self.select = self.select.where(getattr(self.model_type, k) == v)
 
     @overload
-    async def execute(self, session: AsyncSession, statement: TypedReturnsRows[T_row], **kwargs: Any) -> Result[T_row]:
+    async def execute(
+        self, session: AsyncSession, statement: TypedReturnsRows[T_row], **kwargs: Any
+    ) -> Result[T_row]:
         ...
 
     @overload
-    async def execute(self, session: AsyncSession, statement: Executable, **kwargs: Any) -> Result[Any]:
+    async def execute(
+        self, session: AsyncSession, statement: Executable, **kwargs: Any
+    ) -> Result[Any]:
         ...
 
-    async def execute(self, session: AsyncSession, statement: Executable, **kwargs: Any) -> Result[Any]:
+    async def execute(
+        self, session: AsyncSession, statement: Executable, **kwargs: Any
+    ) -> Result[Any]:
         """
         Execute `statement` with [`self.session`][starlite_lib.repository.Base.session].
 

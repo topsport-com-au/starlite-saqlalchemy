@@ -1,4 +1,4 @@
-from starlite_lib.starlite import Starlite, get
+from starlite_lib.init_plugin import Starlite, get
 
 
 @get("/example")

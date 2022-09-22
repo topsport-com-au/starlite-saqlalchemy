@@ -2,13 +2,13 @@ import logging
 
 from starlette.responses import Response
 from starlette.status import HTTP_409_CONFLICT
+from starlite.connection import Request
 from starlite.exceptions import (
     HTTPException,
     InternalServerException,
     NotFoundException,
 )
 from starlite.exceptions.utils import create_exception_response
-from starlite.types import Request
 
 __all__ = [
     "HTTPConflictException",

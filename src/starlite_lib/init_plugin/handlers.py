@@ -122,7 +122,7 @@ def _resolve_id_guards(
 # noinspection PyPep8Naming
 class put(handlers.http.put):
     """
-    Wraps [`Starlite.put`][starlite.handlers.http.put], adding the `id_guard` parameter.
+    Wraps [`Starlite.put`][init_plugin.handlers.http.put], adding the `id_guard` parameter.
 
     Parameters
     ----------
@@ -201,7 +201,7 @@ class put(handlers.http.put):
 # noinspection PyPep8Naming
 class patch(handlers.http.patch):
     """
-    Wraps [`Starlite.patch`][starlite.handlers.http.patch], adding the `id_guard` parameter.
+    Wraps [`Starlite.patch`][init_plugin.handlers.http.patch], adding the `id_guard` parameter.
 
     Parameters
     ----------
@@ -280,7 +280,7 @@ class patch(handlers.http.patch):
 # noinspection PyPep8Naming
 class delete(handlers.http.delete):
     """
-    Wraps [`starlite.delete`][starlite.handlers.http.delete] so we can override default status to
+    Wraps [`init_plugin.delete`][init_plugin.handlers.http.delete] so we can override default status to
     `200`.
     """
 
@@ -342,6 +342,6 @@ class delete(handlers.http.delete):
 
 
 get = handlers.http.get
-"""Identical to [`starlite.get`][starlite.handlers.http.get]."""
+"""Identical to [`init_plugin.get`][init_plugin.handlers.http.get]."""
 post = handlers.http.post
-"""Identical to [`starlite.post`][starlite.handlers.http.post]."""
+"""Identical to [`init_plugin.post`][init_plugin.handlers.http.post]."""
