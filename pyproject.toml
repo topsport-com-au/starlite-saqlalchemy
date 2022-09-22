@@ -15,7 +15,7 @@ redis = "*"
 saq = {version = "*", extras = ["hiredis"]}
 sentry-sdk = "*"
 sqlalchemy = { git = "https://github.com/sqlalchemy/sqlalchemy.git", branch = "main" }
-starlite = "*"
+starlite = { git = "https://github.com/starlite-api/starlite.git", branch = "on-app-config-hook" }
 
 [tool.poetry.dev-dependencies]
 black = "*"
@@ -33,7 +33,7 @@ pytest = "*"
 pytest-asyncio = "*"
 pytest-cov = "*"
 pytest-dotenv = "*"
-starlite = { extras = ["testing"], version = "*" }
+starlite = { extras = ["testing"], git = "https://github.com/starlite-api/starlite.git", branch = "on-app-config-hook" }
 types-redis = "*"
 types-requests = "^2.28.9"
 
