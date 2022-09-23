@@ -11,7 +11,7 @@ from starlite_saqpg.db import engine
 from starlite_saqpg.redis import redis
 from starlite_saqpg.worker import Worker, WorkerFunction, queue
 
-from . import db, health, logging, response
+from . import db, health, logging, response, openapi
 from .dependencies import filters, session
 from .exceptions import logging_exception_handler
 
@@ -49,5 +49,8 @@ class ConfigureApp:
 
         if app_config.response_class is None:
             app_config.response_class = response.Response
+
+        if app_config.openapi_config is None:
+            app_config.openapi_config = openapi.config
 
         return app_config
