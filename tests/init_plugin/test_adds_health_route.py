@@ -1,4 +1,5 @@
 from starlite.config.app import AppConfig
+
 from starlite_saqpg import ConfigureApp, init_plugin
 
 

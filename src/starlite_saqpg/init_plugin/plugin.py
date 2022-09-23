@@ -11,7 +11,7 @@ from starlite_saqpg.db import engine
 from starlite_saqpg.redis import redis
 from starlite_saqpg.worker import Worker, WorkerFunction, queue
 
-from . import db, health, logging
+from . import db, health, logging, response
 from .dependencies import filters, session
 from .exceptions import logging_exception_handler
 
@@ -24,12 +24,11 @@ class ConfigureApp:
     def __call__(self, app_config: AppConfig) -> AppConfig:
         app_config.dependencies.setdefault("filters", starlite.Provide(filters))
         app_config.dependencies.setdefault("session", starlite.Provide(session))
-
         app_config.exception_handlers.setdefault(
             HTTP_500_INTERNAL_SERVER_ERROR, logging_exception_handler
         )
 
-        if not isinstance(app_config.before_send, abc.Sequence):
+        if not isinstance(app_config.before_send, list):
             app_config.before_send = [app_config.before_send]
         app_config.before_send.append(db.transaction_manager)
 
@@ -47,4 +46,8 @@ class ConfigureApp:
             app_config.on_startup.append(worker_on_app_startup)
 
         app_config.route_handlers.append(health.health_check)
+
+        if app_config.response_class is None:
+            app_config.response_class = response.Response
+
         return app_config
