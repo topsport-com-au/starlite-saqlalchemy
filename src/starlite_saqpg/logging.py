@@ -54,22 +54,21 @@ log_config = LoggingConfig(
             "propagate": True,
         },
         "uvicorn.access": {
-            "propagate": True,
+            "propagate": False,
             "filters": ["health_filter"],
+            "handlers": ["queue_listener"],
         },
         "uvicorn.error": {
-            "propagate": True,
+            "propagate": False,
+            "handlers": ["queue_listener"],
         },
-        "sqlalchemy": {
-            "propagate": True,
+        "sqlalchemy.engine": {
+            "propagate": False,
+            "handlers": ["queue_listener"],
         },
         "starlite": {
             "level": "WARNING",
-            "propagate": True,
-        },
-        "pydantic_openapi_schema": {
-            "propagate": True,
-            "level": "WARNING",
+            "propagate": False,
             "handlers": ["queue_listener"],
         },
     },
