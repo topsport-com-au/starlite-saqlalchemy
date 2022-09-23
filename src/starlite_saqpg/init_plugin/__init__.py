@@ -1,11 +1,9 @@
-from .controller import Controller
 from .handlers import delete, get, get_collection, patch, post, put
 from .plugin import ConfigureApp
 from .response import Response
 
 __all__ = [
     "ConfigureApp",
-    "Controller",
     "Response",
     "cache",
     "compression",
