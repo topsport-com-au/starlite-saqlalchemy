@@ -4,7 +4,7 @@ from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlite import Dependency
 
-from starlite_lib.repository import BeforeAfter, CollectionFilter, LimitOffset
+from starlite_saqpg.repository import BeforeAfter, CollectionFilter, LimitOffset
 
 from .db import AsyncScopedSession
 

@@ -5,11 +5,11 @@ import starlite
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from starlite.config.app import AppConfig
 
-from starlite_lib import sentry
-from starlite_lib.client import HttpClient
-from starlite_lib.db import engine
-from starlite_lib.redis import redis
-from starlite_lib.worker import Worker, WorkerFunction, queue
+from starlite_saqpg import sentry
+from starlite_saqpg.client import HttpClient
+from starlite_saqpg.db import engine
+from starlite_saqpg.redis import redis
+from starlite_saqpg.worker import Worker, WorkerFunction, queue
 
 from . import db, health, logging
 from .dependencies import filters, session

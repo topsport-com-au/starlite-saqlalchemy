@@ -1,6 +1,6 @@
 from starlite import Starlite
 
-from starlite_lib import ConfigureApp, get
+from starlite_saqpg import ConfigureApp, get
 
 
 @get("/example")

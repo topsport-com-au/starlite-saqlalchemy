@@ -2,8 +2,8 @@ from starlite import CacheConfig
 from starlite.config.cache import default_cache_key_builder
 from starlite.connection import Request
 
-from starlite_lib.config import api_settings, app_settings
-from starlite_lib.redis import redis
+from starlite_saqpg.config import api_settings, app_settings
+from starlite_saqpg.redis import redis
 
 
 def cache_key_builder(request: Request) -> str:

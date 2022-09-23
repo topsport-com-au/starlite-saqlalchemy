@@ -37,9 +37,9 @@ class Base(Generic[T_repository, T_schema]):
     """
 
     repository_type: type[T_repository]
-    """A [`repository.Base`][starlite_lib.repository.Base] concrete subclass."""
+    """A [`repository.Base`][starlite_saqpg.repository.Base] concrete subclass."""
     schema_type: type[T_schema]
-    """A [`schema.Base`][starlite_lib.schema.Base] concrete subclass."""
+    """A [`schema.Base`][starlite_saqpg.schema.Base] concrete subclass."""
     exclude_keys = {"created", "updated"}
     """
     These keys are always excluded from payloads passed to the repository. Merged with the 

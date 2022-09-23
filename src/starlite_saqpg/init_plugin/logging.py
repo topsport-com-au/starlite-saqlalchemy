@@ -5,7 +5,7 @@ from typing import Any
 from starlette.status import HTTP_200_OK
 from starlite import LoggingConfig
 
-from starlite_lib.config import api_settings, app_settings
+from starlite_saqpg.config import api_settings, app_settings
 
 
 class AccessLogFilter(logging.Filter):
@@ -50,7 +50,7 @@ log_config = LoggingConfig(
         }
     },
     loggers={
-        "starlite_lib": {
+        "starlite_saqpg": {
             "propagate": True,
         },
         "uvicorn.access": {

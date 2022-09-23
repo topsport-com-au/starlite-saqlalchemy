@@ -8,7 +8,7 @@ def configure() -> None:
     """
     Callback to configure sentry on app startup.
 
-    See [SentrySettings][starlite_lib.config.SentrySettings].
+    See [SentrySettings][starlite_saqpg.config.SentrySettings].
     """
     sentry_sdk.init(
         dsn=sentry_settings.DSN,

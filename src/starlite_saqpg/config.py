@@ -2,7 +2,7 @@
 All configuration is via environment variables.
 
 Take not of the environment variable prefixes required for each settings class, except
-[`AppSettings`][starlite_lib.config.AppSettings].
+[`AppSettings`][starlite_saqpg.config.AppSettings].
 """
 from typing import Literal
 

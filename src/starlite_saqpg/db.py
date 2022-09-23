@@ -31,7 +31,7 @@ engine = create_async_engine(
     pool_timeout=db_settings.POOL_TIMEOUT,
     poolclass=NullPool if db_settings.POOL_DISABLE else None,
 )
-"""Configure via [DatabaseSettings][starlite_lib.config.DatabaseSettings]. Overrides default JSON 
+"""Configure via [DatabaseSettings][starlite_saqpg.config.DatabaseSettings]. Overrides default JSON 
 serializer to use `orjson`. See [`create_async_engine()`][sqlalchemy.ext.asyncio.create_async_engine]
 for detailed instructions.
 """

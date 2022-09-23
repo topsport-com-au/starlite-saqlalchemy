@@ -67,7 +67,7 @@ class Worker(saq.Worker):
     """
     [SAQ worker](https://github.com/tobymao/saq/blob/master/saq/worker.py).
 
-    We set [AsyncScopedSession.remove()][starlite_lib.db.AsyncScopedSession] to
+    We set [AsyncScopedSession.remove()][starlite_saqpg.db.AsyncScopedSession] to
     `Worker.after_process` if it is not otherwise provided. If passing a different async function
     for that parameter the caller should take responsibility to ensure that the
     [`async_scoped_session.remove()`][sqlalchemy.ext.asyncio.async_scoped_session.remove] method
@@ -92,6 +92,6 @@ class Worker(saq.Worker):
 
 queue = Queue(redis)
 """
-[Queue][starlite_lib.worker.Queue] instance instantiated with [redis][starlite_lib.redis.redis] 
+[Queue][starlite_saqpg.worker.Queue] instance instantiated with [redis][starlite_saqpg.redis.redis] 
 instance.
 """

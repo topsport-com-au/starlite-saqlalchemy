@@ -102,7 +102,7 @@ class Base(Generic[T_model]):
     session : AsyncSession
         ORM database connection interface.
     select : Select
-        [Select][sqlalchemy.sql.expression.Select] for [`model_type`][starlite_lib.repository.Base.model_type].
+        [Select][sqlalchemy.sql.expression.Select] for [`model_type`][starlite_saqpg.repository.Base.model_type].
 
     Parameters
     ----------
@@ -174,10 +174,10 @@ class Base(Generic[T_model]):
         [`SQLAlchemyError`][sqlalchemy.exc.SQLAlchemyError].
 
         If [`IntegrityError`][sqlalchemy.exc.IntegrityError] is raised, we raise
-        [`Base.integrity_error_type`][starlite_lib.repository.Base.integrity_error_type].
+        [`Base.integrity_error_type`][starlite_saqpg.repository.Base.integrity_error_type].
 
         Any other [`SQLAlchemyError`][sqlalchemy.exc.SQLAlchemyError] is wrapped in
-        [`Base.base_error_type`][starlite_lib.repository.Base.base_error_type].
+        [`Base.base_error_type`][starlite_saqpg.repository.Base.base_error_type].
         """
         try:
             yield
@@ -215,7 +215,7 @@ class Base(Generic[T_model]):
         self, session: AsyncSession, statement: Executable, **kwargs: Any
     ) -> Result[Any]:
         """
-        Execute `statement` with [`self.session`][starlite_lib.repository.Base.session].
+        Execute `statement` with [`self.session`][starlite_saqpg.repository.Base.session].
 
         Parameters
         ----------
@@ -342,7 +342,7 @@ class Base(Generic[T_model]):
         session : AsyncSession
             A SQLAlchemy session instance.
         **kwargs : Any
-            Passed as kwargs to [`execute()`][starlite_lib.repository.Base.execute].
+            Passed as kwargs to [`execute()`][starlite_saqpg.repository.Base.execute].
 
         Returns
         -------
@@ -356,8 +356,8 @@ class Base(Generic[T_model]):
 
     def check_not_found(self, instance_or_none: T | None) -> T:
         """
-        Responsible for raising the [`Base.not_found_error_type`][starlite_lib.repository.Base.not_found_error_type]
-        on access of a [`scalar()`][starlite_lib.repository.Base.scalar] query result where no
+        Responsible for raising the [`Base.not_found_error_type`][starlite_saqpg.repository.Base.not_found_error_type]
+        on access of a [`scalar()`][starlite_saqpg.repository.Base.scalar] query result where no
         result is found.
 
         Parameters

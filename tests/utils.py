@@ -4,7 +4,7 @@ import requests
 from starlite import Starlite
 from starlite.testing import TestClient
 
-from starlite_lib import ConfigureApp
+from starlite_saqpg import ConfigureApp
 
 
 def make_test_client_request(

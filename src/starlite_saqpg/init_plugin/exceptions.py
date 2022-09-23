@@ -66,10 +66,10 @@ class HTTPExceptionMixin:
     Mixin class for configuring repository objects to raise errors that return an HTTP response.
 
     Ensure to mixin such that this overwrites the class attributes on
-    [`repository.Base`][starlite_lib.repository.Base]:
+    [`repository.Base`][starlite_saqpg.repository.Base]:
 
     ```python
-    from starlite_lib import repository
+    from starlite_saqpg import repository
 
     class Repo(HTTPExceptionMixin, repository.Base):
         ...

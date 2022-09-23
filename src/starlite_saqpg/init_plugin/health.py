@@ -2,7 +2,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlite import get
 
-from starlite_lib.config import AppSettings, api_settings, app_settings
+from starlite_saqpg.config import AppSettings, api_settings, app_settings
 
 
 @get(path=api_settings.HEALTH_PATH, cache=False, tags=["Misc"])

@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock
 
-from starlite_lib.init_plugin import db, get
+from starlite_saqpg.init_plugin import db, get
 
 from ..utils import make_test_client_request
 

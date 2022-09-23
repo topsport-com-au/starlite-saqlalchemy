@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy.ext.asyncio import async_scoped_session
 
-from starlite_lib.db import async_session_factory
+from starlite_saqpg.db import async_session_factory
 
 if TYPE_CHECKING:
     from starlite.datastructures import State
