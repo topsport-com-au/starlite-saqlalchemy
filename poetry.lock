@@ -994,7 +994,7 @@ full = ["requests", "brotli", "picologging", "cryptography"]
 type = "git"
 url = "https://github.com/starlite-api/starlite.git"
 reference = "on-app-config-hook"
-resolved_reference = "3081a935c84f741c2b42f99d19deb54149d84a65"
+resolved_reference = "ce7e8ab0b5db746a31ae4b2cc5d8fccb40bd6ba4"
 
 [[package]]
 name = "starlite-multipart"
