@@ -3,8 +3,8 @@ from uuid import UUID
 
 from starlite import Parameter
 
-from starlite_lib.config import api_settings
-from starlite_lib.repository import BeforeAfter, CollectionFilter, LimitOffset
+from starlite_saqpg.config import api_settings
+from starlite_saqpg.repository import BeforeAfter, CollectionFilter, LimitOffset
 
 DTorNone = datetime | None
 

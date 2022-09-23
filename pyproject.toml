@@ -1,9 +1,11 @@
 [tool.poetry]
-name = "starlite-lib"
+name = "starlite-saqpg"
 version = "0.0.1"
 description = "Starlite API and async worker boilerplate"
 authors = ["Peter Schutt <peter.github@proton.me>"]
-packages = [{ include = "starlite_lib", from = "src" }]
+packages = [
+    { include = "starlite_saqpg", from = "src" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -15,7 +17,7 @@ redis = "*"
 saq = {version = "*", extras = ["hiredis"]}
 sentry-sdk = "*"
 sqlalchemy = { git = "https://github.com/sqlalchemy/sqlalchemy.git", branch = "main" }
-starlite = "*"
+starlite = ">=1.21"
 
 [tool.poetry.dev-dependencies]
 black = "*"
@@ -33,7 +35,7 @@ pytest = "*"
 pytest-asyncio = "*"
 pytest-cov = "*"
 pytest-dotenv = "*"
-starlite = { extras = ["testing"], version = "*" }
+starlite = { extras = ["testing"], version = ">=1.21" }
 types-redis = "*"
 types-requests = "^2.28.9"
 
@@ -71,5 +73,5 @@ warn_unused_ignores = true
 plugins = ["pydantic.mypy"]
 
 [tool.pytest.ini_options]
-addopts = "--cov=starlite_lib -v --doctest-modules --doctest-glob=*.md --envfile=tests.env"
+addopts = "--cov=starlite_saqpg -v --doctest-modules --doctest-glob=*.md --envfile=tests.env"
 asyncio_mode = "auto"

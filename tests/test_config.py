@@ -1,6 +1,6 @@
 from typing import Any
 
-from starlite_lib.config import DatabaseSettings
+from starlite_saqpg.config import DatabaseSettings
 
 
 def test_db_settings_echo_pool_true(monkeypatch: Any) -> None:

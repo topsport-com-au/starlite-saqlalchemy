@@ -10,3 +10,4 @@ site/
 !tests.env
 .coverage
 .dmypy.json
+.python-version

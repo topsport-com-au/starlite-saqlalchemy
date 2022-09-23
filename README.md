@@ -1,8 +1,13 @@
 <img src="https://www.topsport.com.au/assets/images/logo_pulse.svg" width="200"/>
 
-# starlite-lib
+# starlite-saqpg
 
-Starlite API boilerplate abstraction and utilities.
+Configuration for a [Starlite][starlite.app.Starlite] application using:
+
+- SQLAlchemy 2.0
+- Postgresql
+- SAQ
+- Redis
 
 ### TODO
 

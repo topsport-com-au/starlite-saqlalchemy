@@ -1,10 +1,10 @@
-site_name: starlite-lib
+site_name: starlite-saqpg
 repo_url: https://github.com/topsport-com-au/starlite-lib
 nav:
   - index.md
   - Reference: reference/
 watch:
-  - src/starlite_lib
+  - src/starlite_saqpg
 theme:
   name: material
   features:
