@@ -11,7 +11,7 @@ from starlite_saqpg.db import engine
 from starlite_saqpg.redis import redis
 from starlite_saqpg.worker import Worker, WorkerFunction, queue
 
-from . import db, health, logging, response, openapi
+from . import db, health, logging, openapi, response
 from .dependencies import filters, session
 from .exceptions import logging_exception_handler
 

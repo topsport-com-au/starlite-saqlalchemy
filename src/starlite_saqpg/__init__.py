@@ -4,7 +4,8 @@
 
 An opinionated starlite api configuration library.
 """
-from .init_plugin import ConfigureApp, delete, get, get_collection, patch, post, put
+from .handlers import delete, get, get_collection, patch, post, put
+from .init_plugin import ConfigureApp
 
 __all__ = [
     "ConfigureApp",
