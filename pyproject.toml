@@ -64,6 +64,7 @@ exclude_lines = [
 ]
 
 [tool.pytest.ini_options]
+addopts = ["-ra", "--strict-config"]
 asyncio_mode = "auto"
 env_files = ["tests.env"]
 testpaths = ["tests/unit"]
