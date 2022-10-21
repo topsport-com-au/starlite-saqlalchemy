@@ -22,7 +22,7 @@ redis = "*"
 saq = "*"
 sentry-sdk = "*"
 sqlalchemy = { git = "https://github.com/sqlalchemy/sqlalchemy.git", branch = "main" }
-starlite = { git = "https://github.com/starlite-api/starlite.git", branch = "main"}
+starlite = "*"
 
 [tool.poetry.group.linting]
 optional = true
@@ -47,16 +47,20 @@ line-length = 100
 [tool.isort]
 profile = "black"
 
+[tool.coverage.run]
+branch = true
+source_pkgs = ["starlite_saqlalchemy"]
+omit = ["tests/*"]
+
+[tool.coverage.paths]
+source = ["src", ".tox/*/site-packages"]
+
 [tool.coverage.report]
 show_missing = true
+skip_covered = true
 exclude_lines = [
     'if TYPE_CHECKING:',
     'pragma: no cover',
-]
-
-[tool.coverage.run]
-omit = [
-    "tests/*",
 ]
 
 [tool.pytest.ini_options]
