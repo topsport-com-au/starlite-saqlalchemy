@@ -76,7 +76,7 @@ def test_service_exception_to_http_response(exc: type[ServiceException], status:
 
 
 @pytest.mark.parametrize(
-    ("exc", "fn", "expected_message"),
+    ("exc", "func", "expected_message"),
     [
         (
             RepositoryException("message"),
