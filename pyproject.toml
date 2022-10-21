@@ -52,9 +52,6 @@ branch = true
 source_pkgs = ["starlite_saqlalchemy"]
 omit = ["tests/*"]
 
-[tool.coverage.paths]
-source = ["src", ".tox/*/site-packages"]
-
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
@@ -64,6 +61,7 @@ exclude_lines = [
 ]
 
 [tool.pytest.ini_options]
+addopts = ["-ra", "--strict-config"]
 asyncio_mode = "auto"
 env_files = ["tests.env"]
 testpaths = ["tests/unit"]
