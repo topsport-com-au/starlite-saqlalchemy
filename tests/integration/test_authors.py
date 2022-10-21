@@ -1,3 +1,4 @@
+"""Integration tests for the test Author domain."""
 from typing import TYPE_CHECKING
 
 from httpx import AsyncClient
@@ -7,6 +8,7 @@ if TYPE_CHECKING:
 
 
 async def test_update_author(app: "Starlite") -> None:
+    """Integration test for PUT route."""
 
     async with AsyncClient(app=app, base_url="http://testserver") as client:
         response = await client.put(

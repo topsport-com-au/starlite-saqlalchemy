@@ -1,3 +1,9 @@
+"""Logging config for the application.
+
+Ensures that the app, sqlalchemy, saq and uvicorn loggers all log through the queue listener.
+
+Adds a filter for health check route logs.
+"""
 import logging
 import re
 from typing import Any
@@ -8,7 +14,7 @@ from starlite import LoggingConfig
 from . import settings
 
 
-class AccessLogFilter(logging.Filter):
+class AccessLogFilter(logging.Filter):  # pylint: disable=too-few-public-methods
     """Filter for omitting log records from uvicorn access logs based on
     request path.
 
@@ -46,7 +52,10 @@ config = LoggingConfig(
     },
     formatters={
         "standard": {
-            "format": "%(asctime)s loglevel=%(levelname)-6s logger=%(name)s %(funcName)s() L%(lineno)-4d %(message)s"
+            "format": (
+                "%(asctime)s loglevel=%(levelname)-6s logger=%(name)s %(funcName)s() "
+                "L%(lineno)-4d %(message)s"
+            )
         }
     },
     loggers={

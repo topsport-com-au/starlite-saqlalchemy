@@ -1,3 +1,4 @@
+"""Tests for exception translation behavior."""
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
@@ -24,6 +25,7 @@ if TYPE_CHECKING:
 
 
 def test_after_exception_hook_handler_called(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Tests that the handler gets added to the app and called."""
     logger_mock = MagicMock()
     monkeypatch.setattr(exceptions.logger, "error", logger_mock)
 
@@ -31,7 +33,9 @@ def test_after_exception_hook_handler_called(monkeypatch: pytest.MonkeyPatch) ->
     def raises() -> None:
         raise RuntimeError
 
-    with create_test_client(route_handlers=[raises], after_exception=exceptions.after_exception_hook_handler) as client:
+    with create_test_client(
+        route_handlers=[raises], after_exception=exceptions.after_exception_hook_handler
+    ) as client:
         resp = client.get("/error")
         assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -47,6 +51,8 @@ def test_after_exception_hook_handler_called(monkeypatch: pytest.MonkeyPatch) ->
     ],
 )
 def test_repository_exception_to_http_response(exc: type[RepositoryException], status: int) -> None:
+    """Test translation of repository exceptions to Starlite HTTP exception
+    types."""
     app = Starlite(route_handlers=[])
     request = RequestFactory(app=app, server="testserver").get("/wherever")
     response = exceptions.repository_exception_to_http_response(request, exc())
@@ -61,6 +67,8 @@ def test_repository_exception_to_http_response(exc: type[RepositoryException], s
     ],
 )
 def test_service_exception_to_http_response(exc: type[ServiceException], status: int) -> None:
+    """Test translation of service exceptions to Starlite HTTP exception
+    types."""
     app = Starlite(route_handlers=[])
     request = RequestFactory(app=app, server="testserver").get("/wherever")
     response = exceptions.service_exception_to_http_response(request, exc())
@@ -83,9 +91,10 @@ def test_service_exception_to_http_response(exc: type[ServiceException], status:
     ],
 )
 def test_exception_serves_debug_middleware_response(
-    exc: Exception, fn: "abc.Callable", expected_message: bytes
+    exc: Exception, func: "abc.Callable", expected_message: bytes
 ) -> None:
+    """Test behavior of exception translation in debug mode."""
     app = Starlite(route_handlers=[], debug=True)
     request = RequestFactory(app=app, server="testserver").get("/wherever")
-    response = fn(request, exc)
+    response = func(request, exc)
     assert response.body == expected_message

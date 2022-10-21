@@ -1,3 +1,4 @@
+"""Config for integration tests."""
 # pylint: disable=redefined-outer-name
 import asyncio
 import timeit
@@ -11,10 +12,9 @@ from redis.exceptions import ConnectionError as RedisConnectionError
 from sqlalchemy.engine import URL
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
-from starlite import Router, Provide
+from starlite import Provide, Router
 
 from starlite_saqlalchemy import orm, sqlalchemy_plugin, worker
-
 from tests.utils import controllers
 
 if TYPE_CHECKING:
@@ -108,7 +108,7 @@ async def db_responsive(host: str) -> bool:
 
 @pytest.fixture(scope="session", autouse=True)
 async def _containers(
-    docker_ip: str, docker_services: "Services"
+    docker_ip: str, docker_services: "Services"  # pylint: disable=unused-argument
 ) -> None:  # pylint: disable=unused-argument
     """Starts containers for required services, fixture waits until they are
     responsive before returning.
@@ -196,8 +196,12 @@ def _patch_redis(app: "Starlite", redis: Redis, monkeypatch: pytest.MonkeyPatch)
     monkeypatch.setattr(worker.queue, "redis", redis)
 
 
-@pytest.fixture
+@pytest.fixture()
 def router() -> Router:
+    """
+    Returns:
+        This is a router with controllers added for testing against the test domain.
+    """
     return Router(
         path="/authors",
         route_handlers=[
@@ -212,7 +216,15 @@ def router() -> Router:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def app(app: "Starlite", router: Router) -> "Starlite":
+    """
+    Args:
+        app: App from outermost conftest.py
+        router: Router with controllers for tests.
+
+    Returns:
+        App with router attached for integration tests.
+    """
     app.register(router)
     return app

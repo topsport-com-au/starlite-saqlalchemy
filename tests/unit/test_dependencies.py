@@ -1,14 +1,22 @@
+"""Dependency tests.
+
+- tests datastructures produced by dependency provide functions
+- tests injection of dependencies when declared in handler signatures
+"""
 from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
 import pytest
 from starlite import Starlite, get
-from starlite.testing import RequestFactory
 
 from starlite_saqlalchemy import dependencies
-from starlite_saqlalchemy.repository.filters import BeforeAfter, CollectionFilter, LimitOffset
-from starlite_saqlalchemy.repository.types import FilterTypes
+from starlite_saqlalchemy.repository.filters import (
+    BeforeAfter,
+    CollectionFilter,
+    LimitOffset,
+)
+from starlite_saqlalchemy.repository.types import FilterTypes  # noqa: TC002
 
 if TYPE_CHECKING:
     from collections import abc
@@ -17,32 +25,44 @@ if TYPE_CHECKING:
 
 
 def test_id_filter() -> None:
+    """Test datastructure produced by id filter dependency."""
     ids = [uuid4() for _ in range(3)]
     assert dependencies.provide_id_filter(ids) == CollectionFilter(field_name="id", values=ids)
 
 
 @pytest.mark.parametrize(
     ("filter_", "field_name"),
-    [(dependencies.provide_created_filter, "created"), (dependencies.provide_updated_filter, "updated")],
+    [
+        (dependencies.provide_created_filter, "created"),
+        (dependencies.provide_updated_filter, "updated"),
+    ],
 )
-def test_before_after_filters(filter_: "abc.Callable[[datetime, datetime], BeforeAfter]", field_name: str) -> None:
+def test_before_after_filters(
+    filter_: "abc.Callable[[datetime, datetime], BeforeAfter]", field_name: str
+) -> None:
+    """Test datastructure created by created/updated filters."""
     assert filter_(datetime.max, datetime.min) == BeforeAfter(
         field_name=field_name, before=datetime.max, after=datetime.min
     )
 
 
 def test_limit_offset_pagination() -> None:
+    """Test datastructure produced by limit offset pagination dependency."""
     assert dependencies.provide_limit_offset_pagination(10, 100) == LimitOffset(100, 900)
 
 
 def test_provided_filters(app: "Starlite", client: "TestClient") -> None:
+    """Tests collection route filters injected individually."""
     called = False
     path = f"/{uuid4()}"
     ids = [uuid4() for _ in range(2)]
 
     @get(path)
     def filtered_collection_route(
-        created_filter: BeforeAfter, updated_filter: BeforeAfter, limit_offset: LimitOffset, id_filter: CollectionFilter
+        created_filter: BeforeAfter,
+        updated_filter: BeforeAfter,
+        limit_offset: LimitOffset,
+        id_filter: CollectionFilter,
     ) -> None:
         nonlocal called
         assert created_filter == BeforeAfter("created", datetime.max, datetime.min)
@@ -68,6 +88,7 @@ def test_provided_filters(app: "Starlite", client: "TestClient") -> None:
 
 
 def test_filters_dependency(app: "Starlite", client: "TestClient") -> None:
+    """Test collection route aggregate filters dependency."""
     called = False
     path = f"/{uuid4()}"
     ids = [uuid4() for _ in range(2)]

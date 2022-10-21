@@ -1,3 +1,4 @@
+"""SAQ worker and queue."""
 import asyncio
 from collections import abc
 from functools import partial
@@ -39,6 +40,8 @@ class Queue(saq.Queue):  # type:ignore[misc]
 
 
 class Worker(saq.Worker):  # type:ignore[misc]
+    """Modify behavior of saq worker for orchestration by Starlite."""
+
     # same issue: https://github.com/samuelcolvin/arq/issues/182
     SIGNALS: list[str] = []
 
@@ -50,8 +53,8 @@ class Worker(saq.Worker):  # type:ignore[misc]
 
 queue = Queue(redis.client)
 """
-[Queue][starlite_saqlalchemy.worker.Queue] instance instantiated with [redis][starlite_saqlalchemy.redis.client]
-instance.
+[Queue][starlite_saqlalchemy.worker.Queue] instance instantiated with
+[redis][starlite_saqlalchemy.redis.client] instance.
 """
 
 

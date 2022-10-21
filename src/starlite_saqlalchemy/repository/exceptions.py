@@ -1,3 +1,6 @@
+"""Repository exception types."""
+
+
 class RepositoryException(Exception):
     """Base repository exception type."""
 

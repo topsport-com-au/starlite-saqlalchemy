@@ -65,4 +65,4 @@ env_files = ["tests.env"]
 testpaths = ["tests/unit"]
 
 [tool.pylint.main]
-extension-pkg-whitelist = ["pydantic"]
+extension-pkg-whitelist = ["asyncpg", "orjson", "pydantic"]

@@ -1,3 +1,5 @@
+"""Constants for the application."""
+
 STATIC_DIR = "static"
 """Name of the static directory"""
 STATIC_PATH = "/static"

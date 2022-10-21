@@ -1,3 +1,9 @@
+"""Sentry config for our application.
+
+The current support for sentry is limited, but still worth having.
+
+See: https://github.com/getsentry/sentry-python/issues/1549
+"""
 import sentry_sdk
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 

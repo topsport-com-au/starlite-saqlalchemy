@@ -1,3 +1,8 @@
+"""Definition of extra HTTP exceptions that aren't included in `Starlite`.
+
+Also, defines functions that translate service and repository exceptions
+into HTTP exceptions.
+"""
 import logging
 from typing import TYPE_CHECKING
 
@@ -28,10 +33,14 @@ logger = logging.getLogger(__name__)
 
 
 class ConflictException(HTTPException):
+    """Request conflict with the current state of the target resource."""
+
     status_code = 409
 
 
 class ForbiddenException(HTTPException):
+    """Server understands the request but refuses to authorize it."""
+
     status_code = 403
 
 
@@ -51,12 +60,16 @@ def after_exception_hook_handler(exc: Exception, scope: "Scope", state: "State")
     )
 
 
-def _create_error_response_from_starlite_middleware(request: "Request", exc: Exception) -> "Response":
+def _create_error_response_from_starlite_middleware(
+    request: "Request", exc: Exception
+) -> "Response":
     server_middleware = ServerErrorMiddleware(app=request.app)  # type: ignore[arg-type]
     return server_middleware.debug_response(request=request, exc=exc)  # type: ignore[arg-type]
 
 
-def repository_exception_to_http_response(request: "Request", exc: RepositoryException) -> "Response":
+def repository_exception_to_http_response(
+    request: "Request", exc: RepositoryException
+) -> "Response":
     """Transform repository exceptions to HTTP exceptions.
 
     Args:

@@ -1,3 +1,4 @@
+"""Application cache config."""
 from typing import TYPE_CHECKING
 
 from starlite import CacheConfig

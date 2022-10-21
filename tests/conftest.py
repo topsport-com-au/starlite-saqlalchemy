@@ -1,14 +1,12 @@
+"""Config that can be shared between all test types."""
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from uuid import UUID
 
 import pytest
 from starlite import Starlite
-from starlite.testing import TestClient
-from starlite_saqlalchemy import ConfigureApp
 
-if TYPE_CHECKING:
-    from collections import abc
+from starlite_saqlalchemy import ConfigureApp
 
 
 @pytest.fixture()
@@ -22,20 +20,6 @@ def app() -> Starlite:
         The application instance.
     """
     return Starlite(route_handlers=[], on_app_init=[ConfigureApp()])
-
-
-@pytest.fixture()
-def client(app: "Starlite") -> "abc.Iterator[TestClient]":  # pylint: disable=redefined-outer-name
-    """Client instance attached to app.
-
-    Args:
-        app: The app for testing.
-
-    Returns:
-        Test client instance.
-    """
-    with TestClient(app=app) as c:
-        yield c
 
 
 @pytest.fixture()

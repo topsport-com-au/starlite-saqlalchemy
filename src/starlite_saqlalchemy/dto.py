@@ -23,18 +23,41 @@ DTO_INFO_KEY = "dto"
 
 
 class Mode(Enum):
-    read_only = auto()
-    private = auto()
+    """For marking column definitions on the domain models.
+
+    Example:
+
+        ```python
+        class Model(Base):
+            ...
+            updated_at: Mapped[datetime] = mapped_column(info={"dto": Mode.READ_ONLY})
+        ```
+    """
+
+    READ_ONLY = auto()
+    PRIVATE = auto()
 
 
 class Purpose(Enum):
-    read = auto()
-    write = auto()
+    """For identifying the purpose of a DTO to the factory.
+
+    The factory will exclude fields marked as private or read-only on the domain model depending
+    on the purpose of the DTO.
+
+    Example:
+
+        ```python
+        ReadDTO = dto.factory("AuthorReadDTO", Author, purpose=dto.Purpose.READ)
+        ```
+    """
+
+    READ = auto()
+    WRITE = auto()
 
 
 def _construct_field_info(column: "Column", purpose: Purpose) -> FieldInfo:
     default = column.default
-    if purpose is Purpose.read or default is None:
+    if purpose is Purpose.READ or default is None:
         return FieldInfo(...)
     if default.is_scalar:
         return FieldInfo(default=default.arg)  # type:ignore[attr-defined]
@@ -47,15 +70,11 @@ def _should_exclude_field(purpose: Purpose, column: "Column", exclude: set[str])
     if column.key in exclude:
         return True
     mode = column.info.get(DTO_INFO_KEY)
-    if mode is Mode.private:
+    if mode is Mode.PRIVATE:
         return True
-    if purpose is Purpose.write and mode is Mode.read_only:
+    if purpose is Purpose.WRITE and mode is Mode.READ_ONLY:
         return True
     return False
-
-
-class Config:
-    orm_mode = True
 
 
 def factory(
@@ -69,15 +88,15 @@ def factory(
         ```python
         class User(DeclarativeBase):
             id: Mapped[UUID] = mapped_column(
-                default=uuid4, primary_key=True, info={"dto": dto.Mode.read_only}
+                default=uuid4, primary_key=True, info={"dto": dto.Mode.READ_ONLY}
             )
             email: Mapped[str]
-            password_hash: Mapped[str] = mapped_column(info={"dto": dto.Mode.private})
+            password_hash: Mapped[str] = mapped_column(info={"dto": dto.Mode.PRIVATE})
         ```
 
-    In the above example, a DTO generated for `Purpose.read` will include the `id` and `email` fields,
-    while a model generated for `Purpose.write` will only include a field for `email`. Notice that
-    columns marked as `Mode.private` will not have a field produced in any DTO object.
+    In the above example, a DTO generated for `Purpose.READ` will include the `id` and `email`
+    fields, while a model generated for `Purpose.WRITE` will only include a field for `email`.
+    Notice that columns marked as `Mode.PRIVATE` will not have a field produced in any DTO object.
 
     Args:
         name: Name given to the DTO class.

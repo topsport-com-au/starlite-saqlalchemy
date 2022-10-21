@@ -1,3 +1,5 @@
+"""Custom response class for the application that handles serialization of pg
+UUID values."""
 from typing import Any
 
 import starlite

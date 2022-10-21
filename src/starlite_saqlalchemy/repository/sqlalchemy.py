@@ -1,3 +1,4 @@
+"""SQLAlchemy-based implementation of the repository protocol."""
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Literal, TypeVar
 
@@ -21,11 +22,11 @@ if TYPE_CHECKING:
 
 __all__ = [
     "SQLAlchemyRepository",
-    "T_model",
+    "ModelT",
 ]
 
 T = TypeVar("T")
-T_model = TypeVar("T_model", bound="orm.Base")
+ModelT = TypeVar("ModelT", bound="orm.Base")
 
 
 @contextmanager
@@ -43,20 +44,29 @@ def wrap_sqlalchemy_exception() -> Any:
     """
     try:
         yield
-    except IntegrityError as e:
-        raise RepositoryConflictException from e
-    except SQLAlchemyError as e:
-        raise RepositoryException(f"An exception occurred: {e}") from e
+    except IntegrityError as exc:
+        raise RepositoryConflictException from exc
+    except SQLAlchemyError as exc:
+        raise RepositoryException(f"An exception occurred: {exc}") from exc
 
 
-class SQLAlchemyRepository(AbstractRepository[T_model]):
-    model_type: type[T_model]
+class SQLAlchemyRepository(AbstractRepository[ModelT]):
+    """SQLAlchemy based implementation of the repository interface.
 
-    def __init__(self, session: "AsyncSession", select_: "Select[tuple[T_model]] | None" = None) -> None:
+    Args:
+        session: Session managing the unit-of-work for the operation.
+        select_: To facilitate customization of the underlying select query.
+    """
+
+    model_type: type[ModelT]
+
+    def __init__(
+        self, session: "AsyncSession", select_: "Select[tuple[ModelT]] | None" = None
+    ) -> None:
         self._session = session
         self._select = select(self.model_type) if select_ is None else select_
 
-    async def add(self, data: T_model) -> T_model:
+    async def add(self, data: ModelT) -> ModelT:
         with wrap_sqlalchemy_exception():
             instance = await self._attach_to_session(data)
             await self._session.flush()
@@ -64,7 +74,7 @@ class SQLAlchemyRepository(AbstractRepository[T_model]):
             self._session.expunge(instance)
             return instance
 
-    async def delete(self, id_: Any) -> T_model:
+    async def delete(self, id_: Any) -> ModelT:
         with wrap_sqlalchemy_exception():
             instance = await self.get(id_)
             await self._session.delete(instance)
@@ -72,7 +82,7 @@ class SQLAlchemyRepository(AbstractRepository[T_model]):
             self._session.expunge(instance)
             return instance
 
-    async def get(self, id_: Any) -> T_model:
+    async def get(self, id_: Any) -> ModelT:
         with wrap_sqlalchemy_exception():
             self._filter_select_by_kwargs(**{self.id_attribute: id_})
             instance = (await self._execute()).scalar_one_or_none()
@@ -80,9 +90,9 @@ class SQLAlchemyRepository(AbstractRepository[T_model]):
             self._session.expunge(instance)
             return instance
 
-    async def list(self, *filters: "FilterTypes", **kwargs: Any) -> list[T_model]:
-        for f in filters:
-            match f:
+    async def list(self, *filters: "FilterTypes", **kwargs: Any) -> list[ModelT]:
+        for filter_ in filters:
+            match filter_:
                 case LimitOffset(limit, offset):
                     self._apply_limit_offset_pagination(limit, offset)
                 case BeforeAfter(field_name, before, after):
@@ -98,7 +108,7 @@ class SQLAlchemyRepository(AbstractRepository[T_model]):
                 self._session.expunge(instance)
             return instances
 
-    async def update(self, data: T_model) -> T_model:
+    async def update(self, data: ModelT) -> ModelT:
         with wrap_sqlalchemy_exception():
             id_ = self.get_id_attribute_value(data)
             # this will raise for not found, and will put the item in the session
@@ -110,7 +120,7 @@ class SQLAlchemyRepository(AbstractRepository[T_model]):
             self._session.expunge(instance)
             return instance
 
-    async def upsert(self, data: T_model) -> T_model:
+    async def upsert(self, data: ModelT) -> ModelT:
         with wrap_sqlalchemy_exception():
             instance = await self._attach_to_session(data, strategy="merge")
             await self._session.flush()
@@ -137,19 +147,21 @@ class SQLAlchemyRepository(AbstractRepository[T_model]):
     def _apply_limit_offset_pagination(self, limit: int, offset: int) -> None:
         self._select = self._select.limit(limit).offset(offset)
 
-    async def _attach_to_session(self, model: T_model, strategy: Literal["add", "merge"] = "add") -> T_model:
+    async def _attach_to_session(
+        self, model: ModelT, strategy: Literal["add", "merge"] = "add"
+    ) -> ModelT:
         """Attach detached instance to the session.
 
         Parameters
         ----------
-        model : T_model
+        model : ModelT
             The instance to be attached to the session.
         strategy : Literal["add", "merge"]
             How the instance should be attached.
 
         Returns
         -------
-        T_model
+        ModelT
         """
         match strategy:  # noqa: R503
             case "add":
@@ -160,7 +172,7 @@ class SQLAlchemyRepository(AbstractRepository[T_model]):
             case _:
                 raise ValueError("Unexpected value for `strategy`, must be `'add'` or `'merge'`")
 
-    async def _execute(self) -> "Result[tuple[T_model, ...]]":
+    async def _execute(self) -> "Result[tuple[ModelT, ...]]":
         return await self._session.execute(self._select)
 
     def _filter_in_collection(self, field_name: str, values: "abc.Collection[Any]") -> None:
@@ -168,7 +180,9 @@ class SQLAlchemyRepository(AbstractRepository[T_model]):
             return
         self._select = self._select.where(getattr(self.model_type, field_name).in_(values))
 
-    def _filter_on_datetime_field(self, field_name: str, before: "datetime | None", after: "datetime | None") -> None:
+    def _filter_on_datetime_field(
+        self, field_name: str, before: "datetime | None", after: "datetime | None"
+    ) -> None:
         field = getattr(self.model_type, field_name)
         if before is not None:
             self._select = self._select.where(field < before)
@@ -176,5 +190,5 @@ class SQLAlchemyRepository(AbstractRepository[T_model]):
             self._select = self._select.where(field > before)
 
     def _filter_select_by_kwargs(self, **kwargs: Any) -> None:
-        for k, v in kwargs.items():
-            self._select = self._select.where(getattr(self.model_type, k) == v)
+        for key, val in kwargs.items():
+            self._select = self._select.where(getattr(self.model_type, key) == val)

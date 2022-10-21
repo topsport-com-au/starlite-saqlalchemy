@@ -1,3 +1,5 @@
+"""AbstractRepository defines the interface for interacting with the
+application persistent data."""
 from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
@@ -12,6 +14,9 @@ T = TypeVar("T")
 
 
 class AbstractRepository(Generic[T], metaclass=ABCMeta):
+    """Defines the interface for interacting with the application persistent
+    data."""
+
     model_type: type[T]
     """Type of object represented by the repository."""
     id_attribute = "id"

@@ -3,6 +3,7 @@
 Take note of the environment variable prefixes required for each
 settings class, except `AppSettings`.
 """
+# pylint: disable=too-few-public-methods,missing-class-docstring
 from typing import Literal
 
 from pydantic import AnyUrl, BaseSettings, PostgresDsn

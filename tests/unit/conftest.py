@@ -1,17 +1,20 @@
+"""Unit test specific config."""
 from typing import TYPE_CHECKING, Any
 from unittest.mock import MagicMock
 
 import pytest
+from starlite.testing import TestClient
 
 from starlite_saqlalchemy import sqlalchemy_plugin, worker
 
 from ..utils import domain
-
 from .utils import GenericMockRepository
 
 if TYPE_CHECKING:
     from collections import abc
     from uuid import UUID
+
+    from starlite import Starlite
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -44,3 +47,17 @@ def _author_repository(raw_authors: list[dict[str, Any]], monkeypatch: pytest.Mo
         collection[getattr(author, AuthorRepository.id_attribute)] = author
     monkeypatch.setattr(AuthorRepository, "collection", collection)
     monkeypatch.setattr(domain, "Repository", AuthorRepository)
+
+
+@pytest.fixture()
+def client(app: "Starlite") -> "abc.Iterator[TestClient]":  # pylint: disable=redefined-outer-name
+    """Client instance attached to app.
+
+    Args:
+        app: The app for testing.
+
+    Returns:
+        Test client instance.
+    """
+    with TestClient(app=app) as client_:
+        yield client_

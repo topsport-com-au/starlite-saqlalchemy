@@ -1,3 +1,5 @@
+"""Application redis instance."""
+
 from redis.asyncio import Redis
 
 from . import settings

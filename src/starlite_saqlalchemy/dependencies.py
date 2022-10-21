@@ -1,3 +1,4 @@
+"""Application dependency providers."""
 from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -10,7 +11,7 @@ from .repository.types import FilterTypes
 
 if TYPE_CHECKING:
 
-    from starlite import Request
+    from starlite import Request  # noqa: F401
 
 DTorNone = datetime | None
 

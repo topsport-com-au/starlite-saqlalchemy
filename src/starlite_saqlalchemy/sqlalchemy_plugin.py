@@ -1,10 +1,11 @@
+"""Database connectivity and transaction management for the application."""
 from functools import partial
 from typing import TYPE_CHECKING, Any, cast
 from uuid import UUID
 
 from orjson import dumps, loads
 from sqlalchemy import event
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 from starlite.plugins.sql_alchemy import SQLAlchemyConfig, SQLAlchemyPlugin
 from starlite.plugins.sql_alchemy.config import (
@@ -15,6 +16,7 @@ from starlite.plugins.sql_alchemy.config import (
 from . import settings
 
 if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
     from starlite.datastructures.state import State
     from starlite.types import Message, Scope
 
@@ -42,11 +44,11 @@ engine = create_async_engine(
     pool_timeout=settings.db.POOL_TIMEOUT,
     poolclass=NullPool if settings.db.POOL_DISABLE else None,
 )
-"""Configure via [DatabaseSettings][starlite_saqlalchemy.settings.DatabaseSettings]. Overrides default JSON
-serializer to use `orjson`. See [`create_async_engine()`][sqlalchemy.ext.asyncio.create_async_engine]
-for detailed instructions.
+"""Configure via [DatabaseSettings][starlite_saqlalchemy.settings.DatabaseSettings]. Overrides
+default JSON serializer to use `orjson`. See
+[`create_async_engine()`][sqlalchemy.ext.asyncio.create_async_engine] for detailed instructions.
 """
-async_session_factory = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+async_session_factory: async_sessionmaker["AsyncSession"] = async_sessionmaker(engine)
 """
 Database session factory. See [`async_sessionmaker()`][sqlalchemy.ext.asyncio.async_sessionmaker].
 """
@@ -62,7 +64,7 @@ def _sqla_on_connect(dbapi_connection: Any, _: Any) -> Any:
     return a `str` so that SQLAlchemy could then convert it to binary, or do the following, which
     changes the behaviour of the dialect to expect a binary value from the serializer.
 
-    See Also https://github.com/sqlalchemy/sqlalchemy/blob/14bfbadfdf9260a1c40f63b31641b27fe9de12a0/lib/sqlalchemy/dialects/postgresql/asyncpg.py#L934
+    See Also https://github.com/sqlalchemy/sqlalchemy/blob/14bfbadfdf9260a1c40f63b31641b27fe9de12a0/lib/sqlalchemy/dialects/postgresql/asyncpg.py#L934  pylint: disable=line-too-long
     """
 
     def encoder(bin_value: bytes) -> bytes:
