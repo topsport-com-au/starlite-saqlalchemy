@@ -2,10 +2,10 @@ name: ci
 
 on:
   push:
-    branches: [ main ]
-    tags: [ "*" ]
+    branches: [main]
+    tags: ["*"]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 env:
@@ -91,7 +91,6 @@ jobs:
           name: coverage-data
       - name: Fail if it's <100%.
         run: |
-          
           python -m coverage html --skip-covered --skip-empty
           python -m coverage report --fail-under=85
       - name: Upload HTML report if check failed.
