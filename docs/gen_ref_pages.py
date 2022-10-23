@@ -3,8 +3,11 @@
 from pathlib import Path
 
 import mkdocs_gen_files
+from mkdocs_gen_files.nav import Nav
 
-nav = mkdocs_gen_files.Nav()
+# Ignore is due to `Nav.__init__()` having no typed arguments and no `-> None:` so mypy infers it
+# to be untyped.
+nav = Nav()  # type:ignore[no-untyped-call]
 
 for path in sorted(Path("src").rglob("*.py")):  #
     module_path = path.relative_to("src").with_suffix("")
@@ -23,7 +26,7 @@ for path in sorted(Path("src").rglob("*.py")):  #
     nav[parts] = doc_path.as_posix()
 
     with mkdocs_gen_files.open(full_doc_path, "w") as fd:
-        identifier = ".".join(parts)
+        identifier = ".".join(parts)  # pylint: disable=invalid-name
         fd.write(f"::: {identifier}")
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path)

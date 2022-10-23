@@ -1,0 +1,113 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+    tags: ["*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  FORCE_COLOR: "1"
+  TOX_TESTENV_PASSENV: "FORCE_COLOR"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PYTHON_LATEST: "3.10"
+
+permissions:
+  contents: read
+
+jobs:
+  pylint:
+    name: pylint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{env.PYTHON_LATEST}}
+      - name: Install Dependencies
+        run: python -m pip install --upgrade wheel tox
+      - run: python -m tox -e pylint
+  mypy:
+    name: mypy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{env.PYTHON_LATEST}}
+      - name: Install Dependencies
+        run: python -m pip install --upgrade wheel tox
+      - run: python -m tox -e mypy
+  pyright:
+    name: pyright
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{env.PYTHON_LATEST}}
+      - name: Install Dependencies
+        run: python -m pip install --upgrade wheel tox
+      - run: python -m tox -e pyright
+  tests:
+    name: tests on ${{matrix.python-version}}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.10"
+          # NOTE: https://github.com/npm/node-semver#advanced-range-syntax
+          # NOTE: this allows pre-release and first GA release
+          - "~3.11.0-0"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{matrix.python-version}}
+      - name: Install Dependencies
+        run: python -m pip install --upgrade wheel tox tox-gh-actions
+      - run: python -m tox
+      - name: Upload Coverage Data
+        uses: actions/upload-artifact@v3
+        with:
+          name: covdata
+          path: .coverage.*
+  coverage:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{env.PYTHON_LATEST}}
+      - run: python -m pip install --upgrade wheel tox tox-gh-actions
+      - name: Download coverage data
+        uses: actions/download-artifact@v3
+        with:
+          name: covdata
+      - name: Fail if it's <100%.
+        run: |
+          python -m tox -e coverage
+      - name: Upload HTML report if check failed.
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-report
+          path: htmlcov
+        if: ${{ failure() }}
+  check:
+    if: always()
+    needs:
+      - pylint
+      - pyright
+      - mypy
+      - tests
+      - coverage
+    runs-on: Ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}

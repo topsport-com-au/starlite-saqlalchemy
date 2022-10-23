@@ -1,3 +1,14 @@
 [flake8]
+exclude = alembic/*
 max-line-length = 100
-ignore = E,W
+ignore = E,W,B008
+type-checking-exempt-modules = from sqlalchemy.orm
+per-file-ignores =
+    src/starlite_saqlalchemy/dependencies.py:TC
+    src/starlite_saqlalchemy/health.py:TC
+    src/starlite_saqlalchemy/repository/filters.py:TC
+    src/starlite_saqlalchemy/users/controllers.py:TC
+    tests/*:SCS108,PT013
+    tests/integration/test_tests.py:TC002,SCS108
+    tests/unit/lib/test_dependencies.py:TC,SCS108
+    tests/utils/controllers.py:TC
