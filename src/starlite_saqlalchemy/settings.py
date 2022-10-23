@@ -133,7 +133,7 @@ class DatabaseSettings(BaseSettings):
 class RedisSettings(BaseSettings):
     """Cache settings for the application.
 
-    Prefix all environment variables with `CACHE_`, e.g., `CACHE_URL`.
+    Prefix all environment variables with `REDIS_`, e.g., `REDIS_URL`.
 
     Attributes
     ----------
