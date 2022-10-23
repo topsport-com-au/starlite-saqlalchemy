@@ -54,7 +54,7 @@ omit = ["tests/*"]
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
-others = [".", "*/starlite_saqalchemy"]
+others = [".", "*/starlite_saqlalchemy"]
 
 [tool.coverage.report]
 show_missing = true
