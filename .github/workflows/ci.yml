@@ -83,7 +83,7 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{env.PYTHON_LATEST}}
-      - run: python -m pip install --upgrade wheel tox tox-gh-actions
+      - run: python -m pip install --upgrade wheel tox
       - name: Download coverage data
         uses: actions/download-artifact@v3
         with:
@@ -96,7 +96,7 @@ jobs:
         with:
           name: html-report
           path: htmlcov
-        if: ${{ failure() }}
+        if: ${{failure()}}
   check:
     if: always()
     needs:
@@ -110,4 +110,4 @@ jobs:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          jobs: ${{ toJSON(needs) }}
+          jobs: ${{toJSON(needs)}}
