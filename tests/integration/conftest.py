@@ -76,7 +76,7 @@ async def redis_responsive(host: str) -> bool:
     Returns:
         Boolean indicating if we can connect to the redis server.
     """
-    client: Redis = Redis(host=host, port=6379)
+    client: Redis = Redis(host=host, port=6397)
     try:
         return await client.ping()
     except (ConnectionError, RedisConnectionError):
@@ -95,7 +95,7 @@ async def db_responsive(host: str) -> bool:
     """
     try:
         conn = await asyncpg.connect(
-            host=host, port=5432, user="postgres", database="postgres", password="super-secret"
+            host=host, port=5423, user="postgres", database="postgres", password="super-secret"
         )
     except (ConnectionError, asyncpg.CannotConnectNowError):
         return False
