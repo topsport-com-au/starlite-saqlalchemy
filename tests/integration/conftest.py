@@ -131,7 +131,7 @@ async def redis(docker_ip: str) -> Redis:
     Returns:
         Redis client instance, function scoped.
     """
-    return Redis(host=docker_ip, port=6379)
+    return Redis(host=docker_ip, port=6397)
 
 
 @pytest.fixture()
@@ -150,7 +150,7 @@ async def engine(docker_ip: str) -> AsyncEngine:
             username="postgres",
             password="super-secret",
             host=docker_ip,
-            port=5432,
+            port=5423,
             database="postgres",
             query={},  # type:ignore[arg-type]
         ),
