@@ -11,5 +11,6 @@ site/
 !tests.env
 coverage.json
 .coverage
+.coverage.*
 .dmypy.json
 .python-version
