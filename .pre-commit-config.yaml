@@ -1,3 +1,8 @@
+default_language_version:
+  python: python3.10
+default_stages:
+  - commit
+  - push
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
@@ -84,3 +89,8 @@ repos:
     rev: v0.4.0
     hooks:
       - id: flake8-markdown
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v2.1.1
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]

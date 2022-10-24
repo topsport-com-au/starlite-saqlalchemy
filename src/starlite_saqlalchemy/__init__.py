@@ -66,3 +66,5 @@ __all__ = [
     "static_files",
     "worker",
 ]
+
+__version__ = "0.0.0"
