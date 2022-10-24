@@ -3,10 +3,8 @@ name: ci
 on:
   push:
     branches: [main]
-    tags: ["*"]
   pull_request:
     branches: [main]
-  workflow_dispatch:
 
 env:
   FORCE_COLOR: "1"
@@ -83,7 +81,7 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{env.PYTHON_LATEST}}
-      - run: python -m pip install --upgrade wheel tox tox-gh-actions
+      - run: python -m pip install --upgrade wheel tox
       - name: Download coverage data
         uses: actions/download-artifact@v3
         with:
@@ -96,7 +94,7 @@ jobs:
         with:
           name: html-report
           path: htmlcov
-        if: ${{ failure() }}
+        if: ${{failure()}}
   check:
     if: always()
     needs:
@@ -110,4 +108,20 @@ jobs:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          jobs: ${{ toJSON(needs) }}
+          jobs: ${{toJSON(needs)}}
+  release:
+    runs-on: ubuntu-latest
+    concurrency: release
+    if: github.ref == 'refs/heads/main'
+    needs: check
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.SEMANTIC_RELEASES_TOKEN }}
+      - name: Python Semantic Release
+        uses: relekang/python-semantic-release@master
+        with:
+          github_token: ${{ secrets.SEMANTIC_RELEASES_TOKEN }}
+          repository_username: __token__
+          repository_password: ${{ secrets.PYPI_TOKEN }}

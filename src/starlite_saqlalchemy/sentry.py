@@ -13,7 +13,7 @@ from . import settings
 def configure() -> None:
     """Callback to configure sentry on app startup.
 
-    See [SentrySettings][starlite_saqlalchemy.config.SentrySettings].
+    See [SentrySettings][starlite_saqlalchemy.settings.SentrySettings].
     """
     sentry_sdk.init(
         dsn=settings.sentry.DSN,

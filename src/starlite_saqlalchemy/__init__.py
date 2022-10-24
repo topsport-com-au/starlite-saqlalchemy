@@ -42,10 +42,11 @@ from . import (
     static_files,
     worker,
 )
-from .init_plugin import ConfigureApp
+from .init_plugin import ConfigureApp, PluginConfig
 
 __all__ = [
     "ConfigureApp",
+    "PluginConfig",
     "cache",
     "compression",
     "dependencies",
@@ -65,3 +66,5 @@ __all__ = [
     "static_files",
     "worker",
 ]
+
+__version__ = "0.0.0"

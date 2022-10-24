@@ -4,11 +4,11 @@ services:
   postgres:
     image: postgres
     ports:
-      - "5432:5432"
+      - "5423:5432"
     environment:
       POSTGRES_PASSWORD: super-secret
 
   redis:
     image: redis
     ports:
-      - "6379:6379"
+      - "6397:6379"

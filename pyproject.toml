@@ -1,51 +1,9 @@
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
-name = "starlite-saqlalchemy"
-version = "0.0.1"
-description = "Starlite API and async worker boilerplate"
-authors = ["Peter Schutt <peter.github@proton.me>"]
-packages = [
-    { include = "starlite_saqlalchemy", from = "src" }
-]
-
-[tool.poetry.dependencies]
-python = "^3.10"
-asyncpg = "*"
-hiredis = "*"
-httpx = "*"
-orjson = "*"
-pydantic = "*"
-redis = "*"
-saq = "*"
-sentry-sdk = "*"
-sqlalchemy = { git = "https://github.com/sqlalchemy/sqlalchemy.git", branch = "main" }
-starlite = "*"
-
-[tool.poetry.group.linting]
-optional = true
-
-[tool.poetry.group.linting.dependencies]
-pre-commit = "*"
-
-[tool.poetry.group.docs]
-optional = true
-
-[tool.poetry.group.docs.dependencies]
-mkdocs-gen-files = "*"
-mkdocs-literate-nav = "*"
-mkdocs-material = "*"
-mkdocs-section-index = "*"
-mkdocstrings = {version = "*", extras = ["python"]}
-pymdown-extensions = "*"
 
 [tool.black]
 line-length = 100
-
-[tool.isort]
-profile = "black"
 
 [tool.coverage.run]
 branch = true
@@ -64,6 +22,50 @@ exclude_lines = [
     'pragma: no cover',
 ]
 
+[tool.isort]
+profile = "black"
+
+[tool.poetry]
+name = "starlite-saqlalchemy"
+version = "0.0.0"
+description = "Starlite config plugin with SAQ and SQLAlchemy boilerplate"
+license = "MIT"
+authors = ["Peter Schutt <peter.github@proton.me>"]
+readme = "README.md"
+repository = "https://github.com/topsport-com-au/starlite-saqlalchemy"
+keywords = ["api", "rest", "http", "asgi", "starlite", "saq", "sqlalchemy", "plugin", "python"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Plugins",
+    "Framework :: Starlite",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development",
+    "Topic :: System :: Installation/Setup",
+]
+packages = [
+    { include = "starlite_saqlalchemy", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+asyncpg = "*"
+hiredis = "*"
+httpx = "*"
+orjson = "*"
+pydantic = "*"
+redis = "*"
+saq = "*"
+sentry-sdk = "*"
+sqlalchemy = { git = "https://github.com/sqlalchemy/sqlalchemy.git", branch = "main" }
+starlite = "*"
+
+[tool.poetry.urls]
+GitHub = "https://github.com/topsport-com-au"
+Bugs = "https://github.com/topsport-com-au/starlite-saqlalchemy/issues"
+
 [tool.pytest.ini_options]
 addopts = ["-ra", "--strict-config"]
 asyncio_mode = "auto"
@@ -72,3 +74,12 @@ testpaths = ["tests/unit"]
 
 [tool.pylint.main]
 extension-pkg-whitelist = ["asyncpg", "orjson", "pydantic"]
+
+[tool.semantic_release]
+branch = "main"
+version_variable = "src/starlite_saqlalchemy/__init__.py:__version__"
+version_toml = "pyproject.toml:tool.poetry.version"
+major_on_zero = false
+upload_to_repository = true
+upload_to_release = true
+build_command = "pip install poetry && poetry build"

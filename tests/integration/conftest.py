@@ -76,7 +76,7 @@ async def redis_responsive(host: str) -> bool:
     Returns:
         Boolean indicating if we can connect to the redis server.
     """
-    client: Redis = Redis(host=host, port=6379)
+    client: Redis = Redis(host=host, port=6397)
     try:
         return await client.ping()
     except (ConnectionError, RedisConnectionError):
@@ -95,7 +95,7 @@ async def db_responsive(host: str) -> bool:
     """
     try:
         conn = await asyncpg.connect(
-            host=host, port=5432, user="postgres", database="postgres", password="super-secret"
+            host=host, port=5423, user="postgres", database="postgres", password="super-secret"
         )
     except (ConnectionError, asyncpg.CannotConnectNowError):
         return False
@@ -131,7 +131,7 @@ async def redis(docker_ip: str) -> Redis:
     Returns:
         Redis client instance, function scoped.
     """
-    return Redis(host=docker_ip, port=6379)
+    return Redis(host=docker_ip, port=6397)
 
 
 @pytest.fixture()
@@ -150,7 +150,7 @@ async def engine(docker_ip: str) -> AsyncEngine:
             username="postgres",
             password="super-secret",
             host=docker_ip,
-            port=5432,
+            port=5423,
             database="postgres",
             query={},  # type:ignore[arg-type]
         ),

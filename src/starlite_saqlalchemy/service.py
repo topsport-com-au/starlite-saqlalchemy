@@ -120,7 +120,6 @@ class Service(Generic[ModelT]):
             data: Representation for upsert.
 
         Returns:
-        -------
             Updated or created representation.
         """
         data = await self.authorize_upsert(id_, data)
