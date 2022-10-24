@@ -42,10 +42,11 @@ from . import (
     static_files,
     worker,
 )
-from .init_plugin import ConfigureApp
+from .init_plugin import ConfigureApp, PluginConfig
 
 __all__ = [
     "ConfigureApp",
+    "PluginConfig",
     "cache",
     "compression",
     "dependencies",

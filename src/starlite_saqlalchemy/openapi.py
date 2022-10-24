@@ -11,4 +11,4 @@ config = OpenAPIConfig(
     contact=Contact(name=settings.openapi.CONTACT_NAME, email=settings.openapi.CONTACT_EMAIL),
     use_handler_docstrings=True,
 )
-"""OpenAPI config for app, see [OpenAPISettings][starlite_saqlalchemy.config.OpenAPISettings]"""
+"""OpenAPI config for app, see [OpenAPISettings][starlite_saqlalchemy.settings.OpenAPISettings]"""

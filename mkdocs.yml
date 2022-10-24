@@ -1,5 +1,5 @@
 site_name: starlite-saqlalchemy
-repo_url: https://github.com/topsport-com-au/starlite-lib
+repo_url: https://github.com/topsport-com-au/starlite-saqlalchemy
 nav:
   - index.md
   - Reference: reference/
@@ -54,7 +54,7 @@ plugins:
           - https://redis-py.readthedocs.io/en/stable/objects.inv
           - https://starlite-api.github.io/starlite/objects.inv
           options:
-            docstring_style: numpy
+            docstring_style: google
             docstring_options:
               ignore_init_summary: yes
             line_length: 100
@@ -64,3 +64,8 @@ plugins:
             show_root_full_path: no
             show_root_toc_entry: no
   - autorefs
+
+# extra:
+#   version:
+#     provider: mike
+#     default: latest
