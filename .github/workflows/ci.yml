@@ -10,7 +10,7 @@ env:
   FORCE_COLOR: "1"
   TOX_TESTENV_PASSENV: "FORCE_COLOR"
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
-  PYTHON_LATEST: "3.10"
+  PYTHON_LATEST: "3.11"
 
 permissions:
   contents: read
@@ -57,9 +57,7 @@ jobs:
       matrix:
         python-version:
           - "3.10"
-          # NOTE: https://github.com/npm/node-semver#advanced-range-syntax
-          # NOTE: this allows pre-release and first GA release
-          - "~3.11.0-0"
+          - "3.11"
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
