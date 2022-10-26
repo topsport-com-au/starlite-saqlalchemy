@@ -53,23 +53,16 @@ class Service(Generic[ModelT]):
 
     repository_type: type["AbstractRepository[ModelT]"]
 
-    @classmethod
-    def __class_getitem__(cls: type[ServiceT], item: type[ModelT]) -> type[ServiceT]:
+    def __init_subclass__(cls: type[ServiceT]) -> None:
         """Create and cache a DTO instance that is internal use only.
 
         note:
             This pattern could be changed to on first access, rather than at compile time.
-
-        Args:
-            item: The SQLAlchemy model type the type is annotated with.
-
-        Returns:
-            The type, unchanged.
         """
+        model_type = cls.repository_type.model_type
         cls._INTERNAL_DTO_CACHE[cls] = dto.factory(
-            f"__{item.__tablename__}DTO", item, dto.Purpose.READ
+            f"__{model_type.__tablename__}DTO", model_type, dto.Purpose.READ
         )
-        return cls
 
     def __init__(self, session: "AsyncSession") -> None:
         self.repository = self.repository_type(session)
