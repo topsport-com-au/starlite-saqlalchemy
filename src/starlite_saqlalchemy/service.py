@@ -5,6 +5,7 @@ SQLAlchemy model.
 """
 
 import importlib
+import inspect
 import logging
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
@@ -12,6 +13,7 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 from . import dto
 from .repository.sqlalchemy import ModelT
 from .sqlalchemy_plugin import async_session_factory
+from .worker import queue
 
 if TYPE_CHECKING:
     from pydantic import BaseModel
@@ -53,12 +55,13 @@ class Service(Generic[ModelT]):
 
     repository_type: type["AbstractRepository[ModelT]"]
 
-    def __init_subclass__(cls: type[ServiceT]) -> None:
+    def __init_subclass__(cls, *args: Any, **kwargs: Any) -> None:
         """Create and cache a DTO instance that is internal use only.
 
         note:
             This pattern could be changed to on first access, rather than at compile time.
         """
+        super().__init_subclass__(*args, **kwargs)
         model_type = cls.repository_type.model_type
         cls._INTERNAL_DTO_CACHE[cls] = dto.factory(
             f"__{model_type.__tablename__}DTO", model_type, dto.Purpose.READ
@@ -91,7 +94,9 @@ class Service(Generic[ModelT]):
             Representation of created instance.
         """
         data = await self.authorize_create(data)
-        return await self.repository.add(data)
+        data = await self.repository.add(data)
+        await self.enqueue_callback(Operation.CREATE, data)
+        return data
 
     # noinspection PyMethodMayBeStatic
     async def authorize_list(self) -> None:
@@ -134,7 +139,9 @@ class Service(Generic[ModelT]):
             Updated representation.
         """
         data = await self.authorize_update(id_, data)
-        return await self.repository.update(data)
+        data = await self.repository.update(data)
+        await self.enqueue_callback(Operation.UPDATE, data)
+        return data
 
     async def authorize_upsert(self, id_: Any, data: ModelT) -> ModelT:
         """Authorize upsert of item.
@@ -160,7 +167,9 @@ class Service(Generic[ModelT]):
             Updated or created representation.
         """
         data = await self.authorize_upsert(id_, data)
-        return await self.repository.upsert(data)
+        data = await self.repository.upsert(data)
+        await self.enqueue_callback(Operation.UPDATE, data)
+        return data
 
     async def authorize_get(self, id_: Any) -> None:
         """Authorize get of item.
@@ -198,7 +207,28 @@ class Service(Generic[ModelT]):
             Representation of the deleted instance.
         """
         await self.authorize_delete(id_)
-        return await self.repository.delete(id_)
+        data = await self.repository.delete(id_)
+        await self.enqueue_callback(Operation.DELETE, data)
+        return data
+
+    async def enqueue_callback(self, operation: Operation, data: ModelT) -> None:
+        """Enqueue an async callback for the operation and data.
+
+        Args:
+            operation: Operation performed on data.
+            data: The data for the operation.
+        """
+        module = inspect.getmodule(self)
+        if module is None:
+            logger.warning("Callback not enqueued, no module resolved for %s", self)
+            return
+        await queue.enqueue(
+            make_service_callback.__qualname__,
+            service_module_name=module.__name__,
+            service_type_fqdn=type(self).__qualname__,
+            operation=operation,
+            raw_obj=self._get_model_dto().from_orm(data).dict(),
+        )
 
     async def receive_callback(self, operation: Operation, raw_obj: dict[str, Any]) -> None:
         """Method called by the async workers.
