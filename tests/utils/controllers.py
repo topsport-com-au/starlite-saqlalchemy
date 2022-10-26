@@ -7,14 +7,14 @@ from starlite import Dependency, delete, get, post, put
 
 from starlite_saqlalchemy.repository.types import FilterTypes
 
-from .domain import Author, CreateDTO, ReadDTO, Repository, Service, UpdateDTO
+from .domain import Author, CreateDTO, ReadDTO, Service, UpdateDTO
 
 DETAIL_ROUTE = "/{author_id:uuid}"
 
 
 def provides_service(db_session: AsyncSession) -> Service:
     """Constructs repository and service objects for the request."""
-    return Service(Repository(session=db_session))
+    return Service(session=db_session)
 
 
 @get()

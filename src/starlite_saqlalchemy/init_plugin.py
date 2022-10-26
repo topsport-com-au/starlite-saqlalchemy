@@ -50,11 +50,10 @@ from . import (
 )
 from .health import health_check
 from .repository.exceptions import RepositoryException
-from .service import ServiceException
+from .service import ServiceException, make_service_callback
 from .worker import create_worker_instance
 
 if TYPE_CHECKING:
-    from collections import abc
 
     from starlite.config.app import AppConfig
 
@@ -71,7 +70,7 @@ class PluginConfig(BaseModel):
     application.
     """
 
-    worker_functions: "abc.Sequence[WorkerFunction]" = []
+    worker_functions: "list[WorkerFunction | tuple[str, WorkerFunction]]" = []
     """
     Queue worker functions.
     """
@@ -335,6 +334,9 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_worker and self.config.worker_functions:
+            self.config.worker_functions.append(
+                (make_service_callback.__qualname__, make_service_callback)
+            )
             worker_instance = create_worker_instance(self.config.worker_functions)
             app_config.on_shutdown.append(worker_instance.stop)
             app_config.on_startup.append(worker_instance.on_app_startup)

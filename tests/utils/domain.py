@@ -24,6 +24,8 @@ class Repository(SQLAlchemyRepository[Author]):
 class Service(service.Service[Author]):
     """Author service object."""
 
+    repository_type = Repository
+
     async def create(self, data: Author) -> Author:
         created = await super().create(data)
         await queue.enqueue("author_created", data=ReadDTO.from_orm(created).dict())

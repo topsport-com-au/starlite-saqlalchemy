@@ -3,13 +3,27 @@
 Service object is generic on the domain model type, which should be a
 SQLAlchemy model.
 """
-from typing import TYPE_CHECKING, Any, Generic
 
+import importlib
+import logging
+from enum import Enum
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
+
+from . import dto
 from .repository.sqlalchemy import ModelT
+from .sqlalchemy_plugin import async_session_factory
 
 if TYPE_CHECKING:
+    from pydantic import BaseModel
+    from sqlalchemy.ext.asyncio import AsyncSession
+
     from .repository.abc import AbstractRepository
     from .repository.types import FilterTypes
+
+
+logger = logging.getLogger(__name__)
+
+ServiceT = TypeVar("ServiceT", bound="Service")
 
 
 class ServiceException(Exception):
@@ -20,6 +34,14 @@ class UnauthorizedException(ServiceException):
     """A user tried to do something they shouldn't have."""
 
 
+class Operation(str, Enum):
+    """Operation type markers sent with callbacks."""
+
+    CREATE = "create"
+    DELETE = "delete"
+    UPDATE = "update"
+
+
 class Service(Generic[ModelT]):
     """Generic Service object.
 
@@ -27,8 +49,30 @@ class Service(Generic[ModelT]):
         repository: Instance conforming to `AbstractRepository` interface.
     """
 
-    def __init__(self, repository: "AbstractRepository[ModelT]") -> None:
-        self.repository = repository
+    _INTERNAL_DTO_CACHE: dict[type["Service"], type["BaseModel"]] = {}
+
+    repository_type: type["AbstractRepository[ModelT]"]
+
+    @classmethod
+    def __class_getitem__(cls: type[ServiceT], item: type[ModelT]) -> type[ServiceT]:
+        """Create and cache a DTO instance that is internal use only.
+
+        note:
+            This pattern could be changed to on first access, rather than at compile time.
+
+        Args:
+            item: The SQLAlchemy model type the type is annotated with.
+
+        Returns:
+            The type, unchanged.
+        """
+        cls._INTERNAL_DTO_CACHE[cls] = dto.factory(
+            f"__{item.__tablename__}DTO", item, dto.Purpose.READ
+        )
+        return cls
+
+    def __init__(self, session: "AsyncSession") -> None:
+        self.repository = self.repository_type(session)
 
     # noinspection PyMethodMayBeStatic
     async def authorize_create(self, data: ModelT) -> ModelT:
@@ -162,3 +206,57 @@ class Service(Generic[ModelT]):
         """
         await self.authorize_delete(id_)
         return await self.repository.delete(id_)
+
+    async def receive_callback(self, operation: Operation, raw_obj: dict[str, Any]) -> None:
+        """Method called by the async workers.
+
+        Do what you want in here but remember not to block the loop.
+
+        Args:
+            operation: Operation performed on the object.
+            raw_obj: Raw representation of the object.
+        """
+        dto_parsed_obj = self._get_model_dto().parse_obj(raw_obj)
+        model_instance = self.repository_type.model_type(**dto_parsed_obj.dict())
+        logger.info("Callback executed for %s: %s", operation, model_instance)
+
+    @classmethod
+    def _get_model_dto(cls) -> type["BaseModel"]:
+        """DTO for model cached globally on first access.
+
+        Returns:
+            Pydantic model instance used for internal deserialization.
+        """
+        return cls._INTERNAL_DTO_CACHE[cls]
+
+
+async def make_service_callback(
+    _ctx: dict,
+    *,
+    service_module_name: str,
+    service_type_fqdn: str,
+    operation: Operation,
+    raw_obj: dict[str, Any],
+) -> None:
+    """Function that makes the async service callbacks.
+
+    Args:
+        _ctx: the SAQ context
+        service_module_name: Module of service type to instantiate.
+        service_type_fqdn: Reference to service type in module.
+        operation: Operation performed on the instance.
+        raw_obj: Data received from the work queue.
+
+    Returns:
+    """
+    service_module = importlib.import_module(service_module_name)
+    for name in service_type_fqdn.split("."):
+        obj_ = getattr(service_module, name)
+        if issubclass(obj_, Service):
+            service_type = obj_
+            break
+    else:
+        raise RuntimeError("Couldn't find a service type with given module and fqdn")
+    async with async_session_factory() as session:
+        service_object: Service = service_type(session=session)
+    await service_object.receive_callback(operation, raw_obj=raw_obj)

@@ -55,11 +55,11 @@ async def test_sqlalchemy_repo_add(mock_repo: SQLAlchemyRepository) -> None:
     mock_instance = MagicMock()
     instance = await mock_repo.add(mock_instance)
     assert instance is mock_instance
-    mock_repo._session.add.assert_called_once_with(mock_instance)
-    mock_repo._session.flush.assert_called_once()
-    mock_repo._session.refresh.assert_called_once_with(mock_instance)
-    mock_repo._session.expunge.assert_called_once_with(mock_instance)
-    mock_repo._session.commit.assert_not_called()
+    mock_repo.session.add.assert_called_once_with(mock_instance)
+    mock_repo.session.flush.assert_called_once()
+    mock_repo.session.refresh.assert_called_once_with(mock_instance)
+    mock_repo.session.expunge.assert_called_once_with(mock_instance)
+    mock_repo.session.commit.assert_not_called()
 
 
 async def test_sqlalchemy_repo_delete(
@@ -70,10 +70,10 @@ async def test_sqlalchemy_repo_delete(
     monkeypatch.setattr(mock_repo, "get", AsyncMock(return_value=mock_instance))
     instance = await mock_repo.delete("instance-id")
     assert instance is mock_instance
-    mock_repo._session.delete.assert_called_once_with(mock_instance)
-    mock_repo._session.flush.assert_called_once()
-    mock_repo._session.expunge.assert_called_once_with(mock_instance)
-    mock_repo._session.commit.assert_not_called()
+    mock_repo.session.delete.assert_called_once_with(mock_instance)
+    mock_repo.session.flush.assert_called_once()
+    mock_repo.session.expunge.assert_called_once_with(mock_instance)
+    mock_repo.session.commit.assert_not_called()
 
 
 async def test_sqlalchemy_repo_get_member(
@@ -87,8 +87,8 @@ async def test_sqlalchemy_repo_get_member(
     monkeypatch.setattr(mock_repo, "_execute", execute_mock)
     instance = await mock_repo.get("instance-id")
     assert instance is mock_instance
-    mock_repo._session.expunge.assert_called_once_with(mock_instance)
-    mock_repo._session.commit.assert_not_called()
+    mock_repo.session.expunge.assert_called_once_with(mock_instance)
+    mock_repo.session.commit.assert_not_called()
 
 
 async def test_sqlalchemy_repo_list(
@@ -102,8 +102,8 @@ async def test_sqlalchemy_repo_list(
     monkeypatch.setattr(mock_repo, "_execute", execute_mock)
     instances = await mock_repo.list()
     assert instances == mock_instances
-    mock_repo._session.expunge.assert_has_calls(*mock_instances)
-    mock_repo._session.commit.assert_not_called()
+    mock_repo.session.expunge.assert_has_calls(*mock_instances)
+    mock_repo.session.commit.assert_not_called()
 
 
 async def test_sqlalchemy_repo_list_with_pagination(
@@ -162,27 +162,27 @@ async def test_sqlalchemy_repo_update(
     monkeypatch.setattr(mock_repo, "get_id_attribute_value", get_id_value_mock)
     get_mock = AsyncMock()
     monkeypatch.setattr(mock_repo, "get", get_mock)
-    mock_repo._session.merge.return_value = mock_instance
+    mock_repo.session.merge.return_value = mock_instance
     instance = await mock_repo.update(mock_instance)
     assert instance is mock_instance
-    mock_repo._session.merge.assert_called_once_with(mock_instance)
-    mock_repo._session.flush.assert_called_once()
-    mock_repo._session.refresh.assert_called_once_with(mock_instance)
-    mock_repo._session.expunge.assert_called_once_with(mock_instance)
-    mock_repo._session.commit.assert_not_called()
+    mock_repo.session.merge.assert_called_once_with(mock_instance)
+    mock_repo.session.flush.assert_called_once()
+    mock_repo.session.refresh.assert_called_once_with(mock_instance)
+    mock_repo.session.expunge.assert_called_once_with(mock_instance)
+    mock_repo.session.commit.assert_not_called()
 
 
 async def test_sqlalchemy_repo_upsert(mock_repo: SQLAlchemyRepository) -> None:
     """Test the sequence of repo calls for upsert operation."""
     mock_instance = MagicMock()
-    mock_repo._session.merge.return_value = mock_instance
+    mock_repo.session.merge.return_value = mock_instance
     instance = await mock_repo.upsert(mock_instance)
     assert instance is mock_instance
-    mock_repo._session.merge.assert_called_once_with(mock_instance)
-    mock_repo._session.flush.assert_called_once()
-    mock_repo._session.refresh.assert_called_once_with(mock_instance)
-    mock_repo._session.expunge.assert_called_once_with(mock_instance)
-    mock_repo._session.commit.assert_not_called()
+    mock_repo.session.merge.assert_called_once_with(mock_instance)
+    mock_repo.session.flush.assert_called_once()
+    mock_repo.session.refresh.assert_called_once_with(mock_instance)
+    mock_repo.session.expunge.assert_called_once_with(mock_instance)
+    mock_repo.session.commit.assert_not_called()
 
 
 async def test_attach_to_session_unexpected_strategy_raises_valueerror(
@@ -196,7 +196,7 @@ async def test_attach_to_session_unexpected_strategy_raises_valueerror(
 async def test_execute(mock_repo: SQLAlchemyRepository) -> None:
     """Simple test of the abstraction over `AsyncSession.execute()`"""
     await mock_repo._execute()
-    mock_repo._session.execute.assert_called_once_with(mock_repo._select)
+    mock_repo.session.execute.assert_called_once_with(mock_repo._select)
 
 
 def test_filter_in_collection_noop_if_collection_empty(mock_repo: SQLAlchemyRepository) -> None:

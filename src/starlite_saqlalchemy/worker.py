@@ -58,7 +58,9 @@ queue = Queue(redis.client)
 """
 
 
-def create_worker_instance(functions: abc.Iterable[WorkerFunction]) -> Worker:
+def create_worker_instance(
+    functions: abc.Iterable[WorkerFunction | tuple[str, WorkerFunction]]
+) -> Worker:
     """
 
     Args:

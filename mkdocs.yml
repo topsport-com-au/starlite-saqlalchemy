@@ -65,7 +65,6 @@ plugins:
             show_root_toc_entry: no
   - autorefs
 
-# extra:
-#   version:
-#     provider: mike
-#     default: latest
+extra:
+  version:
+    provider: mike

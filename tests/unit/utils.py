@@ -12,6 +12,8 @@ from starlite_saqlalchemy.repository.abc import AbstractRepository
 if TYPE_CHECKING:
     from collections import abc
 
+    from sqlalchemy.ext.asyncio import AsyncSession
+
     from starlite_saqlalchemy.repository.types import FilterTypes
 
 BaseT = TypeVar("BaseT", bound=Base)
@@ -25,7 +27,10 @@ class GenericMockRepository(AbstractRepository[BaseT], Generic[BaseT]):
 
     collection: "abc.MutableMapping[abc.Hashable, BaseT]" = {}
 
-    def __init__(self, id_factory: "abc.Callable[[], Any]" = uuid4, **_: Any) -> None:
+    def __init__(
+        self, session: "AsyncSession", id_factory: "abc.Callable[[], Any]" = uuid4, **_: Any
+    ) -> None:
+        super().__init__(session)
         self._id_factory = id_factory
 
     def _find_or_raise_not_found(self, id_: Any) -> BaseT:
