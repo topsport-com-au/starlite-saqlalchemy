@@ -35,7 +35,6 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """Add `data` to the collection.
 
         Args:
-            session: Thing represents transaction scope.
             data: Instance to be added to the collection.
 
         Returns:
@@ -47,7 +46,6 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """Delete instance identified by `id_`
 
         Args:
-            session: Thing represents transaction scope.
             id_: Identifier of instance to be deleted.
 
         Returns:
@@ -62,7 +60,6 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """Get instance identified by `id_`.
 
         Args:
-            session: Thing represents transaction scope.
             id_: Identifier of the instance to be retrieved.
 
         Returns:
@@ -77,7 +74,6 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """Get a list of instances, optionally filtered.
 
         Args:
-            session: Thing represents transaction scope.
             *filters: Types for specific filtering operations.
             **kwargs: Instance attribute value filters.
 
@@ -91,7 +87,6 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         `data`.
 
         Args:
-            session: Thing represents transaction scope.
             data: An instance that should have a value for `self.id_attribute` that exists in the
                 collection.
 
@@ -108,7 +103,6 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         `data`, or create a new instance if one doesn't exist.
 
         Args:
-            session: Thing represents transaction scope.
             data: Instance to update existing, or be created. Identifier used to determine if an
                 existing instance exists is the value of an attribute on `data` named as value of
                 `self.id_attribute`.
