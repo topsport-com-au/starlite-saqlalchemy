@@ -269,8 +269,6 @@ async def make_service_callback(
         service_type_fqdn: Reference to service type in module.
         operation: Operation performed on the instance.
         raw_obj: Data received from the work queue.
-
-    Returns:
     """
     service_module = importlib.import_module(service_module_name)
     for name in service_type_fqdn.split("."):

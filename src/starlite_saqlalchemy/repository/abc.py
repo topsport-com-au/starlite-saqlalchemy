@@ -15,9 +15,6 @@ __all__ = ["AbstractRepository"]
 T = TypeVar("T")
 
 
-Transaction = Any
-
-
 class AbstractRepository(Generic[T], metaclass=ABCMeta):
     """Defines the interface for interacting with the application persistent
     data."""
