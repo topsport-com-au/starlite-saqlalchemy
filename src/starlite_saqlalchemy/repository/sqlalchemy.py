@@ -63,23 +63,23 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
     def __init__(
         self, session: "AsyncSession", select_: "Select[tuple[ModelT]] | None" = None
     ) -> None:
-        self._session = session
+        super().__init__(session)
         self._select = select(self.model_type) if select_ is None else select_
 
     async def add(self, data: ModelT) -> ModelT:
         with wrap_sqlalchemy_exception():
             instance = await self._attach_to_session(data)
-            await self._session.flush()
-            await self._session.refresh(instance)
-            self._session.expunge(instance)
+            await self.session.flush()
+            await self.session.refresh(instance)
+            self.session.expunge(instance)
             return instance
 
     async def delete(self, id_: Any) -> ModelT:
         with wrap_sqlalchemy_exception():
             instance = await self.get(id_)
-            await self._session.delete(instance)
-            await self._session.flush()
-            self._session.expunge(instance)
+            await self.session.delete(instance)
+            await self.session.flush()
+            self.session.expunge(instance)
             return instance
 
     async def get(self, id_: Any) -> ModelT:
@@ -87,7 +87,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
             self._filter_select_by_kwargs(**{self.id_attribute: id_})
             instance = (await self._execute()).scalar_one_or_none()
             instance = self.check_not_found(instance)
-            self._session.expunge(instance)
+            self.session.expunge(instance)
             return instance
 
     async def list(self, *filters: "FilterTypes", **kwargs: Any) -> list[ModelT]:
@@ -105,7 +105,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
             result = await self._execute()
             instances = list(result.scalars())
             for instance in instances:
-                self._session.expunge(instance)
+                self.session.expunge(instance)
             return instances
 
     async def update(self, data: ModelT) -> ModelT:
@@ -115,31 +115,31 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
             await self.get(id_)
             # this will merge the inbound data to the instance we just put in the session
             instance = await self._attach_to_session(data, strategy="merge")
-            await self._session.flush()
-            await self._session.refresh(instance)
-            self._session.expunge(instance)
+            await self.session.flush()
+            await self.session.refresh(instance)
+            self.session.expunge(instance)
             return instance
 
     async def upsert(self, data: ModelT) -> ModelT:
         with wrap_sqlalchemy_exception():
             instance = await self._attach_to_session(data, strategy="merge")
-            await self._session.flush()
-            await self._session.refresh(instance)
-            self._session.expunge(instance)
+            await self.session.flush()
+            await self.session.refresh(instance)
+            self.session.expunge(instance)
             return instance
 
     @classmethod
-    async def check_health(cls, db_session: "AsyncSession") -> bool:
+    async def check_health(cls, session: "AsyncSession") -> bool:
         """Perform a health check on the database.
 
         Args:
-            db_session: through which we runa check statement
+            session: through which we runa check statement
 
         Returns:
             `True` if healthy.
         """
         return (  # type:ignore[no-any-return]  # pragma: no cover
-            await db_session.execute(text("SELECT 1"))
+            await session.execute(text("SELECT 1"))
         ).scalar_one() == 1
 
     # the following is all sqlalchemy implementation detail, and shouldn't be directly accessed
@@ -154,6 +154,8 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
 
         Parameters
         ----------
+        session: AsyncSession
+            DB transaction.
         model : ModelT
             The instance to be attached to the session.
         strategy : Literal["add", "merge"]
@@ -165,15 +167,15 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
         """
         match strategy:  # noqa: R503
             case "add":
-                self._session.add(model)
+                self.session.add(model)
                 return model
             case "merge":
-                return await self._session.merge(model)
+                return await self.session.merge(model)
             case _:
                 raise ValueError("Unexpected value for `strategy`, must be `'add'` or `'merge'`")
 
     async def _execute(self) -> "Result[tuple[ModelT, ...]]":
-        return await self._session.execute(self._select)
+        return await self.session.execute(self._select)
 
     def _filter_in_collection(self, field_name: str, values: "abc.Collection[Any]") -> None:
         if not values:

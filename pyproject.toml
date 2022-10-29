@@ -59,7 +59,7 @@ pydantic = "*"
 redis = "*"
 saq = "*"
 sentry-sdk = "*"
-sqlalchemy = { git = "https://github.com/sqlalchemy/sqlalchemy.git", branch = "main" }
+sqlalchemy = "==2.0.0b2"
 starlite = "~=1.32"
 
 [tool.poetry.urls]
