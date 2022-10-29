@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.1 (2022-10-29)
+### Fix
+* **docs:** Use python 3.11 ([#25](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/25)) ([`52d7f15`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/52d7f1526f94540a318142c72522a1deb2ffcb6d))
+
 ## v0.1.0 (2022-10-29)
 ### Feature
 * Service object callback pattern ([#22](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/22)) ([`b59c2d5`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/b59c2d5f8feee0dbb40d326258daacd28849b62a))
