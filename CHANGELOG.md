@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.6 (2022-10-30)
+### Fix
+* **docs:** Debug permissions issue ([#31](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/31)) ([`4556dec`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/4556decf34e9a9886a165cd277eb42b5da9c0e31))
+
 ## v0.1.5 (2022-10-30)
 ### Fix
 * **docs:** Passenv HOME for locating git config ([#30](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/30)) ([`164ddf0`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/164ddf03d44366c0a3d4bdca53a0905275f8d77b))
