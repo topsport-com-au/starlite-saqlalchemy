@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.2 (2022-10-30)
+### Fix
+* **build:** Don't use GH action ([#26](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/26)) ([`305f8e7`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/305f8e7b9f1de3a5e75823f30ab3d99cef26fbe6))
+
 ## v0.1.1 (2022-10-29)
 ### Fix
 * **docs:** Use python 3.11 ([#25](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/25)) ([`52d7f15`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/52d7f1526f94540a318142c72522a1deb2ffcb6d))
