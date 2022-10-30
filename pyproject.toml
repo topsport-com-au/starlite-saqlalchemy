@@ -56,7 +56,7 @@ httpx = "*"
 orjson = "*"
 pydantic = "*"
 redis = "*"
-saq = "*"
+saq = { git = "https://github.com/tobymao/saq.git" }
 sentry-sdk = "*"
 sqlalchemy = "==2.0.0b2"
 starlite = "~=1.32"

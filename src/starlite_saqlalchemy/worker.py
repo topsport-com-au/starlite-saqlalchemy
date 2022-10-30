@@ -2,12 +2,15 @@
 import asyncio
 from collections import abc
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import orjson
-import saq  # type:ignore[import]
+import saq
 
 from . import redis
+
+if TYPE_CHECKING:
+    from signal import Signals
 
 __all__ = [
     "Queue",
@@ -20,7 +23,7 @@ __all__ = [
 WorkerFunction = abc.Callable[..., abc.Awaitable[Any]]
 
 
-class Queue(saq.Queue):  # type:ignore[misc]
+class Queue(saq.Queue):
     """[SAQ Queue](https://github.com/tobymao/saq/blob/master/saq/queue.py)
 
     Configures `orjson` for JSON serialization/deserialization if not otherwise configured.
@@ -39,11 +42,11 @@ class Queue(saq.Queue):  # type:ignore[misc]
         super().__init__(*args, **kwargs)
 
 
-class Worker(saq.Worker):  # type:ignore[misc]
+class Worker(saq.Worker):
     """Modify behavior of saq worker for orchestration by Starlite."""
 
     # same issue: https://github.com/samuelcolvin/arq/issues/182
-    SIGNALS: list[str] = []
+    SIGNALS: list["Signals"] = []
 
     async def on_app_startup(self) -> None:
         """Attach the worker to the running event loop."""
@@ -59,7 +62,7 @@ queue = Queue(redis.client)
 
 
 def create_worker_instance(
-    functions: abc.Iterable[WorkerFunction | tuple[str, WorkerFunction]]
+    functions: abc.Collection[WorkerFunction | tuple[str, WorkerFunction]]
 ) -> Worker:
     """
 

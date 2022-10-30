@@ -309,15 +309,22 @@ description = "Distributed Python job queue with asyncio and redis"
 category = "main"
 optional = false
 python-versions = "*"
+develop = false
 
 [package.dependencies]
 croniter = ">=0.3.18"
 redis = ">=4.2.0"
 
 [package.extras]
-dev = ["black (==22.3.0)", "pylint"]
+dev = ["black", "mypy", "pylint", "types-croniter", "types-redis", "types-setuptools"]
 hiredis = ["redis[hiredis] (>=4.2.0)"]
-web = ["aiohttp", "aiohttp-basicauth"]
+web = ["aiohttp", "aiohttp_basicauth"]
+
+[package.source]
+type = "git"
+url = "https://github.com/tobymao/saq.git"
+reference = "HEAD"
+resolved_reference = "877c5dd5a72be4b4c41d9244a6bcd795982e7650"
 
 [[package]]
 name = "sentry-sdk"
@@ -496,7 +503,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "0d3719985709f73528dcd84636c0f9237e8c0466b963c485b336b621a3784529"
+content-hash = "d7664f9f8cbe10f21bb91157feb0036862b3df9e9ed0f97a3400f590760e6c44"
 
 [metadata.files]
 anyio = [
@@ -855,10 +862,7 @@ rfc3986 = [
     {file = "rfc3986-1.5.0-py2.py3-none-any.whl", hash = "sha256:a86d6e1f5b1dc238b218b012df0aa79409667bb209e58da56d0b94704e712a97"},
     {file = "rfc3986-1.5.0.tar.gz", hash = "sha256:270aaf10d87d0d4e095063c65bf3ddbc6ee3d0b226328ce21e036f946e421835"},
 ]
-saq = [
-    {file = "saq-0.9.0-py3-none-any.whl", hash = "sha256:0056ad4d42f639eb5c2d575326ae8ce7ffdec05b8ceeafb83de6e73ccff6fec5"},
-    {file = "saq-0.9.0.tar.gz", hash = "sha256:73c316c3e7b90e6e4546dec3c4d15926d85b70a71b2fd23df78723ae6a2803e8"},
-]
+saq = []
 sentry-sdk = [
     {file = "sentry-sdk-1.10.1.tar.gz", hash = "sha256:105faf7bd7b7fa25653404619ee261527266b14103fe1389e0ce077bd23a9691"},
     {file = "sentry_sdk-1.10.1-py2.py3-none-any.whl", hash = "sha256:06c0fa9ccfdc80d7e3b5d2021978d6eb9351fa49db9b5847cf4d1f2a473414ad"},
