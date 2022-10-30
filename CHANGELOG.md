@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.4 (2022-10-30)
+### Fix
+* **docs:** Address docs build error ([#28](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/28)) ([`07b7f0c`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/07b7f0ca668efcd8fc63a3d590e726faff432890))
+
 ## v0.1.3 (2022-10-30)
 ### Fix
 * **build:** Remove invalid classifier ([#27](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/27)) ([`76386a1`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/76386a135360b5b1f09413bd5920bae4c9591d70))
