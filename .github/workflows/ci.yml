@@ -23,8 +23,13 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
         with:
-          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
-
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            files.pythonhosted.org:443
+            github.com:443
+            objects.githubusercontent.com:443
+            pypi.org:443
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
         with:
@@ -39,8 +44,13 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
         with:
-          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
-
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            files.pythonhosted.org:443
+            github.com:443
+            objects.githubusercontent.com:443
+            pypi.org:443
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
         with:
@@ -55,8 +65,14 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
         with:
-          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
-
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            files.pythonhosted.org:443
+            github.com:443
+            objects.githubusercontent.com:443
+            pypi.org:443
+            registry.npmjs.org:443
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
         with:
@@ -77,8 +93,15 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
         with:
-          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
-
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            files.pythonhosted.org:443
+            github.com:443
+            objects.githubusercontent.com:443
+            production.cloudflare.docker.com:443
+            pypi.org:443
+            registry-1.docker.io:443
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
         with:
@@ -98,8 +121,13 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
         with:
-          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
-
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            files.pythonhosted.org:443
+            github.com:443
+            objects.githubusercontent.com:443
+            pypi.org:443
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
         with:
@@ -131,7 +159,8 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
         with:
-          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+          egress-policy: block
+          allowed-endpoints: >
 
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe
@@ -150,8 +179,15 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
         with:
-          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
-
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            files.pythonhosted.org:443
+            github.com:443
+            objects.githubusercontent.com:443
+            pypi.org:443
+            upload.pypi.org:443
+            uploads.github.com:443
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
         with:
           fetch-depth: 0
