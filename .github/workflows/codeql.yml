@@ -19,8 +19,6 @@ jobs:
       security-events: write
     strategy:
       fail-fast: false
-      matrix:
-        language: ["python"]
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
@@ -34,15 +32,10 @@ jobs:
             pypi.org:443
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
-        with:
-          python-version: "3.10"
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
-          languages: ${{ matrix.language }}
+          languages: python
+          setup-python-dependencies: false
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
-        with:
-          category: "/language:${{matrix.language}}"
