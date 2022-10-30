@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.5 (2022-10-30)
+### Fix
+* **docs:** Passenv HOME for locating git config ([#30](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/30)) ([`164ddf0`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/164ddf03d44366c0a3d4bdca53a0905275f8d77b))
+
 ## v0.1.4 (2022-10-30)
 ### Fix
 * **docs:** Address docs build error ([#28](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/28)) ([`07b7f0c`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/07b7f0ca668efcd8fc63a3d590e726faff432890))
