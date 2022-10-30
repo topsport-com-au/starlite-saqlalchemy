@@ -18,8 +18,12 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install --upgrade wheel tox
+      - id: get-version
+        run: |
+          version=$(python -c 'print("${{github.ref_name}}".rsplit(".", 1)[0])')
+          echo "::set-output name=version::$version"
       - name: Build docs website and API reference
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          tox -e docs -- deploy --push ${{github.ref_name}}
+          tox -e docs -- deploy --push ${{steps.get-version.outputs.version}}
