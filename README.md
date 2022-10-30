@@ -19,6 +19,9 @@
   <a href="https://api.securityscorecards.dev/projects/github.com/topsport-com-au/starlite-saqlalchemy">
     <img alt="OpenSSF Scorecard" src="https://api.securityscorecards.dev/projects/github.com/topsport-com-au/starlite-saqlalchemy/badge"/>
   </a>
+  <a href="https://bestpractices.coreinfrastructure.org/projects/6646">
+    <img alt="OpenSSF Best Practices" src="https://bestpractices.coreinfrastructure.org/projects/6646/badge">
+  </a>
 </p>
 
 Configuration for a [Starlite](https://github.com/starlite-api/starlite) application that features:
