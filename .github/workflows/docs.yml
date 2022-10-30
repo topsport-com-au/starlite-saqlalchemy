@@ -5,7 +5,7 @@ on:
     tags: ["*"]
 
 permissions:  # added using https://github.com/step-security/secure-workflows
-  contents: read
+  contents: write
 
 jobs:
   docs:
