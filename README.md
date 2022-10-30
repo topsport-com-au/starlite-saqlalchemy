@@ -1,10 +1,25 @@
-# starlite-saqlalchemy
+<h1 align="center">starlite-saqlalchemy</h1>
+<p align="center">
+  <img src="https://www.topsport.com.au/assets/images/logo_pulse.svg" width="200" alt="TopSport Pulse"/>
+</p>
 
-<img src="https://www.topsport.com.au/assets/images/logo_pulse.svg" width="200"/>
-
-![PyPI - License](https://img.shields.io/pypi/l/starlite-saqlalchemy?color=blue)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/starlite-saqlalchemy)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/topsport-com-au/starlite-saqlalchemy/main.svg)](https://results.pre-commit.ci/latest/github/topsport-com-au/starlite-saqlalchemy/main)
+<p align="center">
+  <a href="https://pypi.org/project/starlite-saqlalchemy">
+    <img src="https://img.shields.io/pypi/v/starlite-saqlalchemy" alt="PYPI: starlite-saqlalchemy"/>
+  </a>
+  <a href="https://github.com/topsport-com-au/starlite-saqlalchemy/blob/main/LICENSE">
+    <img src="https://img.shields.io/pypi/l/starlite-saqlalchemy?color=blue" alt="License: MIT"/>
+  </a>
+  <a href="https://python.org">
+    <img src="https://img.shields.io/pypi/pyversions/starlite-saqlalchemy" alt="Python: supported versions"/>
+  </a>
+  <a href="https://results.pre-commit.ci/latest/github/topsport-com-au/starlite-saqlalchemy/main">
+    <img alt="pre-commit.ci status" src="https://results.pre-commit.ci/badge/github/topsport-com-au/starlite-saqlalchemy/main.svg"/>
+  </a>
+  <a href="https://api.securityscorecards.dev/projects/github.com/topsport-com-au/starlite-saqlalchemy">
+    <img alt="OpenSSF Scorecard" src="https://api.securityscorecards.dev/projects/github.com/topsport-com-au/starlite-saqlalchemy/badge"/>
+  </a>
+</p>
 
 Configuration for a [Starlite](https://github.com/starlite-api/starlite) application that features:
 
