@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.3 (2022-10-30)
+### Fix
+* **build:** Remove invalid classifier ([#27](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/27)) ([`76386a1`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/76386a135360b5b1f09413bd5920bae4c9591d70))
+
 ## v0.1.2 (2022-10-30)
 ### Fix
 * **build:** Don't use GH action ([#26](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/26)) ([`305f8e7`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/305f8e7b9f1de3a5e75823f30ab3d99cef26fbe6))
