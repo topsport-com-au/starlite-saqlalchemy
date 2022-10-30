@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.8 (2022-10-30)
+### Fix
+* **worker:** Depend on typed SAQ ([#33](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/33)) ([`13d3ac0`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/13d3ac00eaff1d288cfcf7c69e78e320f5937330))
+
+### Documentation
+* Header alignment and new badges ([#35](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/35)) ([`3f8ff79`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/3f8ff79cd3291691aac66a9fdb1716106dd66a8d))
+
 ## v0.1.7 (2022-10-30)
 ### Fix
 * **docs:** Removes patch version from docs tag ([#32](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/32)) ([`ffcc647`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ffcc6477ce59b8a3bd09b8377c50697aec231c5d))
