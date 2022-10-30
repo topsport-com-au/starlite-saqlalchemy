@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.7 (2022-10-30)
+### Fix
+* **docs:** Removes patch version from docs tag ([#32](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/32)) ([`ffcc647`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ffcc6477ce59b8a3bd09b8377c50697aec231c5d))
+
 ## v0.1.6 (2022-10-30)
 ### Fix
 * **docs:** Debug permissions issue ([#31](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/31)) ([`4556dec`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/4556decf34e9a9886a165cd277eb42b5da9c0e31))
