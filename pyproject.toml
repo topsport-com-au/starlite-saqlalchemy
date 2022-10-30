@@ -37,7 +37,6 @@ keywords = ["api", "rest", "http", "asgi", "starlite", "saq", "sqlalchemy", "plu
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Plugins",
-    "Framework :: Starlite",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Operating System :: OS Independent",
