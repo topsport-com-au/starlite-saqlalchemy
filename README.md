@@ -16,9 +16,6 @@
   <a href="https://results.pre-commit.ci/latest/github/topsport-com-au/starlite-saqlalchemy/main">
     <img alt="pre-commit.ci status" src="https://results.pre-commit.ci/badge/github/topsport-com-au/starlite-saqlalchemy/main.svg"/>
   </a>
-  <a href="https://api.securityscorecards.dev/projects/github.com/topsport-com-au/starlite-saqlalchemy">
-    <img alt="OpenSSF Scorecard" src="https://api.securityscorecards.dev/projects/github.com/topsport-com-au/starlite-saqlalchemy/badge"/>
-  </a>
   <a href="https://bestpractices.coreinfrastructure.org/projects/6646">
     <img alt="OpenSSF Best Practices" src="https://bestpractices.coreinfrastructure.org/projects/6646/badge">
   </a>
