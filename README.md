@@ -19,8 +19,8 @@
   <a href="https://bestpractices.coreinfrastructure.org/projects/6646">
     <img alt="OpenSSF Best Practices" src="https://bestpractices.coreinfrastructure.org/projects/6646/badge">
   </a>
-  <a href="https://github.com/topsport-com-au/starlite-saqlalchemyactions/workflows/codeql.yml">
-    <img alt="Actions: CodeQL" src="https://github.com/topsport-com-au/starlite-saqlalchemy/actions/workflows/codeql.yml/badge.svg?branch=main&event=push"/>
+  <a href="https://github.com/topsport-com-au/starlite-saqlalchemy/actions/workflows/ci.yml">
+    <img alt="Actions: CI" src="https://github.com/topsport-com-au/starlite-saqlalchemy/actions/workflows/ci.yml/badge.svg?branch=main&event=push"/>
   </a>
 </p>
 
