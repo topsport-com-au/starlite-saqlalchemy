@@ -2,7 +2,7 @@
 
 from redis.asyncio import Redis
 
-from . import settings
+from starlite_saqlalchemy import settings
 
 __all__ = ["client"]
 

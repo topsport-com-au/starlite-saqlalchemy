@@ -3,7 +3,7 @@ application persistent data."""
 from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from .exceptions import RepositoryNotFoundException
+from starlite_saqlalchemy.repository.exceptions import RepositoryNotFoundException
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession

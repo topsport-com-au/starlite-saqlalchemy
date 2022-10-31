@@ -34,7 +34,7 @@ from pydantic import BaseModel
 from starlite.app import DEFAULT_CACHE_CONFIG, DEFAULT_OPENAPI_CONFIG
 from starlite.plugins.sql_alchemy import SQLAlchemyPlugin
 
-from . import (
+from starlite_saqlalchemy import (
     cache,
     compression,
     dependencies,
@@ -48,10 +48,10 @@ from . import (
     sqlalchemy_plugin,
     static_files,
 )
-from .health import health_check
-from .repository.exceptions import RepositoryException
-from .service import ServiceException, make_service_callback
-from .worker import create_worker_instance
+from starlite_saqlalchemy.health import health_check
+from starlite_saqlalchemy.repository.exceptions import RepositoryException
+from starlite_saqlalchemy.service import ServiceException, make_service_callback
+from starlite_saqlalchemy.worker import create_worker_instance
 
 if TYPE_CHECKING:
 

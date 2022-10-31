@@ -3,7 +3,7 @@ from pathlib import Path
 
 from starlite.config import StaticFilesConfig
 
-from .constants import STATIC_DIR, STATIC_PATH
+from starlite_saqlalchemy.constants import STATIC_DIR, STATIC_PATH
 
 here = Path(__file__).parent
 

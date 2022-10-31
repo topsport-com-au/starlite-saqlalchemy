@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from starlite import CacheConfig
 from starlite.config.cache import default_cache_key_builder
 
-from . import redis, settings
+from starlite_saqlalchemy import redis, settings
 
 if TYPE_CHECKING:
     from starlite.connection import Request

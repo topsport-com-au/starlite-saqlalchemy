@@ -11,7 +11,7 @@ from typing import Any
 from starlette.status import HTTP_200_OK
 from starlite import LoggingConfig
 
-from . import settings
+from starlite_saqlalchemy import settings
 
 
 class AccessLogFilter(logging.Filter):  # pylint: disable=too-few-public-methods

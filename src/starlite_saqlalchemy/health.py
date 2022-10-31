@@ -8,9 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlite import get
 from starlite.exceptions import ServiceUnavailableException
 
-from . import settings
-from .repository.sqlalchemy import SQLAlchemyRepository
-from .settings import AppSettings
+from starlite_saqlalchemy import settings
+from starlite_saqlalchemy.repository.sqlalchemy import SQLAlchemyRepository
+from starlite_saqlalchemy.settings import AppSettings
 
 
 class HealthCheckFailure(ServiceUnavailableException):
