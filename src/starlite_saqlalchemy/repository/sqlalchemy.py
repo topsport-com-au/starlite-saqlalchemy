@@ -1,4 +1,6 @@
 """SQLAlchemy-based implementation of the repository protocol."""
+from __future__ import annotations
+
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Literal, TypeVar
 
@@ -67,9 +69,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
 
     model_type: type[ModelT]
 
-    def __init__(
-        self, session: "AsyncSession", select_: "Select[tuple[ModelT]] | None" = None
-    ) -> None:
+    def __init__(self, session: AsyncSession, select_: Select[tuple[ModelT]] | None = None) -> None:
         super().__init__(session)
         self._select = select(self.model_type) if select_ is None else select_
 
@@ -181,13 +181,13 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
     async def _execute(self) -> "Result[tuple[ModelT, ...]]":
         return await self.session.execute(self._select)
 
-    def _filter_in_collection(self, field_name: str, values: "abc.Collection[Any]") -> None:
+    def _filter_in_collection(self, field_name: str, values: abc.Collection[Any]) -> None:
         if not values:
             return
         self._select = self._select.where(getattr(self.model_type, field_name).in_(values))
 
     def _filter_on_datetime_field(
-        self, field_name: str, before: "datetime | None", after: "datetime | None"
+        self, field_name: str, before: datetime | None, after: datetime | None
     ) -> None:
         field = getattr(self.model_type, field_name)
         if before is not None:

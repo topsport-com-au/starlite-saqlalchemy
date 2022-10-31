@@ -1,4 +1,5 @@
 """Application OpenAPI config."""
+from __future__ import annotations
 
 from pydantic_openapi_schema.v3_1_0 import Contact
 from starlite import OpenAPIConfig

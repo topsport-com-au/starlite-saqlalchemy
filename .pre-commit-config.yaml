@@ -72,6 +72,7 @@ repos:
           [
             "flake8-bugbear",
             "flake8-comprehensions",
+            "flake8-future-annotations",
             "flake8-mutable",
             "flake8-print",
             "flake8-simplify",

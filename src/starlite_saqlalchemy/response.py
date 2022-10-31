@@ -1,5 +1,7 @@
 """Custom response class for the application that handles serialization of pg
 UUID values."""
+from __future__ import annotations
+
 from typing import Any
 
 import starlite

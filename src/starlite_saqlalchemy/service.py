@@ -3,6 +3,7 @@
 Service object is generic on the domain model type, which should be a
 SQLAlchemy model.
 """
+from __future__ import annotations
 
 import importlib
 import inspect
@@ -51,9 +52,9 @@ class Service(Generic[ModelT]):
         repository: Instance conforming to `AbstractRepository` interface.
     """
 
-    _INTERNAL_DTO_CACHE: dict[type["Service"], type["BaseModel"]] = {}
+    _INTERNAL_DTO_CACHE: dict[type[Service], type[BaseModel]] = {}
 
-    repository_type: type["AbstractRepository[ModelT]"]
+    repository_type: type[AbstractRepository[ModelT]]
 
     def __init_subclass__(cls, *args: Any, **kwargs: Any) -> None:
         """Create and cache a DTO instance that is internal use only.
@@ -69,7 +70,7 @@ class Service(Generic[ModelT]):
             f"__{model_type.__tablename__}DTO", model_type, dto.Purpose.READ
         )
 
-    def __init__(self, session: "AsyncSession") -> None:
+    def __init__(self, session: AsyncSession) -> None:
         self.repository = self.repository_type(session)
 
     # noinspection PyMethodMayBeStatic
@@ -246,7 +247,7 @@ class Service(Generic[ModelT]):
         logger.info("Callback executed for %s: %s", operation, model_instance)
 
     @classmethod
-    def _get_model_dto(cls) -> type["BaseModel"]:
+    def _get_model_dto(cls) -> type[BaseModel]:
         """DTO for model cached globally on first access.
 
         Returns:

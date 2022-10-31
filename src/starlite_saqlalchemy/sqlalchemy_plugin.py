@@ -1,4 +1,6 @@
 """Database connectivity and transaction management for the application."""
+from __future__ import annotations
+
 from functools import partial
 from typing import TYPE_CHECKING, Any, cast
 from uuid import UUID
@@ -48,7 +50,7 @@ engine = create_async_engine(
 default JSON serializer to use `orjson`. See
 [`create_async_engine()`][sqlalchemy.ext.asyncio.create_async_engine] for detailed instructions.
 """
-async_session_factory: async_sessionmaker["AsyncSession"] = async_sessionmaker(engine)
+async_session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(engine)
 """
 Database session factory. See [`async_sessionmaker()`][sqlalchemy.ext.asyncio.async_sessionmaker].
 """

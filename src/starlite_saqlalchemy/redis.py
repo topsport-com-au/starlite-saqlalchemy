@@ -1,4 +1,5 @@
 """Application redis instance."""
+from __future__ import annotations
 
 from redis.asyncio import Redis
 

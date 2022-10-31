@@ -1,4 +1,6 @@
 """Static file service configuration for the application."""
+from __future__ import annotations
+
 from pathlib import Path
 
 from starlite.config import StaticFilesConfig
