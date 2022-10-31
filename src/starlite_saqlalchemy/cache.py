@@ -11,16 +11,11 @@ if TYPE_CHECKING:
 
 
 def cache_key_builder(request: "Request") -> str:
-    """App name prefixed cache key builder.
+    """
+    Args:
+        request: Current request instance.
 
-    Parameters
-    ----------
-    request : Request
-        Current request instance.
-
-    Returns
-    -------
-    str
+    Returns:
         App slug prefixed cache key.
     """
     return f"{settings.app.slug}:{default_cache_key_builder(request)}"

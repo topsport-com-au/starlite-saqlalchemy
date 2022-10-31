@@ -58,6 +58,8 @@ class Service(Generic[ModelT]):
     def __init_subclass__(cls, *args: Any, **kwargs: Any) -> None:
         """Create and cache a DTO instance that is internal use only.
 
+        This DTO object should never be used to serialize client facing data.
+
         note:
             This pattern could be changed to on first access, rather than at compile time.
         """
