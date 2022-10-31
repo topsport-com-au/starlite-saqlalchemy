@@ -15,7 +15,7 @@ from sqlalchemy.orm import (
     registry,
 )
 
-from . import dto
+from starlite_saqlalchemy import dto
 
 if TYPE_CHECKING:
     from pydantic import BaseModel

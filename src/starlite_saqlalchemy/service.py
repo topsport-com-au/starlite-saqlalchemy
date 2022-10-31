@@ -10,17 +10,17 @@ import logging
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from . import dto
-from .repository.sqlalchemy import ModelT
-from .sqlalchemy_plugin import async_session_factory
-from .worker import queue
+from starlite_saqlalchemy import dto
+from starlite_saqlalchemy.repository.sqlalchemy import ModelT
+from starlite_saqlalchemy.sqlalchemy_plugin import async_session_factory
+from starlite_saqlalchemy.worker import queue
 
 if TYPE_CHECKING:
     from pydantic import BaseModel
     from sqlalchemy.ext.asyncio import AsyncSession
 
-    from .repository.abc import AbstractRepository
-    from .repository.types import FilterTypes
+    from starlite_saqlalchemy.repository.abc import AbstractRepository
+    from starlite_saqlalchemy.repository.types import FilterTypes
 
 
 logger = logging.getLogger(__name__)

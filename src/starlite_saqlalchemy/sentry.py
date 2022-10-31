@@ -7,7 +7,7 @@ See: https://github.com/getsentry/sentry-python/issues/1549
 import sentry_sdk
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 
-from . import settings
+from starlite_saqlalchemy import settings
 
 
 def configure() -> None:

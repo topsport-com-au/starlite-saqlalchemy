@@ -3,7 +3,7 @@
 from pydantic_openapi_schema.v3_1_0 import Contact
 from starlite import OpenAPIConfig
 
-from . import settings
+from starlite_saqlalchemy import settings
 
 config = OpenAPIConfig(
     title=settings.openapi.TITLE or settings.app.NAME,

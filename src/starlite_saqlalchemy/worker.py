@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 import orjson
 import saq
 
-from . import redis
+from starlite_saqlalchemy import redis
 
 if TYPE_CHECKING:
     from signal import Signals

@@ -14,12 +14,12 @@ from starlite.exceptions import (
 )
 from starlite.utils.exception import create_exception_response
 
-from .repository.exceptions import (
+from starlite_saqlalchemy.repository.exceptions import (
     RepositoryConflictException,
     RepositoryException,
     RepositoryNotFoundException,
 )
-from .service import ServiceException, UnauthorizedException
+from starlite_saqlalchemy.service import ServiceException, UnauthorizedException
 
 if TYPE_CHECKING:
     from starlite.connection import Request

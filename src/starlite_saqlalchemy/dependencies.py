@@ -5,9 +5,13 @@ from uuid import UUID
 
 from starlite import Dependency, Parameter, Provide
 
-from . import settings
-from .repository.filters import BeforeAfter, CollectionFilter, LimitOffset
-from .repository.types import FilterTypes
+from starlite_saqlalchemy import settings
+from starlite_saqlalchemy.repository.filters import (
+    BeforeAfter,
+    CollectionFilter,
+    LimitOffset,
+)
+from starlite_saqlalchemy.repository.types import FilterTypes
 
 if TYPE_CHECKING:
 

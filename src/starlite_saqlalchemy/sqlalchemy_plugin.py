@@ -13,7 +13,7 @@ from starlite.plugins.sql_alchemy.config import (
     SESSION_TERMINUS_ASGI_EVENTS,
 )
 
-from . import settings
+from starlite_saqlalchemy import settings
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
