@@ -7,6 +7,16 @@ if not, [let me know!](https://github.com/topsport-com-au/starlite-saqlalchemy/i
 
 ## Workflow
 
+### Local Environment for IDE
+
+First install the library and dependencies:
+
+`poetry install`
+
+Then install test dependencies into local env for benefit of IDE:
+
+`poetry run pip install -r dev.requirements.txt`
+
 We use `pre-commit` and `tox` for code quality and testing.
 
 _Suggestion: [pipx](https://pypa.github.io/pipx/) makes installing python tools easy!_

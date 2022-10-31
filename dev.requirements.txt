@@ -1,0 +1,7 @@
+coverage[toml]; python_version < '3.11'
+coverage; python_version >= '3.11'
+cryptography
+pytest
+pytest-asyncio
+pytest-dotenv
+pytest_docker
