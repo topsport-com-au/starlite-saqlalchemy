@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
+        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -30,8 +30,8 @@ jobs:
             github.com:443
             objects.githubusercontent.com:443
             pypi.org:443
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
+      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
         with:
           python-version: ${{env.PYTHON_LATEST}}
       - name: Install Dependencies
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
+        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -51,8 +51,8 @@ jobs:
             github.com:443
             objects.githubusercontent.com:443
             pypi.org:443
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
+      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
         with:
           python-version: ${{env.PYTHON_LATEST}}
       - name: Install Dependencies
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
+        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -73,8 +73,8 @@ jobs:
             objects.githubusercontent.com:443
             pypi.org:443
             registry.npmjs.org:443
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
+      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
         with:
           python-version: ${{env.PYTHON_LATEST}}
       - name: Install Dependencies
@@ -91,7 +91,7 @@ jobs:
           - "3.11"
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
+        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -103,15 +103,15 @@ jobs:
             pypi.org:443
             registry-1.docker.io:443
             auth.docker.io:443
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
+      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
         with:
           python-version: ${{matrix.python-version}}
       - name: Install Dependencies
         run: python -m pip install --upgrade wheel tox tox-gh-actions
       - run: python -m tox
       - name: Upload Coverage Data
-        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # @v3.1.1
         with:
           name: covdata
           path: .coverage.*
@@ -120,7 +120,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
+        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -129,20 +129,20 @@ jobs:
             github.com:443
             objects.githubusercontent.com:443
             pypi.org:443
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
+      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
         with:
           python-version: ${{env.PYTHON_LATEST}}
       - run: python -m pip install --upgrade wheel tox
       - name: Download coverage data
-        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7
+        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # @v3.0.1
         with:
           name: covdata
       - name: Fail if it's <100%.
         run: |
           python -m tox -e coverage
       - name: Upload HTML report if check failed.
-        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # @v3.1.1
         with:
           name: html-report
           path: htmlcov
@@ -158,13 +158,13 @@ jobs:
     runs-on: Ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
+        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
         with:
           egress-policy: block
           allowed-endpoints: >
 
       - name: Decide whether the needed jobs succeeded or failed
-        uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe
+        uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # @v1.2.2
         with:
           jobs: ${{toJSON(needs)}}
   release:
@@ -178,7 +178,7 @@ jobs:
       REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
+        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -189,11 +189,11 @@ jobs:
             pypi.org:443
             upload.pypi.org:443
             uploads.github.com:443
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
         with:
           fetch-depth: 0
           token: ${{ secrets.SEMANTIC_RELEASES_TOKEN }}
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
+      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
         with:
           python-version: ${{env.PYTHON_LATEST}}
       - run: python -m pip install python-semantic-release
