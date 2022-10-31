@@ -152,18 +152,15 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
     ) -> ModelT:
         """Attach detached instance to the session.
 
-        Parameters
-        ----------
-        session: AsyncSession
-            DB transaction.
-        model : ModelT
-            The instance to be attached to the session.
-        strategy : Literal["add", "merge"]
-            How the instance should be attached.
+        Args:
+            model: The instance to be attached to the session.
+            strategy: How the instance should be attached.
+                - "add": New instance added to session
+                - "merge": Instance merged with existing, or new one added.
 
-        Returns
-        -------
-        ModelT
+        Returns:
+            Instance attached to the session - if `"merge"` strategy, may not be same instance
+            that was provided.
         """
         match strategy:  # noqa: R503
             case "add":

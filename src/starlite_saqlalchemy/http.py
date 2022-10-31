@@ -25,23 +25,17 @@ class Client:
         ``httpx.AsyncClient.request``, we  call `raise_for_status()` on the
         response and wrap any `HTTPX` error in a `ClientException`.
 
-        Parameters
-        ----------
-        *args : Any
-            Unpacked into `httpx.AsyncClient.request()`.
-        **kwargs : Any
-            Unpacked into `httpx.AsyncClient.request()`.
+        Args:
+            *args: Unpacked into `httpx.AsyncClient.request()`.
+            **kwargs: Unpacked into `httpx.AsyncClient.request()`.
 
-        Returns
-        -------
-        httpx.Response
+        Returns:
             Return value of `httpx.AsyncClient.request()` after calling
             `httpx.Response.raise_for_status()`
 
-        Raises
-        ------
-        ClientException
-            Wraps any `httpx.HTTPError` arising from the request or response status check.
+        Raises:
+            ClientException: Wraps any `httpx.HTTPError` arising from the request or response status
+                check.
         """
         try:
             req = await self._client.request(*args, **kwargs)
@@ -56,14 +50,10 @@ class Client:
         Abstracts deserializing to allow for optional unwrapping of server response, e.g.,
         `{"data": []}`.
 
-        Parameters
-        ----------
-        response : httpx.Response
-            Response object, we call `.json()` on it.
+        Args:
+            response: Response object, we call `.json()` on it.
 
-        Returns
-        -------
-        Any
+        Returns:
             The result of `httpx.Response.json()` after passing through `self.unwrap_json()`.
         """
         return self.unwrap_json(response.json())
@@ -73,14 +63,10 @@ class Client:
         """Overwrite this method for pre-processing response data, for example
         unwrapping enveloped data.
 
-        Parameters
-        ----------
-        data : Any
-            Value returned from `response.json()`.
+        Args:
+            data: Value returned from `response.json()`.
 
-        Returns
-        -------
-        Any
+        Returns:
             Pre-processed data, default is pass-through/no-op.
         """
         return data

@@ -27,11 +27,11 @@ class Mode(Enum):
 
     Example:
 
-        ```python
-        class Model(Base):
-            ...
-            updated_at: Mapped[datetime] = mapped_column(info={"dto": Mode.READ_ONLY})
-        ```
+    ```python
+    class Model(Base):
+        ...
+        updated_at: Mapped[datetime] = mapped_column(info={"dto": Mode.READ_ONLY})
+    ```
     """
 
     READ_ONLY = auto()
@@ -46,9 +46,9 @@ class Purpose(Enum):
 
     Example:
 
-        ```python
-        ReadDTO = dto.factory("AuthorReadDTO", Author, purpose=dto.Purpose.READ)
-        ```
+    ```python
+    ReadDTO = dto.factory("AuthorReadDTO", Author, purpose=dto.Purpose.READ)
+    ```
     """
 
     READ = auto()
@@ -85,14 +85,14 @@ def factory(
     The fields that are included in the model can be controlled on the SQLAlchemy class
     definition by including a "dto" key in the `Column.info` mapping. For example:
 
-        ```python
-        class User(DeclarativeBase):
-            id: Mapped[UUID] = mapped_column(
-                default=uuid4, primary_key=True, info={"dto": dto.Mode.READ_ONLY}
-            )
-            email: Mapped[str]
-            password_hash: Mapped[str] = mapped_column(info={"dto": dto.Mode.PRIVATE})
-        ```
+    ```python
+    class User(DeclarativeBase):
+        id: Mapped[UUID] = mapped_column(
+            default=uuid4, primary_key=True, info={"dto": dto.Mode.READ_ONLY}
+        )
+        email: Mapped[str]
+        password_hash: Mapped[str] = mapped_column(info={"dto": dto.Mode.PRIVATE})
+    ```
 
     In the above example, a DTO generated for `Purpose.READ` will include the `id` and `email`
     fields, while a model generated for `Purpose.WRITE` will only include a field for `email`.

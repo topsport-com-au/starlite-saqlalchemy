@@ -15,16 +15,12 @@ class Response(_Response):
 
     @staticmethod
     def serializer(value: Any) -> Any:
-        """Serializes `value`.
+        """Serialize `value`.
 
-        Parameters
-        ----------
-        value : Any
-            The thing to be serialized.
+        Args:
+            value: To be serialized.
 
-        Returns
-        -------
-        Any
+        Returns:
             Serialized representation of `value`.
         """
         if isinstance(value, pgproto.UUID):

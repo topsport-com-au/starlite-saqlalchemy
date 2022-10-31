@@ -24,16 +24,13 @@ WorkerFunction = abc.Callable[..., abc.Awaitable[Any]]
 
 
 class Queue(saq.Queue):
-    """[SAQ Queue](https://github.com/tobymao/saq/blob/master/saq/queue.py)
+    """[SAQ Queue](https://github.com/tobymao/saq/blob/master/saq/queue.py).
 
     Configures `orjson` for JSON serialization/deserialization if not otherwise configured.
 
-    Parameters
-    ----------
-    *args : Any
-        Passed through to `saq.Queue.__init__()`
-    **kwargs : Any
-        Passed through to `saq.Queue.__init__()`
+    Args:
+        *args: Passed through to `saq.Queue.__init__()`
+        **kwargs: Passed through to `saq.Queue.__init__()`
     """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:

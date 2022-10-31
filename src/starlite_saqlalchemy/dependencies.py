@@ -25,16 +25,12 @@ UPDATED_FILTER_DEPENDENCY_KEY = "updated_filter"
 def provide_id_filter(
     ids: list[UUID] | None = Parameter(query="ids", default=None, required=False)
 ) -> CollectionFilter[UUID]:
-    """Return type consumed by ``Repository.filter_in_collection()``.
+    """
+    Args:
+        ids: Parsed out of comma separated list of values in query params.
 
-    Parameters
-    ----------
-    ids : list[UUID] | None
-        Parsed out of comma separated list of values in query params.
-
-    Returns
-    -------
-    CollectionFilter[UUID]
+    Returns:
+        Type consumed by `AbstractRepository.filter_in_collection()`
     """
     return CollectionFilter(field_name="id", values=ids or [])
 
@@ -43,14 +39,13 @@ def provide_created_filter(
     before: DTorNone = Parameter(query="created-before", default=None, required=False),
     after: DTorNone = Parameter(query="created-after", default=None, required=False),
 ) -> BeforeAfter:
-    """Return type consumed by `Repository.filter_on_datetime_field()`.
+    """
+    Args:
+        before: Filter for records created before this date/time.
+        after: Filter for records created after this date/time.
 
-    Parameters
-    ----------
-    before : datetime | None
-        Filter for records updated before this date/time.
-    after : datetime | None
-        Filter for records updated after this date/time.
+    Returns:
+        Type consumed by `Repository.filter_on_datetime_field()`.
     """
     return BeforeAfter("created", before, after)
 
@@ -60,13 +55,12 @@ def provide_updated_filter(
     after: DTorNone = Parameter(query="updated-after", default=None, required=False),
 ) -> BeforeAfter:
     """
-    Return type consumed by `Repository.filter_on_datetime_field()`.
-    Parameters
-    ----------
-    before : datetime | None
-        Filter for records updated before this date/time.
-    after : datetime | None
-        Filter for records updated after this date/time.
+    Args:
+        before: Filter for records updated before this date/time.
+        after: Filter for records updated after this date/time.
+
+    Returns:
+        Type consumed by `Repository.filter_on_datetime_field()`.
     """
     return BeforeAfter("updated", before, after)
 
@@ -81,13 +75,12 @@ def provide_limit_offset_pagination(
     ),
 ) -> LimitOffset:
     """
-    Return type consumed by `Repository.apply_limit_offset_pagination()`.
-    Parameters
-    ----------
-    page : int
-        LIMIT to apply to select.
-    page_size : int
-        OFFSET to apply to select.
+    Args:
+        page: LIMIT to apply to select.
+        page_size: OFFSET to apply to select.
+
+    Returns:
+        Type consumed by `Repository.apply_limit_offset_pagination()`.
     """
     return LimitOffset(page_size, page_size * (page - 1))
 
@@ -101,25 +94,22 @@ def provide_filter_dependencies(
     """Common collection route filtering dependencies. Add all filters to any
     route by including this function as a dependency, e.g:
 
-        @get
-        def get_collection_handler(filters: Filters) -> ...:
-            ...
-    The dependency is provided at the application layer, so only need to inject the dependency where
-    necessary.
+    ```python
+    @get
+    def get_collection_handler(filters: Filters) -> ...:
+        ...
+    ```
 
-    Parameters
-    ----------
-    id_filter : repository.CollectionFilter
-        Filter for scoping query to limited set of identities.
-    created_filter : repository.BeforeAfter
-        Filter for scoping query to instance creation date/time.
-    updated_filter : repository.BeforeAfter
-        Filter for scoping query to instance update date/time.
-    limit_offset : repository.LimitOffset
-        Filter for query pagination.
-    Returns
-    -------
-    list[FilterTypes]
+    The dependency is provided at the application layer, so only need to inject the dependency where
+    it is required.
+
+    Args:
+        id_filter: Filter for scoping query to limited set of identities.
+        created_filter: Filter for scoping query to instance creation date/time.
+        updated_filter: Filter for scoping query to instance update date/time.
+        limit_offset: Filter for query pagination.
+
+    Returns:
         List of filters parsed from connection.
     """
     return [
@@ -132,11 +122,8 @@ def provide_filter_dependencies(
 
 def create_collection_dependencies() -> dict[str, Provide]:
     """
-    Creates a dictionary of provides for pagination endpoints.
-    Returns
-    -------
-    dict[str, Provide]
-
+    Returns:
+        A dictionary of provides for pagination endpoints.
     """
     return {
         LIMIT_OFFSET_DEPENDENCY_KEY: Provide(provide_limit_offset_pagination),

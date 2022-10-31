@@ -41,25 +41,16 @@ def touch_updated_timestamp(session: Session, *_: Any) -> None:
     [`before_flush`][sqlalchemy.orm.SessionEvents.before_flush] event to bump
     the `updated` timestamp on modified instances.
 
-    Parameters
-    ----------
-    session : Session
-        The sync [`Session`][sqlalchemy.orm.Session] instance that underlies the async session.
+    Args:
+        session: The sync [`Session`][sqlalchemy.orm.Session] instance that underlies the async
+            session.
     """
     for instance in session.dirty:
         instance.updated = datetime.now()
 
 
 class Base(DeclarativeBase):
-    """Base for all SQLAlchemy declarative models.
-
-    Attributes
-    ----------
-    created : Mapped[datetime]
-        Date/time of instance creation.
-    updated : Mapped[datetime]
-        Date/time of last instance update.
-    """
+    """Base for all SQLAlchemy declarative models."""
 
     registry = registry(
         metadata=MetaData(naming_convention=convention),
@@ -69,12 +60,15 @@ class Base(DeclarativeBase):
     id: Mapped[UUID] = mapped_column(
         default=uuid4, primary_key=True, info={"dto": dto.Mode.READ_ONLY}
     )
+    """Primary key column."""
     created: Mapped[datetime] = mapped_column(
         default=datetime.now, info={"dto": dto.Mode.READ_ONLY}
     )
+    """Date/time of instance creation."""
     updated: Mapped[datetime] = mapped_column(
         default=datetime.now, info={"dto": dto.Mode.READ_ONLY}
     )
+    """Date/time of instance update."""
 
     # noinspection PyMethodParameters
     @declared_attr.directive
