@@ -148,7 +148,7 @@ jobs:
           path: htmlcov
         if: ${{failure()}}
   codeql:
-    name: Analyze
+    name: CodeQL
     runs-on: ubuntu-latest
     permissions:
       actions: read
