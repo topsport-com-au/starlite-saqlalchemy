@@ -4,6 +4,8 @@ The current support for sentry is limited, but still worth having.
 
 See: https://github.com/getsentry/sentry-python/issues/1549
 """
+from __future__ import annotations
+
 import sentry_sdk
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 

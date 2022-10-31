@@ -3,6 +3,8 @@
 Take note of the environment variable prefixes required for each
 settings class, except `AppSettings`.
 """
+from __future__ import annotations
+
 # pylint: disable=too-few-public-methods,missing-class-docstring
 from typing import Literal
 

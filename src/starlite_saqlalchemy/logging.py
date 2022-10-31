@@ -4,6 +4,8 @@ Ensures that the app, sqlalchemy, saq and uvicorn loggers all log through the qu
 
 Adds a filter for health check route logs.
 """
+from __future__ import annotations
+
 import logging
 import re
 from typing import Any

@@ -1,4 +1,6 @@
 """Async HTTP request client implementation built on `httpx`."""
+from __future__ import annotations
+
 from typing import Any
 
 import httpx

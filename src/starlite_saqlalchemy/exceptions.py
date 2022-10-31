@@ -3,6 +3,8 @@
 Also, defines functions that translate service and repository exceptions
 into HTTP exceptions.
 """
+from __future__ import annotations
+
 import logging
 from typing import TYPE_CHECKING
 
@@ -44,7 +46,7 @@ class ForbiddenException(HTTPException):
     status_code = 403
 
 
-def after_exception_hook_handler(exc: Exception, scope: "Scope", state: "State") -> None:
+def after_exception_hook_handler(exc: Exception, scope: Scope, state: State) -> None:
     """Logs exception and returns appropriate response.
 
     Args:
@@ -60,18 +62,14 @@ def after_exception_hook_handler(exc: Exception, scope: "Scope", state: "State")
     )
 
 
-def _create_error_response_from_starlite_middleware(
-    request: "Request", exc: Exception
-) -> "Response":
+def _create_error_response_from_starlite_middleware(request: Request, exc: Exception) -> Response:
     server_middleware = ServerErrorMiddleware(app=request.app)  # type: ignore[arg-type]
     return server_middleware.debug_response(  # type: ignore[return-value]
         request=request, exc=exc  # type:ignore[arg-type]
     )
 
 
-def repository_exception_to_http_response(
-    request: "Request", exc: RepositoryException
-) -> "Response":
+def repository_exception_to_http_response(request: Request, exc: RepositoryException) -> Response:
     """Transform repository exceptions to HTTP exceptions.
 
     Args:
@@ -93,7 +91,7 @@ def repository_exception_to_http_response(
     return create_exception_response(http_exc())
 
 
-def service_exception_to_http_response(request: "Request", exc: ServiceException) -> "Response":
+def service_exception_to_http_response(request: Request, exc: ServiceException) -> Response:
     """Transform service exceptions to HTTP exceptions.
 
     Args:

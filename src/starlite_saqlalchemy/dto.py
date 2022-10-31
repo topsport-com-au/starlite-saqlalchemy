@@ -6,6 +6,7 @@ Also experimenting with marking columns for DTO purposes using the
 `SQLAlchemy.Column.info` field, which allows demarcation of fields that
 should always be private, or read-only at the model declaration layer.
 """
+from __future__ import annotations
 
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Any, cast, get_args, get_origin, get_type_hints
@@ -55,7 +56,7 @@ class Purpose(Enum):
     WRITE = auto()
 
 
-def _construct_field_info(column: "Column", purpose: Purpose) -> FieldInfo:
+def _construct_field_info(column: Column, purpose: Purpose) -> FieldInfo:
     default = column.default
     if purpose is Purpose.READ or default is None:
         return FieldInfo(...)
@@ -66,7 +67,7 @@ def _construct_field_info(column: "Column", purpose: Purpose) -> FieldInfo:
     raise ValueError("Unexpected default type")
 
 
-def _should_exclude_field(purpose: Purpose, column: "Column", exclude: set[str]) -> bool:
+def _should_exclude_field(purpose: Purpose, column: Column, exclude: set[str]) -> bool:
     if column.key in exclude:
         return True
     mode = column.info.get(DTO_INFO_KEY)
@@ -78,7 +79,7 @@ def _should_exclude_field(purpose: Purpose, column: "Column", exclude: set[str])
 
 
 def factory(
-    name: str, model: type["DeclarativeBase"], purpose: Purpose, exclude: set[str] | None = None
+    name: str, model: type[DeclarativeBase], purpose: Purpose, exclude: set[str] | None = None
 ) -> type[BaseModel]:
     """Create a pydantic model class from a SQLAlchemy declarative ORM class.
 

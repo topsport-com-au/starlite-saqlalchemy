@@ -1,4 +1,6 @@
 """Repository type definitions."""
+from __future__ import annotations
+
 from starlite_saqlalchemy.repository.filters import (
     BeforeAfter,
     CollectionFilter,

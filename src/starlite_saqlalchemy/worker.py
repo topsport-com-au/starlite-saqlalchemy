@@ -1,4 +1,6 @@
 """SAQ worker and queue."""
+from __future__ import annotations
+
 import asyncio
 from collections import abc
 from functools import partial
@@ -43,7 +45,7 @@ class Worker(saq.Worker):
     """Modify behavior of saq worker for orchestration by Starlite."""
 
     # same issue: https://github.com/samuelcolvin/arq/issues/182
-    SIGNALS: list["Signals"] = []
+    SIGNALS: list[Signals] = []
 
     async def on_app_startup(self) -> None:
         """Attach the worker to the running event loop."""

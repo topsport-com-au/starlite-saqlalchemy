@@ -28,6 +28,8 @@ instantiation:
 
 The `PluginConfig` has switches to disable every aspect of the plugin behavior.
 """
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
@@ -70,7 +72,7 @@ class PluginConfig(BaseModel):
     application.
     """
 
-    worker_functions: "list[WorkerFunction | tuple[str, WorkerFunction]]" = []
+    worker_functions: list[WorkerFunction | tuple[str, WorkerFunction]] = []
     """
     Queue worker functions.
     """
@@ -153,7 +155,7 @@ class ConfigureApp:
     def __init__(self, config: PluginConfig = PluginConfig()) -> None:
         self.config = config
 
-    def __call__(self, app_config: "AppConfig") -> "AppConfig":
+    def __call__(self, app_config: AppConfig) -> AppConfig:
         """Entrypoint to the app config plugin.
 
         Receives the [`AppConfig`][starlite.config.app.AppConfig] object and modifies it.
@@ -180,7 +182,7 @@ class ConfigureApp:
         app_config.on_shutdown.extend([http.Client.close, redis.client.close])
         return app_config
 
-    def configure_after_exception(self, app_config: "AppConfig") -> None:
+    def configure_after_exception(self, app_config: AppConfig) -> None:
         """Add the logging after exception hook handler.
 
         Args:
@@ -191,7 +193,7 @@ class ConfigureApp:
                 app_config.after_exception = [app_config.after_exception]
             app_config.after_exception.append(exceptions.after_exception_hook_handler)
 
-    def configure_cache(self, app_config: "AppConfig") -> None:
+    def configure_cache(self, app_config: AppConfig) -> None:
         """Configure the application cache.
 
         We only overwrite if [`DEFAULT_CACHE_CONFIG`][starlite.app.DEFAULT_CACHE_CONFIG] is the
@@ -203,7 +205,7 @@ class ConfigureApp:
         if self.config.do_cache and app_config.cache_config is DEFAULT_CACHE_CONFIG:
             app_config.cache_config = cache.config
 
-    def configure_collection_dependencies(self, app_config: "AppConfig") -> None:
+    def configure_collection_dependencies(self, app_config: AppConfig) -> None:
         """Add the required [`Provide`][starlite.datastructures.Provide]
         instances to the app dependency mapping.
 
@@ -216,7 +218,7 @@ class ConfigureApp:
             for key, value in dependencies.create_collection_dependencies().items():
                 app_config.dependencies.setdefault(key, value)
 
-    def configure_compression(self, app_config: "AppConfig") -> None:
+    def configure_compression(self, app_config: AppConfig) -> None:
         """Configure application compression.
 
         No-op if [`AppConfig.compression_config`][starlite.config.app.AppConfig.compression_config]
@@ -228,7 +230,7 @@ class ConfigureApp:
         if self.config.do_compression and app_config.compression_config is None:
             app_config.compression_config = compression.config
 
-    def configure_exception_handlers(self, app_config: "AppConfig") -> None:
+    def configure_exception_handlers(self, app_config: AppConfig) -> None:
         """Add the handlers that translate service and repository exceptions
         into HTTP exceptions.
 
@@ -247,7 +249,7 @@ class ConfigureApp:
             ServiceException, exceptions.service_exception_to_http_response
         )
 
-    def configure_health_check(self, app_config: "AppConfig") -> None:
+    def configure_health_check(self, app_config: AppConfig) -> None:
         """Adds the health check controller.
 
         Args:
@@ -256,7 +258,7 @@ class ConfigureApp:
         if self.config.do_health_check:
             app_config.route_handlers.append(health_check)
 
-    def configure_logging(self, app_config: "AppConfig") -> None:
+    def configure_logging(self, app_config: AppConfig) -> None:
         """Configures application logging if it has not already been
         configured.
 
@@ -266,7 +268,7 @@ class ConfigureApp:
         if self.config.do_logging and app_config.logging_config is None:
             app_config.logging_config = logging.config
 
-    def configure_openapi(self, app_config: "AppConfig") -> None:
+    def configure_openapi(self, app_config: AppConfig) -> None:
         """Configures the OpenAPI docs if they have not already been
         configured.
 
@@ -278,7 +280,7 @@ class ConfigureApp:
         if self.config.do_openapi and app_config.openapi_config is DEFAULT_OPENAPI_CONFIG:
             app_config.openapi_config = openapi.config
 
-    def configure_response_class(self, app_config: "AppConfig") -> None:
+    def configure_response_class(self, app_config: AppConfig) -> None:
         """Add the custom response class.
 
         No-op if the [`AppConfig.response_class`][starlite.config.app.AppConfig.response_class]
@@ -290,7 +292,7 @@ class ConfigureApp:
         if self.config.do_response_class and app_config.response_class is None:
             app_config.response_class = response.Response
 
-    def configure_sentry(self, app_config: "AppConfig") -> None:
+    def configure_sentry(self, app_config: AppConfig) -> None:
         """Add handler to configure Sentry integration.
 
         Args:
@@ -299,7 +301,7 @@ class ConfigureApp:
         if self.config.do_sentry:
             app_config.on_startup.append(sentry.configure)
 
-    def configure_sqlalchemy_plugin(self, app_config: "AppConfig") -> None:
+    def configure_sqlalchemy_plugin(self, app_config: AppConfig) -> None:
         """Configure `SQLAlchemy` for the application.
 
         Adds a configured [`SQLAlchemyPlugin`][starlite.plugins.sql_alchemy.SQLAlchemyPlugin] to
@@ -311,7 +313,7 @@ class ConfigureApp:
         if self.config.do_sqlalchemy_plugin:
             app_config.plugins.append(SQLAlchemyPlugin(config=sqlalchemy_plugin.config))
 
-    def configure_static_files(self, app_config: "AppConfig") -> None:
+    def configure_static_files(self, app_config: AppConfig) -> None:
         """Configure static files for the application.
 
         No-op if
@@ -324,7 +326,7 @@ class ConfigureApp:
         if self.config.do_static_files and app_config.static_files_config is not None:
             app_config.static_files_config = static_files.config
 
-    def configure_worker(self, app_config: "AppConfig") -> None:
+    def configure_worker(self, app_config: AppConfig) -> None:
         """Configure the `SAQ` async worker.
 
         No-op if there are no worker functions set on

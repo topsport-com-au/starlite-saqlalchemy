@@ -1,4 +1,6 @@
 """Application cache config."""
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from starlite import CacheConfig
@@ -10,7 +12,7 @@ if TYPE_CHECKING:
     from starlite.connection import Request
 
 
-def cache_key_builder(request: "Request") -> str:
+def cache_key_builder(request: Request) -> str:
     """
     Args:
         request: Current request instance.

@@ -1,5 +1,7 @@
 """AbstractRepository defines the interface for interacting with the
 application persistent data."""
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
@@ -24,7 +26,7 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
     id_attribute = "id"
     """Name of the primary identifying attribute on `model_type`."""
 
-    def __init__(self, session: "AsyncSession") -> None:
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     @abstractmethod

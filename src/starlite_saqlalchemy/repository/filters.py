@@ -1,5 +1,7 @@
 """Datastructures used by repository to apply filtering to collection
 queries."""
+from __future__ import annotations
+
 from collections import abc
 from dataclasses import dataclass
 from datetime import datetime
