@@ -17,29 +17,25 @@ jobs:
       actions: read
       contents: read
       security-events: write
-
     strategy:
       fail-fast: false
-      matrix:
-        language: ["python"]
-        # CodeQL supports ['cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby']
-        # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
-
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            bootstrap.pypa.io:443
+            files.pythonhosted.org:443
+            github.com:443
+            pypi.org:443
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984
-        with:
-          python-version: "3.11"
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
-          languages: ${{ matrix.language }}
-
+          languages: python
+          setup-python-dependencies: false
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
-        with:
-          category: "/language:${{matrix.language}}"
