@@ -46,11 +46,7 @@ class Operation(str, Enum):
 
 
 class Service(Generic[ModelT]):
-    """Generic Service object.
-
-    Args:
-        repository: Instance conforming to `AbstractRepository` interface.
-    """
+    """Generic Service object."""
 
     _INTERNAL_DTO_CACHE: dict[type[Service], type[BaseModel]] = {}
 
