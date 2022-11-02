@@ -169,6 +169,9 @@ jobs:
             pypi.org:443
       - name: Checkout repository
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
+      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
+        with:
+          python-version: ${{env.PYTHON_LATEST}}
       - name: Initialize CodeQL With Dependencies
         if: github.event_name == 'push' && github.ref_name == 'main'
         uses: github/codeql-action/init@v2
