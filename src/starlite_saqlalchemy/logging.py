@@ -8,12 +8,16 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import Any
+from typing import TYPE_CHECKING
 
 from starlette.status import HTTP_200_OK
 from starlite import LoggingConfig
 
 from starlite_saqlalchemy import settings
+
+if TYPE_CHECKING:
+    from re import Pattern
+    from typing import Any
 
 
 class AccessLogFilter(logging.Filter):  # pylint: disable=too-few-public-methods
@@ -32,7 +36,7 @@ class AccessLogFilter(logging.Filter):  # pylint: disable=too-few-public-methods
 
     def __init__(self, *args: Any, path_re: str, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.path_filter = re.compile(path_re)
+        self.path_filter: Pattern[str] = re.compile(path_re)
 
     def filter(self, record: logging.LogRecord) -> bool:
         *_, req_path, _, status_code = record.args  # type:ignore[misc]

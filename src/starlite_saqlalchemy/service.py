@@ -18,6 +18,7 @@ from starlite_saqlalchemy.worker import queue
 
 if TYPE_CHECKING:
     from pydantic import BaseModel
+    from saq.types import Context
     from sqlalchemy.ext.asyncio import AsyncSession
 
     from starlite_saqlalchemy.repository.abc import AbstractRepository
@@ -67,7 +68,7 @@ class Service(Generic[ModelT]):
         )
 
     def __init__(self, session: AsyncSession) -> None:
-        self.repository = self.repository_type(session)
+        self.repository: AbstractRepository[ModelT] = self.repository_type(session)
 
     # noinspection PyMethodMayBeStatic
     async def authorize_create(self, data: ModelT) -> ModelT:
@@ -253,7 +254,7 @@ class Service(Generic[ModelT]):
 
 
 async def make_service_callback(
-    _ctx: dict,
+    _ctx: Context,
     *,
     service_module_name: str,
     service_type_fqdn: str,

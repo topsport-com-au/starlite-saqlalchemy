@@ -97,7 +97,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
             self.session.expunge(instance)
             return instance
 
-    async def list(self, *filters: "FilterTypes", **kwargs: Any) -> list[ModelT]:
+    async def list(self, *filters: FilterTypes, **kwargs: Any) -> list[ModelT]:
         for filter_ in filters:
             match filter_:
                 case LimitOffset(limit, offset):
@@ -136,7 +136,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
             return instance
 
     @classmethod
-    async def check_health(cls, session: "AsyncSession") -> bool:
+    async def check_health(cls, session: AsyncSession) -> bool:
         """Perform a health check on the database.
 
         Args:
@@ -178,7 +178,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
             case _:
                 raise ValueError("Unexpected value for `strategy`, must be `'add'` or `'merge'`")
 
-    async def _execute(self) -> "Result[tuple[ModelT, ...]]":
+    async def _execute(self) -> Result[tuple[ModelT, ...]]:
         return await self.session.execute(self._select)
 
     def _filter_in_collection(self, field_name: str, values: abc.Collection[Any]) -> None:
