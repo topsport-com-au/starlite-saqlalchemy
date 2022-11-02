@@ -52,7 +52,7 @@ async def test_enqueue_service_callback(
     """Tests that job enqueued with desired arguments."""
     enqueue_mock = AsyncMock()
     monkeypatch.setattr(worker.queue, "enqueue", enqueue_mock)
-    service_instance = domain.Service(sqlalchemy_plugin.async_session_factory())
+    service_instance = domain.Service(session=sqlalchemy_plugin.async_session_factory())
     await service_instance.enqueue_callback(
         service.Operation.UPDATE, domain.Author(**raw_authors[0])
     )
