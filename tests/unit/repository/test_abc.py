@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from starlite_saqlalchemy.repository.exceptions import RepositoryNotFoundException
-from tests.unit.utils import GenericMockRepository
+from starlite_saqlalchemy.testing.repository import GenericMockRepository
 
 
 def test_repository_check_not_found_raises() -> None:
