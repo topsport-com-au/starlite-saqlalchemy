@@ -6,9 +6,9 @@ import pytest
 from starlite.testing import TestClient
 
 from starlite_saqlalchemy import sqlalchemy_plugin, worker
+from starlite_saqlalchemy.testing.repository import GenericMockRepository
 
 from ..utils import domain
-from .utils import GenericMockRepository
 
 if TYPE_CHECKING:
     from collections import abc

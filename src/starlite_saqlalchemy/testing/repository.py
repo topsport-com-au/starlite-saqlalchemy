@@ -8,6 +8,7 @@ from uuid import uuid4
 
 from starlite_saqlalchemy.orm import Base
 from starlite_saqlalchemy.repository.abc import AbstractRepository
+from starlite_saqlalchemy.repository.exceptions import RepositoryConflictException
 
 if TYPE_CHECKING:
     from collections import abc
@@ -33,7 +34,8 @@ class GenericMockRepository(AbstractRepository[BaseT], Generic[BaseT]):
         return self.check_not_found(self.collection.get(id_))
 
     async def add(self, data: BaseT) -> BaseT:
-        assert self.get_id_attribute_value(data) is None, "`add()` received identified item."
+        if self.get_id_attribute_value(data) is not None:
+            raise RepositoryConflictException("`add()` received identified item.")
         now = datetime.now()
         data.updated = data.created = now
         id_ = self._id_factory()
