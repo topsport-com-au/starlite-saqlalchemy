@@ -8,8 +8,6 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 from starlite_saqlalchemy.repository.exceptions import RepositoryNotFoundException
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
-
     from .types import FilterTypes
 
 __all__ = ["AbstractRepository"]
@@ -26,8 +24,8 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
     id_attribute = "id"
     """Name of the primary identifying attribute on `model_type`."""
 
-    def __init__(self, session: AsyncSession) -> None:
-        self.session = session
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
 
     @abstractmethod
     async def add(self, data: T) -> T:

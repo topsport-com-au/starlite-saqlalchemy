@@ -69,8 +69,11 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
 
     model_type: type[ModelT]
 
-    def __init__(self, session: AsyncSession, select_: Select[tuple[ModelT]] | None = None) -> None:
-        super().__init__(session)
+    def __init__(
+        self, *, session: AsyncSession, select_: Select[tuple[ModelT]] | None = None, **kwargs: Any
+    ) -> None:
+        super().__init__(**kwargs)
+        self.session = session
         self._select = select(self.model_type) if select_ is None else select_
 
     async def add(self, data: ModelT) -> ModelT:
