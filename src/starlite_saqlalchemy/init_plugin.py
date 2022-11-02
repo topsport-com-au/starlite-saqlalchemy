@@ -35,6 +35,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel
 from starlite.app import DEFAULT_CACHE_CONFIG, DEFAULT_OPENAPI_CONFIG
 from starlite.plugins.sql_alchemy import SQLAlchemyPlugin
+from starlite.response import Response
 
 from starlite_saqlalchemy import (
     cache,
@@ -45,17 +46,19 @@ from starlite_saqlalchemy import (
     logging,
     openapi,
     redis,
-    response,
     sentry,
     sqlalchemy_plugin,
     static_files,
 )
 from starlite_saqlalchemy.health import health_check
 from starlite_saqlalchemy.repository.exceptions import RepositoryException
+from starlite_saqlalchemy.serializer import default_serializer
 from starlite_saqlalchemy.service import ServiceException, make_service_callback
 from starlite_saqlalchemy.worker import create_worker_instance
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+    from typing import Any
 
     from starlite.config.app import AppConfig
 
@@ -142,6 +145,15 @@ class PluginConfig(BaseModel):
     sets handlers for [`AppConfig.on_startup`][starlite.config.app.AppConfig.on_startup] and
     [`AppConfig.on_shutdown`][starlite.config.app.AppConfig.on_shutdown] that manage the lifecycle
     of the `SAQ` worker.
+    """
+    serializer: Callable[[Any], Any] = default_serializer
+    """
+    The serializer callable that is used by the custom [`Response`][starlite.response.Response]
+    class that is created.
+    If [`AppConfig.response_class`][starlite.config.app.AppConfig.response_class] is not `None`,
+    this is ignored.
+    If [`PluginConfig.do_response_class`][PluginConfig.do_response_class] is `False`, this is
+    ignored.
     """
 
 
@@ -290,7 +302,9 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_response_class and app_config.response_class is None:
-            app_config.response_class = response.Response
+            app_config.response_class = type(
+                "Response", (Response,), {"serializer": staticmethod(self.config.serializer)}
+            )
 
     def configure_sentry(self, app_config: AppConfig) -> None:
         """Add handler to configure Sentry integration.
