@@ -1,8 +1,8 @@
-black
-mike
-mkdocs-gen-files
-mkdocs-literate-nav
-mkdocs-material
-mkdocs-section-index
-mkdocstrings[python]
-pymdown-extensions
+black == 22.10.0
+mike == 1.1.2
+mkdocs-gen-files == 0.4.0
+mkdocs-literate-nav == 0.5.0
+mkdocs-material == 8.5.7
+mkdocs-section-index == 0.3.4
+mkdocstrings[python] == 0.19.0
+pymdown-extensions == 9.7
