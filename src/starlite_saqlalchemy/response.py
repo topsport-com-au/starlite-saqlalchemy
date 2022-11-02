@@ -11,7 +11,7 @@ from starlite.response import Response as _Response
 __all__ = ["Response"]
 
 
-class Response(_Response):
+class Response(_Response[Any]):
     """Custom [`starlite.Response`][starlite.response.Response] that handles
     serialization of the postgres UUID type used by SQLAlchemy."""
 
@@ -27,4 +27,4 @@ class Response(_Response):
         """
         if isinstance(value, pgproto.UUID):
             return str(value)
-        return starlite.Response.serializer(value)
+        return starlite.Response[Any].serializer(value)

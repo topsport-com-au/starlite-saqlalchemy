@@ -69,7 +69,7 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """
 
     @abstractmethod
-    async def list(self, *filters: "FilterTypes", **kwargs: Any) -> list[T]:
+    async def list(self, *filters: FilterTypes, **kwargs: Any) -> list[T]:
         """Get a list of instances, optionally filtered.
 
         Args:

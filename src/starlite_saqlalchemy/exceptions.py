@@ -24,10 +24,13 @@ from starlite_saqlalchemy.repository.exceptions import (
 from starlite_saqlalchemy.service import ServiceException, UnauthorizedException
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from starlite.connection import Request
     from starlite.datastructures import State
     from starlite.response import Response
     from starlite.types import Scope
+    from starlite.utils.exception import ExceptionResponseContent
 
 __all__ = ["after_exception_hook_handler"]
 
@@ -69,7 +72,9 @@ def _create_error_response_from_starlite_middleware(request: Request, exc: Excep
     )
 
 
-def repository_exception_to_http_response(request: Request, exc: RepositoryException) -> Response:
+def repository_exception_to_http_response(
+    request: Request[Any, Any], exc: RepositoryException
+) -> Response[ExceptionResponseContent]:
     """Transform repository exceptions to HTTP exceptions.
 
     Args:
@@ -91,7 +96,9 @@ def repository_exception_to_http_response(request: Request, exc: RepositoryExcep
     return create_exception_response(http_exc())
 
 
-def service_exception_to_http_response(request: Request, exc: ServiceException) -> Response:
+def service_exception_to_http_response(
+    request: Request[Any, Any], exc: ServiceException
+) -> Response[ExceptionResponseContent]:
     """Transform service exceptions to HTTP exceptions.
 
     Args:

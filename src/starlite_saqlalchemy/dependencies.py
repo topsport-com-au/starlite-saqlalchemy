@@ -93,7 +93,7 @@ def provide_limit_offset_pagination(
 def provide_filter_dependencies(
     created_filter: BeforeAfter = Dependency(skip_validation=True),
     updated_filter: BeforeAfter = Dependency(skip_validation=True),
-    id_filter: CollectionFilter = Dependency(skip_validation=True),
+    id_filter: CollectionFilter[UUID] = Dependency(skip_validation=True),
     limit_offset: LimitOffset = Dependency(skip_validation=True),
 ) -> list[FilterTypes]:
     """Common collection route filtering dependencies. Add all filters to any
