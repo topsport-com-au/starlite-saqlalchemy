@@ -1,6 +1,6 @@
 # Logging
 
-`starlite-saqlalchemy` has a baked-in structured logging pattern that facilitates the
+`starlite-saqlalchemy` has structured logging baked-in, built around facilitating the
 [Canonical Log Lines](https://brandur.org/canonical-log-lines) pattern (which is basically, a
 single log line per request or async worker invocation).
 
