@@ -57,10 +57,11 @@ from starlite_saqlalchemy.service import ServiceException, make_service_callback
 from starlite_saqlalchemy.worker import create_worker_instance
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
     from typing import Any
 
     from starlite.config.app import AppConfig
+    from structlog.types import Processor
 
     from starlite_saqlalchemy.worker import WorkerFunction
 
@@ -77,6 +78,7 @@ class PluginConfig(BaseModel):
     application.
     """
 
+    # why isn't the callback defined here?
     worker_functions: list[WorkerFunction | tuple[str, WorkerFunction]] = []
     """
     Queue worker functions.
@@ -157,6 +159,10 @@ class PluginConfig(BaseModel):
     If [`PluginConfig.do_response_class`][PluginConfig.do_response_class] is `False`, this is
     ignored.
     """
+    # the addition of the health check filter processor makes mypy think `log.default_processors` is
+    # list[object].. seems typed correctly to me :/
+    log_processors: Sequence[Processor] = log.default_processors  # type:ignore[assignment]
+    """Chain of structlog log processors."""
 
 
 class ConfigureApp:
@@ -280,10 +286,11 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_logging and app_config.logging_config is None:
+            app_config.on_startup.append(lambda: log.configure(self.config.log_processors))
             app_config.logging_config = log.config
-            app_config.middleware.append(log.middleware_factory)
+            app_config.middleware.append(log.controller.middleware_factory)
             app_config.before_send = self._ensure_list(app_config.before_send)
-            app_config.before_send.append(log.BeforeSendHandler())
+            app_config.before_send.append(log.controller.BeforeSendHandler())
 
     def configure_openapi(self, app_config: AppConfig) -> None:
         """Configures the OpenAPI docs if they have not already been
@@ -354,7 +361,7 @@ class ConfigureApp:
         Args:
             app_config: The Starlite application config object.
         """
-        if self.config.do_worker and self.config.worker_functions:
+        if self.config.do_worker:
             self.config.worker_functions.append(
                 (make_service_callback.__qualname__, make_service_callback)
             )

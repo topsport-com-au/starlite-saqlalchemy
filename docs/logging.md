@@ -5,7 +5,8 @@
 single log line per request or async worker invocation).
 
 The pattern is built upon the excellent [`structlog`](https://github.com/hynek/structlog) library,
-and is configured to be as efficient as possible while not blocking the event loop.
+and is configured to be as efficient as possible while not blocking the event loop (it runs the
+logging in a processor thread, off the event loop).
 
 ## Adding data to the log
 
@@ -21,11 +22,11 @@ def do_something() -> None:
     bind_contextvars(i_did="something")
 ```
 
-As easy as that! Whether you do that in the context of handling an HTTP request, or during an async
-worker invocation, it doesn't matter, that key/value pair will be included in the log for that
+Whether you call that in the context of handling an HTTP request, or during an async worker
+invocation, it doesn't matter, that key/value pair will be included in the log representing that
 invocation.
 
-## Features
+## Controller Logging
 
 ### Middleware
 
@@ -49,7 +50,7 @@ to do two things:
    but once we receive the final `Response Body` message of the request we use it to construct the
    response log, and finally emit the log message at the predetermined severity level.
 
-## Example
+### Example
 
 Here's an example of a log emitted with the default configuration (I've applied the formatting for
 the purposes of this documentation, the logger emits un-formatted json):
@@ -97,7 +98,7 @@ the purposes of this documentation, the logger emits un-formatted json):
 }
 ```
 
-## Controlling Log Content
+### Controlling Log Content
 
 As you can see, we are including a lot of data in our logs that may include sensitive values, such
 as [PII](https://en.wikipedia.org/wiki/Personal_data) and secrets.
@@ -107,7 +108,7 @@ Thankfully, we have mechanisms to ensure that this type of data is excluded from
 Our [LogConfig][starlite_saqlalchemy.settings.LogConfig] object provides a host of options that
 allow you to customize log output. This exposes the following environment variables:
 
-### `LOG_EXCLUDE_PATHS`
+#### `LOG_EXCLUDE_PATHS`
 
 This is a [regular expression][re] that is matched against the path of the request before logging.
 If the path matches the regex, the route is not logged.
@@ -120,7 +121,7 @@ Explicit paths can be excluded by using the "start" (`^`) and "end" (`$`) symbol
 
 Multiple regexes can be concatenated with the "or" symbol (`|`).
 
-### LOG_OBFUSCATE_COOKIES & LOG_OBFUSCATE_HEADERS
+#### LOG_OBFUSCATE_COOKIES & LOG_OBFUSCATE_HEADERS
 
 These two environment variables allow you to specify header and cookie names, whose value will be
 obfuscated in the logs.
@@ -138,7 +139,7 @@ As environment variables are parsed by pydantic, collections such as these shoul
 LOG_OBFUSCATE_HEADERS='["Authorization", "X-API-KEY"]'`
 ```
 
-### LOG_REQUEST_FIELDS & LOG_RESPONSE_FIELDS
+#### LOG_REQUEST_FIELDS & LOG_RESPONSE_FIELDS
 
 These specify the fields from the
 [ASGI Connection Scope](https://asgi.readthedocs.io/en/latest/specs/www.html#http-connection-scope)
@@ -201,3 +202,45 @@ from our dependencies are logged through that, so they won't block the event loo
 
 We inspect `stdout` destination to determine if it is writing to a terminal and modify the processor
 chain so that you get pretty log output when developing locally!
+
+## Worker Logging
+
+### Worker.before_process
+
+Use this hook to do the clear_contextvars() call.
+
+### Worker.after_process
+
+Use this hook to extract context from the job, and log at appropriate level.
+
+Restrict the SAQ logging to WARNING or higher.
+
+## SAQ Logs
+
+### queue.py
+
+#### `class Queue`
+
+- sweep(): l282 - INFO - if sweeping a missing job
+- sweep(): l286 - INFO - sweeping a finished job
+- retry(): l383 - INFO - if retrying a job
+- finish(): l422 - INFO - on job finish
+- dequeue(): l436 - DEBUG - dequeue time out
+- enqueue(): l495 - INFO - on enqueue
+
+### worker.py
+
+#### `class Worker`
+
+- start(): l135 - INFO - on worker shutdown
+- schedule(): l167 - INFO - on scheduled (cron)
+- upkeep(): l181 - EXCEPTION - on failed upkeep task
+- abort(): l223 - INFO - on job abort
+- process(): l242 - INFO - on job processing
+- process(): l253 - EXCEPTION - on job error
+- process(): l270 - EXCEPTION - on after process hook failure
+
+#### `def async_check_health()`
+
+- l343 - WARNING - on health check failure
+- l346 - INFO - on health check success, logs the queue name

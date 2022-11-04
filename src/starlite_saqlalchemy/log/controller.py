@@ -8,13 +8,10 @@ from __future__ import annotations
 
 import logging
 import re
-import sys
 from inspect import isawaitable
 from typing import TYPE_CHECKING
 
-import orjson
 import structlog
-from starlite.config import LoggingConfig
 from starlite.enums import ScopeType
 from starlite.utils.extractors import ConnectionDataExtractor, ResponseDataExtractor
 
@@ -27,6 +24,8 @@ if TYPE_CHECKING:
     from starlite.datastructures import State
     from starlite.types.asgi_types import ASGIApp, Message, Receive, Scope, Send
     from structlog.typing import EventDict, WrappedLogger
+
+LOGGER = structlog.get_logger()
 
 
 def drop_health_logs(_: WrappedLogger, __: str, event_dict: EventDict) -> EventDict:
@@ -46,35 +45,6 @@ def drop_health_logs(_: WrappedLogger, __: str, event_dict: EventDict) -> EventD
     if is_http_log and is_health_log and is_success_status:
         raise structlog.DropEvent
     return event_dict
-
-
-processors = [
-    structlog.contextvars.merge_contextvars,
-    drop_health_logs,
-    structlog.processors.add_log_level,
-    structlog.processors.TimeStamper(fmt="iso", utc=True),
-]
-
-if sys.stderr.isatty():  # pragma: no cover
-    processors.extend([structlog.dev.ConsoleRenderer()])
-else:
-    processors.extend(
-        [
-            structlog.processors.format_exc_info,
-            structlog.processors.dict_tracebacks,
-            structlog.processors.JSONRenderer(serializer=orjson.dumps),
-        ]
-    )
-
-structlog.configure(
-    cache_logger_on_first_use=True,
-    logger_factory=structlog.BytesLoggerFactory(),
-    # mypy infers `processors` as `list[object]` :/
-    processors=processors,  # type:ignore[arg-type]
-    wrapper_class=structlog.make_filtering_bound_logger(settings.log.LEVEL),
-)
-
-LOGGER = structlog.get_logger()
 
 
 def middleware_factory(app: ASGIApp) -> ASGIApp:
@@ -231,35 +201,3 @@ class BeforeSendHandler:
                 continue
             data[key] = value
         return data
-
-
-config = LoggingConfig(
-    root={"level": logging.getLevelName(settings.log.LEVEL), "handlers": ["queue_listener"]},
-    formatters={
-        "standard": {
-            "format": (
-                "%(asctime)s loglevel=%(levelname)-6s logger=%(name)s %(funcName)s() "
-                "L%(lineno)-4d %(message)s"
-            )
-        }
-    },
-    loggers={
-        "uvicorn.error": {
-            "propagate": False,
-            "handlers": ["queue_listener"],
-        },
-        "saq": {
-            "propagate": False,
-            "handlers": ["queue_listener"],
-        },
-        "sqlalchemy.engine": {
-            "propagate": False,
-            "handlers": ["queue_listener"],
-        },
-    },
-)
-"""Pre-configured log config for application deps.
-
-While we use structlog for internal app logging, we still want to ensure that logs emitted by any
-of our dependencies are logged in a non-blocking manner.
-"""

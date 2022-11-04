@@ -29,15 +29,15 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(name="before_send_handler")
-def fx_before_send_handler() -> log.BeforeSendHandler:
+def fx_before_send_handler() -> log.controller.BeforeSendHandler:
     """Callable that receives send messages on their way out to the client."""
-    return log.BeforeSendHandler()
+    return log.controller.BeforeSendHandler()
 
 
 def test_drop_health_logs_raises_structlog_drop_event() -> None:
     """Health check shouldn't be logged if successful."""
     with pytest.raises(DropEvent):
-        log.drop_health_logs(
+        log.controller.drop_health_logs(
             None,
             "abc",
             {
@@ -55,12 +55,12 @@ def test_drop_health_log_no_drop_event_if_not_success_status() -> None:
         "request": {"path": settings.api.HEALTH_PATH},
         "response": {"status_code": HTTP_500_INTERNAL_SERVER_ERROR},
     }
-    assert event_dict == log.drop_health_logs(None, "abc", event_dict)
+    assert event_dict == log.controller.drop_health_logs(None, "abc", event_dict)
 
 
 def test_middleware_factory_added_to_app(app: Starlite) -> None:
     """Ensures the plugin adds the middleware to clear the context."""
-    assert log.middleware_factory in app.middleware
+    assert log.controller.middleware_factory in app.middleware
 
 
 async def test_middleware_calls_structlog_contextvars_clear_contextvars(
@@ -70,7 +70,7 @@ async def test_middleware_calls_structlog_contextvars_clear_contextvars(
     clear_ctx_vars_mock = MagicMock()
     monkeypatch.setattr(structlog.contextvars, "clear_contextvars", clear_ctx_vars_mock)
     app_mock = AsyncMock()
-    middleware = log.middleware_factory(app_mock)
+    middleware = log.controller.middleware_factory(app_mock)
     await middleware(1, 2, 3)  # type:ignore[arg-type]
     clear_ctx_vars_mock.assert_called_once()
     app_mock.assert_called_once_with(1, 2, 3)
@@ -88,7 +88,7 @@ async def test_before_send_handler_exclude_paths(
     pattern: str,
     excluded: list[str],
     included: list[str],
-    before_send_handler: log.BeforeSendHandler,
+    before_send_handler: log.controller.BeforeSendHandler,
     http_response_start: HTTPResponseStartEvent,
     http_scope: HTTPScope,
     state: State,
@@ -127,7 +127,7 @@ async def test_before_send_handler_http_response_start(
     status: int,
     level: int,
     http_response_start: HTTPResponseStartEvent,
-    before_send_handler: log.BeforeSendHandler,
+    before_send_handler: log.controller.BeforeSendHandler,
     http_scope: HTTPScope,
     state: State,
 ) -> None:
@@ -142,7 +142,7 @@ async def test_before_send_handler_http_response_start(
 
 
 async def test_before_send_handler_http_response_body_with_more_body(
-    before_send_handler: log.BeforeSendHandler,
+    before_send_handler: log.controller.BeforeSendHandler,
     cap_logger: CapturingLogger,
     http_response_body: HTTPResponseBodyEvent,
     http_scope: HTTPScope,
@@ -155,7 +155,7 @@ async def test_before_send_handler_http_response_body_with_more_body(
 
 
 async def test_before_send_handler_http_response_body_without_more_body(
-    before_send_handler: log.BeforeSendHandler,
+    before_send_handler: log.controller.BeforeSendHandler,
     cap_logger: CapturingLogger,
     http_response_body: HTTPResponseBodyEvent,
     http_scope: HTTPScope,
@@ -165,8 +165,8 @@ async def test_before_send_handler_http_response_body_without_more_body(
     """We ignore intermediate response body messages, so should be a noop."""
     log_request_mock = AsyncMock()
     log_response_mock = AsyncMock()
-    monkeypatch.setattr(log.BeforeSendHandler, "log_request", log_request_mock)
-    monkeypatch.setattr(log.BeforeSendHandler, "log_response", log_response_mock)
+    monkeypatch.setattr(log.controller.BeforeSendHandler, "log_request", log_request_mock)
+    monkeypatch.setattr(log.controller.BeforeSendHandler, "log_response", log_response_mock)
     # this would have been added by the response start event handling
     http_scope["state"]["log_level"] = logging.INFO
 
@@ -179,7 +179,7 @@ async def test_before_send_handler_http_response_body_without_more_body(
 
 
 async def test_before_send_handler_http_response_body_without_more_body_do_log_request_false(
-    before_send_handler: log.BeforeSendHandler,
+    before_send_handler: log.controller.BeforeSendHandler,
     cap_logger: CapturingLogger,
     http_response_body: HTTPResponseBodyEvent,
     http_scope: HTTPScope,
@@ -189,8 +189,8 @@ async def test_before_send_handler_http_response_body_without_more_body_do_log_r
     """We ignore intermediate response body messages, so should be a noop."""
     log_request_mock = AsyncMock()
     log_response_mock = AsyncMock()
-    monkeypatch.setattr(log.BeforeSendHandler, "log_request", log_request_mock)
-    monkeypatch.setattr(log.BeforeSendHandler, "log_response", log_response_mock)
+    monkeypatch.setattr(log.controller.BeforeSendHandler, "log_request", log_request_mock)
+    monkeypatch.setattr(log.controller.BeforeSendHandler, "log_response", log_response_mock)
     # this would have been added by the response start event handling
     http_scope["state"]["log_level"] = logging.INFO
 
@@ -205,7 +205,7 @@ async def test_before_send_handler_http_response_body_without_more_body_do_log_r
 
 
 async def test_before_send_handler_does_nothing_with_other_message_types(
-    before_send_handler: log.BeforeSendHandler,
+    before_send_handler: log.controller.BeforeSendHandler,
     cap_logger: CapturingLogger,
     http_scope: HTTPScope,
     state: State,
@@ -217,13 +217,15 @@ async def test_before_send_handler_does_nothing_with_other_message_types(
 
 
 async def test_before_send_handler_log_request(
-    before_send_handler: log.BeforeSendHandler, http_scope: HTTPScope, monkeypatch: MonkeyPatch
+    before_send_handler: log.controller.BeforeSendHandler,
+    http_scope: HTTPScope,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Checks that the `log_request()` method does what it should."""
     ret_val = {"a": "b"}
     extractor_mock = AsyncMock(return_value=ret_val)
     bind_mock = MagicMock()
-    monkeypatch.setattr(log.BeforeSendHandler, "extract_request_data", extractor_mock)
+    monkeypatch.setattr(log.controller.BeforeSendHandler, "extract_request_data", extractor_mock)
     monkeypatch.setattr(structlog.contextvars, "bind_contextvars", bind_mock)
     await before_send_handler.log_request(http_scope)
     extractor_mock.assert_called_once()
@@ -231,13 +233,15 @@ async def test_before_send_handler_log_request(
 
 
 async def test_before_send_handler_log_response(
-    before_send_handler: log.BeforeSendHandler, http_scope: HTTPScope, monkeypatch: MonkeyPatch
+    before_send_handler: log.controller.BeforeSendHandler,
+    http_scope: HTTPScope,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Checks that the `log_response()` method does what it should."""
     ret_val = {"a": "b"}
     extractor_mock = MagicMock(return_value=ret_val)
     bind_mock = MagicMock()
-    monkeypatch.setattr(log.BeforeSendHandler, "extract_response_data", extractor_mock)
+    monkeypatch.setattr(log.controller.BeforeSendHandler, "extract_response_data", extractor_mock)
     monkeypatch.setattr(structlog.contextvars, "bind_contextvars", bind_mock)
     await before_send_handler.log_response(http_scope)
     extractor_mock.assert_called_once_with(scope=http_scope)
@@ -245,7 +249,7 @@ async def test_before_send_handler_log_response(
 
 
 async def test_before_send_handler_extract_request_data(
-    before_send_handler: log.BeforeSendHandler,
+    before_send_handler: log.controller.BeforeSendHandler,
 ) -> None:
     """I/O test for extract_request_data() method."""
     request = RequestFactory().post("/", data={"a": "b"})
@@ -263,7 +267,7 @@ async def test_before_send_handler_extract_request_data(
 
 
 def test_before_send_handler_extract_response_data(
-    before_send_handler: log.BeforeSendHandler,
+    before_send_handler: log.controller.BeforeSendHandler,
     http_response_start: HTTPResponseStartEvent,
     http_response_body: HTTPResponseBodyEvent,
     http_scope: HTTPScope,

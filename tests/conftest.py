@@ -22,15 +22,18 @@ def fx_capturing_logger() -> CapturingLogger:
 
 @pytest.fixture(autouse=True)
 def _patch_logger(cap_logger: CapturingLogger, monkeypatch: pytest.MonkeyPatch) -> None:
+    starlite_saqlalchemy.log.configure(
+        starlite_saqlalchemy.log.default_processors  # type:ignore[arg-type]
+    )
     # clear context for every test
     clear_contextvars()
     # pylint: disable=protected-access
-    bound_logger = starlite_saqlalchemy.log.LOGGER.bind()
-    bound_logger._logger = cap_logger
+    controller_logger = starlite_saqlalchemy.log.controller.LOGGER.bind()
+    controller_logger._logger = cap_logger
     # drop rendering processor to get a dict, not bytes
     # noinspection PyProtectedMember
-    bound_logger._processors = bound_logger._processors[:-1]
-    monkeypatch.setattr(starlite_saqlalchemy.log, "LOGGER", bound_logger)
+    controller_logger._processors = controller_logger._processors[:-1]
+    monkeypatch.setattr(starlite_saqlalchemy.log.controller, "LOGGER", controller_logger)
 
 
 @pytest.fixture()
