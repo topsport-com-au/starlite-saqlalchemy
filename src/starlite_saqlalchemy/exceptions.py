@@ -5,7 +5,6 @@ into HTTP exceptions.
 """
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING
 
 from starlette.middleware.errors import ServerErrorMiddleware
@@ -15,6 +14,7 @@ from starlite.exceptions import (
     NotFoundException,
 )
 from starlite.utils.exception import create_exception_response
+from structlog.contextvars import bind_contextvars
 
 from starlite_saqlalchemy.repository.exceptions import (
     RepositoryConflictException,
@@ -34,8 +34,6 @@ if TYPE_CHECKING:
 
 __all__ = ["after_exception_hook_handler"]
 
-logger = logging.getLogger(__name__)
-
 
 class ConflictException(HTTPException):
     """Request conflict with the current state of the target resource."""
@@ -49,20 +47,16 @@ class ForbiddenException(HTTPException):
     status_code = 403
 
 
-def after_exception_hook_handler(exc: Exception, scope: Scope, state: State) -> None:
-    """Logs exception and returns appropriate response.
+def after_exception_hook_handler(exc: Exception, _scope: Scope, _state: State) -> None:
+    """Binds `exc_info` key with exception instance as value to structlog
+    context vars.
 
     Args:
         exc: the exception that was raised.
-        scope: scope of the request
-        state: application state
+        _scope: scope of the request
+        _state: application state
     """
-    logger.error(
-        "Application Exception\n\nRequest Scope: %s\n\nApplication State: %s\n\n",
-        scope,
-        state.dict(),
-        exc_info=exc,
-    )
+    bind_contextvars(exc_info=exc)
 
 
 def _create_error_response_from_starlite_middleware(request: Request, exc: Exception) -> Response:

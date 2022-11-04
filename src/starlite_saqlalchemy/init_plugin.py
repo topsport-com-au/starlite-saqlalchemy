@@ -30,7 +30,7 @@ The `PluginConfig` has switches to disable every aspect of the plugin behavior.
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 
 from pydantic import BaseModel
 from starlite.app import DEFAULT_CACHE_CONFIG, DEFAULT_OPENAPI_CONFIG
@@ -43,7 +43,7 @@ from starlite_saqlalchemy import (
     dependencies,
     exceptions,
     http,
-    logging,
+    log,
     openapi,
     redis,
     sentry,
@@ -63,6 +63,8 @@ if TYPE_CHECKING:
     from starlite.config.app import AppConfig
 
     from starlite_saqlalchemy.worker import WorkerFunction
+
+T = TypeVar("T")
 
 
 class PluginConfig(BaseModel):
@@ -278,7 +280,10 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_logging and app_config.logging_config is None:
-            app_config.logging_config = logging.config
+            app_config.logging_config = log.config
+            app_config.middleware.append(log.middleware_factory)
+            app_config.before_send = self._ensure_list(app_config.before_send)
+            app_config.before_send.append(log.BeforeSendHandler())
 
     def configure_openapi(self, app_config: AppConfig) -> None:
         """Configures the OpenAPI docs if they have not already been
@@ -356,3 +361,9 @@ class ConfigureApp:
             worker_instance = create_worker_instance(self.config.worker_functions)
             app_config.on_shutdown.append(worker_instance.stop)
             app_config.on_startup.append(worker_instance.on_app_startup)
+
+    @staticmethod
+    def _ensure_list(item: T | list[T]) -> list[T]:
+        if isinstance(item, list):
+            return item
+        return [] if item is None else [item]

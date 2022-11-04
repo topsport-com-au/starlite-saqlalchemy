@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Literal
 
 from pydantic import AnyUrl, BaseSettings, PostgresDsn
+from starlite.utils.extractors import RequestExtractorField, ResponseExtractorField
 
 
 # noinspection PyUnresolvedReferences
@@ -29,8 +30,6 @@ class AppSettings(BaseSettings):
     """Run `Starlite` with `debug=True`."""
     ENVIRONMENT: str
     """'dev', 'prod', etc."""
-    LOG_LEVEL: str
-    """Stdlib log level names, 'DEBUG', 'INFO', etc."""
     NAME: str
     """Application name."""
 
@@ -64,6 +63,44 @@ class APISettings(BaseSettings):
     """Max records received for collection routes."""
     HEALTH_PATH: str
     """Route that the health check is served under."""
+
+
+class LogSettings(BaseSettings):
+    class Config:
+        env_prefix = "LOG_"
+        case_sensitive = True
+
+    # https://stackoverflow.com/a/1845097/6560549
+    EXCLUDE_PATHS: str = r"\A(?!x)x"
+    """Regex to exclude paths from logging."""
+    OBFUSCATE_COOKIES: set[str] = {"session"}
+    """Request cookie keys to obfuscate."""
+    OBFUSCATE_HEADERS: set[str] = {"Authorization", "X-API-KEY"}
+    """Request header keys to obfuscate."""
+    REQUEST_FIELDS: list[RequestExtractorField] = [
+        "path",
+        "method",
+        "content_type",
+        "headers",
+        "cookies",
+        "query",
+        "path_params",
+        "body",
+    ]
+    """Attributes of the [Request][starlite.connection.Request] to be logged."""
+    RESPONSE_FIELDS: list[ResponseExtractorField] = [
+        "status_code",
+        "cookies",
+        "headers",
+        "body",
+    ]
+    """Attributes of the [Response][starlite.response.Response] to be logged."""
+    HTTP_EVENT: str = "HTTP"
+    """Log event name for logs from Starlite handlers."""
+    WORKER_EVENT: str = "Worker"
+    """Log event name for logs from SAQ worker."""
+    LEVEL: int = 20
+    """Stdlib log levels. Only emit logs at this level, or higher."""
 
 
 # noinspection PyUnresolvedReferences
@@ -160,6 +197,8 @@ app = AppSettings.parse_obj({})
 """App settings."""
 db = DatabaseSettings.parse_obj({})
 """Database settings."""
+log = LogSettings.parse_obj({})
+"""Log settings."""
 openapi = OpenAPISettings.parse_obj({})
 """Openapi settings."""
 redis = RedisSettings.parse_obj({})
