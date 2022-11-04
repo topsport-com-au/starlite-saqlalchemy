@@ -4,8 +4,8 @@
 [Canonical Log Lines](https://brandur.org/canonical-log-lines) pattern (which is basically, a
 single log line per request or async worker invocation).
 
-The pattern is built upon the excellent [`structlog`](https://github.com/hynek/structlog), and is
-configured to be as efficient as possible while also not blocking the event loop.
+The pattern is built upon the excellent [`structlog`](https://github.com/hynek/structlog) library,
+and is configured to be as efficient as possible while not blocking the event loop.
 
 ## Adding data to the log
 
@@ -30,7 +30,7 @@ invocation.
 ### Middleware
 
 The configuration adds a very light-weight middleware that simply clears the context-local storage
-for each request (if you don't know what that is, keep reading!).
+for each request.
 
 ### Before Send Hook Handler
 
