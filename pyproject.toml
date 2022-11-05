@@ -62,8 +62,7 @@ redis = "*"
 # waiting on release to include https://github.com/tobymao/saq/pull/43
 saq = { git = "https://github.com/tobymao/saq.git", rev = "877c5dd5a72be4b4c41d9244a6bcd795982e7650" }
 sentry-sdk = "*"
-# sqlalchemy = "==2.0.0b2"
-sqlalchemy = { git = "https://github.com/sqlalchemy/sqlalchemy.git" }
+sqlalchemy = "==2.0.0b3"
 starlite = "~=1.32"
 # waiting on release to include https://github.com/hynek/structlog/pull/457
 structlog = { git = "https://github.com/hynek/structlog.git", rev = "6b06c062dbcd166bfba0da407e9af63432bedea2" }
