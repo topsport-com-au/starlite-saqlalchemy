@@ -1,12 +1,40 @@
 """Config that can be shared between all test types."""
+from __future__ import annotations
+
 from datetime import date, datetime
 from typing import Any
 from uuid import UUID
 
 import pytest
 from starlite import Starlite
+from structlog.contextvars import clear_contextvars
+from structlog.testing import CapturingLogger
 
+import starlite_saqlalchemy
 from starlite_saqlalchemy import ConfigureApp
+
+
+@pytest.fixture(name="cap_logger")
+def fx_capturing_logger() -> CapturingLogger:
+    """Used to monkeypatch the app logger, so we can inspect output."""
+    return CapturingLogger()
+
+
+@pytest.fixture(autouse=True)
+def _patch_logger(cap_logger: CapturingLogger, monkeypatch: pytest.MonkeyPatch) -> None:
+    starlite_saqlalchemy.log.configure(
+        starlite_saqlalchemy.log.default_processors  # type:ignore[arg-type]
+    )
+    # clear context for every test
+    clear_contextvars()
+    # pylint: disable=protected-access
+    logger = starlite_saqlalchemy.log.controller.LOGGER.bind()
+    logger._logger = cap_logger
+    # drop rendering processor to get a dict, not bytes
+    # noinspection PyProtectedMember
+    logger._processors = logger._processors[:-1]
+    monkeypatch.setattr(starlite_saqlalchemy.log.controller, "LOGGER", logger)
+    monkeypatch.setattr(starlite_saqlalchemy.log.worker, "LOGGER", logger)
 
 
 @pytest.fixture()

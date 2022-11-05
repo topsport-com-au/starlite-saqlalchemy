@@ -5,6 +5,9 @@ build-backend = "poetry.core.masonry.api"
 [tool.black]
 line-length = 100
 
+[tool.codespell]
+ignore-words-list = "alog"
+
 [tool.coverage.run]
 branch = true
 source_pkgs = ["starlite_saqlalchemy"]
@@ -56,14 +59,20 @@ httpx = "*"
 orjson = "*"
 pydantic = "*"
 redis = "*"
-saq = { git = "https://github.com/tobymao/saq.git" }
+# waiting on release to include https://github.com/tobymao/saq/pull/43
+saq = { git = "https://github.com/tobymao/saq.git", rev = "877c5dd5a72be4b4c41d9244a6bcd795982e7650" }
 sentry-sdk = "*"
 sqlalchemy = "==2.0.0b2"
 starlite = "~=1.32"
+# waiting on release to include https://github.com/hynek/structlog/pull/457
+structlog = { git = "https://github.com/hynek/structlog.git", rev = "6b06c062dbcd166bfba0da407e9af63432bedea2" }
 
 [tool.poetry.urls]
 GitHub = "https://github.com/topsport-com-au"
 Bugs = "https://github.com/topsport-com-au/starlite-saqlalchemy/issues"
+
+[tool.pycln]
+all = true
 
 [tool.pytest.ini_options]
 addopts = ["-ra", "--strict-config"]
@@ -72,6 +81,11 @@ env_files = ["tests.env"]
 testpaths = ["tests/unit"]
 
 [tool.pylint.main]
+disable = [
+    "line-too-long",
+    "too-many-arguments",
+]
+enable = "useless-suppression"
 extension-pkg-whitelist = ["asyncpg", "orjson", "pydantic"]
 
 [tool.semantic_release]
