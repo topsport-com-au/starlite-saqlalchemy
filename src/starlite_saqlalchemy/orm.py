@@ -1,4 +1,6 @@
 """Application ORM configuration."""
+from __future__ import annotations
+
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, TypeVar
 from uuid import UUID, uuid4
@@ -76,7 +78,7 @@ class Base(DeclarativeBase):
         return cls.__name__.lower()
 
     @classmethod
-    def from_dto(cls: type[BaseT], dto_instance: "BaseModel") -> BaseT:
+    def from_dto(cls: type[BaseT], dto_instance: BaseModel) -> BaseT:
         """Construct an instance of the SQLAlchemy model from the Pydantic DTO.
 
         Args:
