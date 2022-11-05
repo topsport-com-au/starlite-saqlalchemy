@@ -60,10 +60,10 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from typing import Any
 
+    from saq.types import Function
+    from saq.worker import Worker
     from starlite.config.app import AppConfig
     from structlog.types import Processor
-
-    from starlite_saqlalchemy.worker import WorkerFunction
 
 T = TypeVar("T")
 
@@ -79,7 +79,9 @@ class PluginConfig(BaseModel):
     """
 
     # why isn't the callback defined here?
-    worker_functions: list[WorkerFunction | tuple[str, WorkerFunction]] = []
+    worker_functions: list[Function | tuple[str, Function]] = [
+        (make_service_callback.__qualname__, make_service_callback)
+    ]
     """
     Queue worker functions.
     """
@@ -171,6 +173,10 @@ class ConfigureApp:
     Args:
         config: Provide a config object to customize the behavior of the plugin.
     """
+
+    __slots__ = ("config", "worker_instance")
+
+    worker_instance: Worker
 
     def __init__(self, config: PluginConfig = PluginConfig()) -> None:
         self.config = config
@@ -362,15 +368,16 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_worker:
-            self.config.worker_functions.append(
-                (make_service_callback.__qualname__, make_service_callback)
-            )
-            worker_instance = create_worker_instance(self.config.worker_functions)
-            app_config.on_shutdown.append(worker_instance.stop)
+            worker_kwargs: dict[str, Any] = {"functions": self.config.worker_functions}
+            if self.config.do_logging:
+                worker_kwargs["before_process"] = log.worker.before_process
+                worker_kwargs["after_process"] = log.worker.after_process
+            worker_instance = create_worker_instance(**worker_kwargs)
             app_config.on_startup.append(worker_instance.on_app_startup)
+            app_config.on_shutdown.append(worker_instance.stop)
 
     @staticmethod
-    def _ensure_list(item: T | list[T]) -> list[T]:
+    def _ensure_list(item: list[T] | T) -> list[T]:
         if isinstance(item, list):
             return item
         return [] if item is None else [item]

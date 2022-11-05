@@ -207,40 +207,33 @@ chain so that you get pretty log output when developing locally!
 
 ### Worker.before_process
 
-Use this hook to do the clear_contextvars() call.
+If logging configuration is enabled, we use this SAQ `Worker` hook to clear the structlog
+contextvars for the job.
 
 ### Worker.after_process
 
-Use this hook to extract context from the job, and log at appropriate level.
+If logging configuration is enabled, we use this SAQ `Worker` hook to extract the configured `Job`
+attributes and inject them into the log, and emit the log event. The attributes that are logged for
+each `Job` can be configured in
+[`LogSettings`][starlite_saqlalchemy.settings.LogSettings.JOB_FIELDS].
 
-Restrict the SAQ logging to WARNING or higher.
+If the `Job.error` attribute is truthy, we log at `ERROR` severity, otherwise log at `INFO`.
 
 ## SAQ Logs
 
-### queue.py
+SAQ emits logs via standard library logging, we restrict these to level of `WARNING` or higher, and
+handle them using the asyncio-friendly `queue_handler` that is provided to us by Starlite.
 
-#### `class Queue`
-
-- sweep(): l282 - INFO - if sweeping a missing job
-- sweep(): l286 - INFO - sweeping a finished job
-- retry(): l383 - INFO - if retrying a job
-- finish(): l422 - INFO - on job finish
-- dequeue(): l436 - DEBUG - dequeue time out
-- enqueue(): l495 - INFO - on enqueue
+That means, you might see the following logs emitted from the SAQ logger:
 
 ### worker.py
 
 #### `class Worker`
 
-- start(): l135 - INFO - on worker shutdown
-- schedule(): l167 - INFO - on scheduled (cron)
 - upkeep(): l181 - EXCEPTION - on failed upkeep task
-- abort(): l223 - INFO - on job abort
-- process(): l242 - INFO - on job processing
 - process(): l253 - EXCEPTION - on job error
 - process(): l270 - EXCEPTION - on after process hook failure
 
 #### `def async_check_health()`
 
 - l343 - WARNING - on health check failure
-- l346 - INFO - on health check success, logs the queue name

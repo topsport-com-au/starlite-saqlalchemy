@@ -12,18 +12,24 @@ from starlite.config.logging import LoggingConfig
 
 from starlite_saqlalchemy import settings
 
-from .controller import drop_health_logs
+from . import controller, worker
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from structlog.typing import Processor
 
-__all__ = ("default_processors", "config", "configure")
+__all__ = (
+    "default_processors",
+    "config",
+    "configure",
+    "controller",
+    "worker",
+)
 
 default_processors = [
     structlog.contextvars.merge_contextvars,
-    drop_health_logs,
+    controller.drop_health_logs,
     structlog.processors.add_log_level,
     structlog.processors.TimeStamper(fmt="iso", utc=True),
 ]
@@ -73,6 +79,7 @@ config = LoggingConfig(
         },
         "saq": {
             "propagate": False,
+            "level": logging.WARNING,
             "handlers": ["queue_listener"],
         },
         "sqlalchemy.engine": {
@@ -84,5 +91,5 @@ config = LoggingConfig(
 """Pre-configured log config for application deps.
 
 While we use structlog for internal app logging, we still want to ensure that logs emitted by any
-of our dependencies are logged in a non-blocking manner.
+of our dependencies are handled in a non-blocking manner.
 """

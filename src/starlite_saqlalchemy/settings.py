@@ -77,6 +77,21 @@ class LogSettings(BaseSettings):
     """Request cookie keys to obfuscate."""
     OBFUSCATE_HEADERS: set[str] = {"Authorization", "X-API-KEY"}
     """Request header keys to obfuscate."""
+    JOB_FIELDS: list[str] = [
+        "function",
+        "kwargs",
+        "key",
+        "scheduled",
+        "attempts",
+        "completed",
+        "queued",
+        "started",
+        "result",
+        "error",
+    ]
+    """Attributes of the SAQ [`Job`](https://github.com/tobymao/saq/blob/master/saq/job.py)
+    to be logged.
+    """
     REQUEST_FIELDS: list[RequestExtractorField] = [
         "path",
         "method",
