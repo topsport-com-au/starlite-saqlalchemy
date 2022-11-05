@@ -35,8 +35,9 @@ for each request.
 
 ### Before Send Hook Handler
 
-We add handler to Starlite's [`before_send`][starlite.app.Starlite.before_send] hook. That allows us
-to do two things:
+We add a handler to Starlite's
+[`before_send`](https://starlite-api.github.io/starlite/usage/0-the-starlite-app/5-application-hooks/#before-send)
+hook. That allows us to do two things:
 
 1. We inspect the outbound messages looking for a
    [Response Start](https://asgi.readthedocs.io/en/latest/specs/www.html#response-start-send-event)
@@ -105,13 +106,15 @@ as [PII](https://en.wikipedia.org/wiki/Personal_data) and secrets.
 
 Thankfully, we have mechanisms to ensure that this type of data is excluded from our logs!
 
-Our [LogConfig][starlite_saqlalchemy.settings.LogConfig] object provides a host of options that
-allow you to customize log output. This exposes the following environment variables:
+Our
+[LogSettings](/reference/starlite_saqlalchemy/settings/#starlite_saqlalchemy.settings.LogSettings)
+object provides a host of options that allow you to customize log output. This exposes the following
+environment variables:
 
 #### `LOG_EXCLUDE_PATHS`
 
-This is a [regular expression][re] that is matched against the path of the request before logging.
-If the path matches the regex, the route is not logged.
+This is a [regular expression](https://docs.python.org/3/library/re.html) that is matched against
+the path of the request before logging. If the path matches the regex, the route is not logged.
 
 For example, the value `^/a` will exclude any path that begins with `/a`, such as `/apath` and
 `/a/path`.
@@ -127,7 +130,7 @@ These two environment variables allow you to specify header and cookie names, wh
 obfuscated in the logs.
 
 This leverages functionality that is provided via Starlite's
-[Extraction Utils][starlite.utils.extractors.ResponseExtractorField].
+[Extraction Utils](https://starlite-api.github.io/starlite/reference/utils/4-extractor-utils/).
 
 Simply provide the exact name of the cookies and headers that should be obfuscated.
 
@@ -150,7 +153,7 @@ As environment variables are parsed by pydantic, collections such as these shoul
 . For example:
 
 ```text
-REQUEST_FIELDS='["path", "method", "content_type", "headers", "cookies", "query", "path_params", "body"]'`
+REQUEST_FIELDS='["path", "method", "content_type", "headers", "cookies", "query", "path_params", "body"]'
 ```
 
 The above is the default configuration for this setting, so if you are happy with that you don't
@@ -158,7 +161,7 @@ need to do anything. However, lets say you never want to log the request body, y
 this in your environment and simply exclude `"body"` from that collection:
 
 ```text
-REQUEST_FIELDS='["path", "method", "content_type", "headers", "cookies", "query", "path_params"]'`
+REQUEST_FIELDS='["path", "method", "content_type", "headers", "cookies", "query", "path_params"]'
 ```
 
 ## Other Log Config
@@ -176,7 +179,7 @@ worker will be `{"event": "Worker", ...}`.
 
 ### LOG_LEVEL
 
-Set this according to the standard library logging levels. Any message emitted a level that is
+Set this according to the standard library logging levels. Any message emitted at a level that is
 below this one will be silently (and efficiently, thanks to `structlog`) dropped.
 
 For example, setting `LOG_LEVEL=WARNING` in your environment would mean that no `INFO` level logs
@@ -195,8 +198,8 @@ any response from the health check handler not within the success status range i
 
 ### Standard library logging config
 
-We configure the standard library logger with a queue listener and handler and ensure that logging
-from our dependencies are logged through that, so they won't block the event loop.
+We configure the standard library logger with a queue listener and handler and route any logs from
+our dependencies through that, so they won't block the event loop.
 
 ### Environment specific processor chain
 
@@ -215,7 +218,7 @@ contextvars for the job.
 If logging configuration is enabled, we use this SAQ `Worker` hook to extract the configured `Job`
 attributes and inject them into the log, and emit the log event. The attributes that are logged for
 each `Job` can be configured in
-[`LogSettings`][starlite_saqlalchemy.settings.LogSettings.JOB_FIELDS].
+[`LogSettings`](/reference/starlite_saqlalchemy/settings/#starlite_saqlalchemy.settings.LogSettings.JOB_FIELDS).
 
 If the `Job.error` attribute is truthy, we log at `ERROR` severity, otherwise log at `INFO`.
 

@@ -158,8 +158,9 @@ class PluginConfig(BaseModel):
     class that is created.
     If [`AppConfig.response_class`][starlite.config.app.AppConfig.response_class] is not `None`,
     this is ignored.
-    If [`PluginConfig.do_response_class`][PluginConfig.do_response_class] is `False`, this is
-    ignored.
+    If
+    [`PluginConfig.do_response_class`][starlite_saqlalchemy.init_plugin.PluginConfig.do_response_class]
+    is `False`, this is ignored.
     """
     # the addition of the health check filter processor makes mypy think `log.default_processors` is
     # list[object].. seems typed correctly to me :/
