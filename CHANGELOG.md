@@ -2,6 +2,18 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.0 (2022-11-05)
+### Feature
+* **worker:** Improves the worker pattern. ([#90](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/90)) ([`32714a5`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/32714a5ca2329bca1d67770b388c4b984f815aaf))
+* **logs:** Structlog configuration. ([#86](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/86)) ([`7d87b96`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/7d87b965557c24e7c244af8a810fe67f12b60b5a))
+* **testing:** Create a `testing` sub-package. ([#85](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/85)) ([`9dfda10`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/9dfda10af09a679ae06aba12f24d8a57b105ae99))
+* **response:** Makes serializer configurable. ([#84](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/84)) ([`3439d26`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/3439d26e589f7c85f4676cca324ccdb728c2bfc3))
+* **repository:** Make abc more general. ([#82](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/82)) ([`9e89434`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/9e89434305d22bee1a0804c0d5c44d720fe3a939))
+
+### Documentation
+* **reference:** Fixes ref docs generation warning. ([#71](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/71)) ([`1f04058`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/1f04058689636b0454500a1577a71e332f30aa66))
+* **readme:** Fix badges. ([#69](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/69)) ([`b9b3b3e`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/b9b3b3e4801abd0f5e6a2d966731ac373543b392))
+
 ## v0.1.8 (2022-10-30)
 ### Fix
 * **worker:** Depend on typed SAQ ([#33](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/33)) ([`13d3ac0`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/13d3ac00eaff1d288cfcf7c69e78e320f5937330))
