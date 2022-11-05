@@ -109,7 +109,7 @@ async def db_responsive(host: str) -> bool:
 @pytest.fixture(scope="session", autouse=True)
 async def _containers(
     docker_ip: str, docker_services: "Services"  # pylint: disable=unused-argument
-) -> None:  # pylint: disable=unused-argument
+) -> None:
     """Starts containers for required services, fixture waits until they are
     responsive before returning.
 

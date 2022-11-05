@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import asyncio
-from collections import abc
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -12,17 +11,17 @@ import saq
 from starlite_saqlalchemy import redis
 
 if TYPE_CHECKING:
+    from collections.abc import Collection
     from signal import Signals
+
+    from saq.types import Function, ReceivesContext
 
 __all__ = [
     "Queue",
     "Worker",
-    "WorkerFunction",
     "create_worker_instance",
     "queue",
 ]
-
-WorkerFunction = abc.Callable[..., abc.Awaitable[Any]]
 
 
 class Queue(saq.Queue):
@@ -61,14 +60,18 @@ queue = Queue(redis.client)
 
 
 def create_worker_instance(
-    functions: abc.Collection[WorkerFunction | tuple[str, WorkerFunction]]
+    functions: Collection[Function | tuple[str, Function]],
+    before_process: ReceivesContext | None = None,
+    after_process: ReceivesContext | None = None,
 ) -> Worker:
     """
 
     Args:
         functions: Functions to be called via the async workers.
+        before_process: Async function called before a job processes.
+        after_process: Async function called after a job processes.
 
     Returns:
         The worker instance, instantiated with `functions`.
     """
-    return Worker(queue, functions)
+    return Worker(queue, functions, before_process=before_process, after_process=after_process)

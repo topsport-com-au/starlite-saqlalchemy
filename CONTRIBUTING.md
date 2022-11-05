@@ -3,7 +3,7 @@
 Thanks for taking an interest in `starlite-saqlalchemy`!
 
 Hopefully this document makes it easy for you to get started contributing to `starlite-saqlalchemy`,
-if not, [let me know!](https://github.com/topsport-com-au/starlite-saqlalchemy/issues)
+if not, [let us know!](https://github.com/topsport-com-au/starlite-saqlalchemy/issues)
 
 ## Workflow
 

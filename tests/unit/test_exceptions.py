@@ -27,11 +27,12 @@ if TYPE_CHECKING:
 def test_after_exception_hook_handler_called(monkeypatch: pytest.MonkeyPatch) -> None:
     """Tests that the handler gets added to the app and called."""
     logger_mock = MagicMock()
-    monkeypatch.setattr(exceptions.logger, "error", logger_mock)
+    monkeypatch.setattr(exceptions, "bind_contextvars", logger_mock)
+    exc = RuntimeError()
 
     @get("/error")
     def raises() -> None:
-        raise RuntimeError
+        raise exc
 
     with create_test_client(
         route_handlers=[raises], after_exception=exceptions.after_exception_hook_handler
@@ -39,7 +40,7 @@ def test_after_exception_hook_handler_called(monkeypatch: pytest.MonkeyPatch) ->
         resp = client.get("/error")
         assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
 
-    logger_mock.assert_called_once()
+    logger_mock.assert_called_once_with(exc_info=exc)
 
 
 @pytest.mark.parametrize(
