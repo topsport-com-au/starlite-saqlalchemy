@@ -162,7 +162,7 @@ class BeforeSendHandler:
         """Creates a dictionary of values for the log.
 
         Args:
-            request: A [Request][starlite.connection.Request] instance.
+            request: A [Request][starlite.connection.request.Request] instance.
         Returns:
             An OrderedDict.
         """

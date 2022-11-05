@@ -102,7 +102,7 @@ class LogSettings(BaseSettings):
         "path_params",
         "body",
     ]
-    """Attributes of the [Request][starlite.connection.Request] to be logged."""
+    """Attributes of the [Request][starlite.connection.request.Request] to be logged."""
     RESPONSE_FIELDS: list[ResponseExtractorField] = [
         "status_code",
         "cookies",
@@ -167,11 +167,11 @@ class DatabaseSettings(BaseSettings):
     [`NullPool`][sqlalchemy.pool.NullPool].
     """
     POOL_MAX_OVERFLOW: int
-    """See [`max_overflow`][sqlalchemy.pool.QueuePool.max_overflow]."""
+    """See [`max_overflow`][sqlalchemy.pool.QueuePool]."""
     POOL_SIZE: int
-    """See [`pool_size`][sqlalchemy.pool.QueuePool.pool_size]."""
+    """See [`pool_size`][sqlalchemy.pool.QueuePool]."""
     POOL_TIMEOUT: int
-    """See [`timeout`][sqlalchemy.pool.QueuePool.timeout]."""
+    """See [`timeout`][sqlalchemy.pool.QueuePool]."""
     URL: PostgresDsn
 
 
