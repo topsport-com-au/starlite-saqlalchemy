@@ -8,16 +8,13 @@ from __future__ import annotations
 import importlib
 import inspect
 import logging
-from enum import Enum
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from starlite_saqlalchemy import dto
 from starlite_saqlalchemy.repository.sqlalchemy import ModelT
 from starlite_saqlalchemy.sqlalchemy_plugin import async_session_factory
 from starlite_saqlalchemy.worker import queue
 
 if TYPE_CHECKING:
-    from pydantic import BaseModel
     from saq.types import Context
 
     from starlite_saqlalchemy.repository.abc import AbstractRepository
@@ -37,34 +34,10 @@ class UnauthorizedException(ServiceException):
     """A user tried to do something they shouldn't have."""
 
 
-class Operation(str, Enum):
-    """Operation type markers sent with callbacks."""
-
-    CREATE = "create"
-    DELETE = "delete"
-    UPDATE = "update"
-
-
 class Service(Generic[ModelT]):
     """Generic Service object."""
 
-    _INTERNAL_DTO_CACHE: dict[type[Service], type[BaseModel]] = {}
-
     repository_type: type[AbstractRepository[ModelT]]
-
-    def __init_subclass__(cls, *args: Any, **kwargs: Any) -> None:
-        """Create and cache a DTO instance that is internal use only.
-
-        This DTO object should never be used to serialize client facing data.
-
-        note:
-            This pattern could be changed to on first access, rather than at compile time.
-        """
-        super().__init_subclass__(*args, **kwargs)
-        model_type = cls.repository_type.model_type
-        cls._INTERNAL_DTO_CACHE[cls] = dto.factory(
-            f"__{model_type.__tablename__}DTO", model_type, dto.Purpose.READ
-        )
 
     def __init__(self, **repo_kwargs: Any) -> None:
         self.repository: AbstractRepository[ModelT] = self.repository_type(**repo_kwargs)
@@ -93,9 +66,7 @@ class Service(Generic[ModelT]):
             Representation of created instance.
         """
         data = await self.authorize_create(data)
-        data = await self.repository.add(data)
-        await self.enqueue_callback(Operation.CREATE, data)
-        return data
+        return await self.repository.add(data)
 
     # noinspection PyMethodMayBeStatic
     async def authorize_list(self) -> None:
@@ -138,9 +109,7 @@ class Service(Generic[ModelT]):
             Updated representation.
         """
         data = await self.authorize_update(id_, data)
-        data = await self.repository.update(data)
-        await self.enqueue_callback(Operation.UPDATE, data)
-        return data
+        return await self.repository.update(data)
 
     async def authorize_upsert(self, id_: Any, data: ModelT) -> ModelT:
         """Authorize upsert of item.
@@ -166,9 +135,7 @@ class Service(Generic[ModelT]):
             Updated or created representation.
         """
         data = await self.authorize_upsert(id_, data)
-        data = await self.repository.upsert(data)
-        await self.enqueue_callback(Operation.UPDATE, data)
-        return data
+        return await self.repository.upsert(data)
 
     async def authorize_get(self, id_: Any) -> None:
         """Authorize get of item.
@@ -206,16 +173,17 @@ class Service(Generic[ModelT]):
             Representation of the deleted instance.
         """
         await self.authorize_delete(id_)
-        data = await self.repository.delete(id_)
-        await self.enqueue_callback(Operation.DELETE, data)
-        return data
+        return await self.repository.delete(id_)
 
-    async def enqueue_callback(self, operation: Operation, data: ModelT) -> None:
+    async def enqueue_background_task(self, method_name: str, **kwargs: Any) -> None:
         """Enqueue an async callback for the operation and data.
 
         Args:
-            operation: Operation performed on data.
-            data: The data for the operation.
+            method_name: Method on the service object that should be called by the async worker.
+            **kwargs: Arguments to be passed to the method when called.
+
+                Note:
+                    Must be JSON serializable.
         """
         module = inspect.getmodule(self)
         if module is None:
@@ -225,31 +193,9 @@ class Service(Generic[ModelT]):
             make_service_callback.__qualname__,
             service_module_name=module.__name__,
             service_type_fqdn=type(self).__qualname__,
-            operation=operation,
-            raw_obj=self._get_model_dto().from_orm(data).dict(),
+            service_method_name=method_name,
+            **kwargs,
         )
-
-    async def receive_callback(self, operation: Operation, raw_obj: dict[str, Any]) -> None:
-        """Method called by the async workers.
-
-        Do what you want in here but remember not to block the loop.
-
-        Args:
-            operation: Operation performed on the object.
-            raw_obj: Raw representation of the object.
-        """
-        dto_parsed_obj = self._get_model_dto().parse_obj(raw_obj)
-        model_instance = self.repository_type.model_type(**dto_parsed_obj.dict())
-        logger.info("Callback executed for %s: %s", operation, model_instance)
-
-    @classmethod
-    def _get_model_dto(cls) -> type[BaseModel]:
-        """DTO for model cached globally on first access.
-
-        Returns:
-            Pydantic model instance used for internal deserialization.
-        """
-        return cls._INTERNAL_DTO_CACHE[cls]
 
 
 async def make_service_callback(
@@ -257,8 +203,8 @@ async def make_service_callback(
     *,
     service_module_name: str,
     service_type_fqdn: str,
-    operation: Operation,
-    raw_obj: dict[str, Any],
+    service_method_name: str,
+    **kwargs: Any,
 ) -> None:
     """Function that makes the async service callbacks.
 
@@ -266,8 +212,8 @@ async def make_service_callback(
         _ctx: the SAQ context
         service_module_name: Module of service type to instantiate.
         service_type_fqdn: Reference to service type in module.
-        operation: Operation performed on the instance.
-        raw_obj: Data received from the work queue.
+        service_method_name: Method to be called on the service object.
+        **kwargs: Unpacked into the service method call as keyword arguments.
     """
     service_module = importlib.import_module(service_module_name)
     for name in service_type_fqdn.split("."):
@@ -279,4 +225,5 @@ async def make_service_callback(
         raise RuntimeError("Couldn't find a service type with given module and fqdn")
     async with async_session_factory() as session:
         service_object: Service = service_type(session=session)
-    await service_object.receive_callback(operation, raw_obj=raw_obj)
+    method = getattr(service_object, service_method_name)
+    await method(**kwargs)
