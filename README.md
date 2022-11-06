@@ -117,10 +117,6 @@ Engine, logging, pooling etc all configurable via environment. We configure star
 custom `before_send` wrapper that inspects the outgoing status code to determine whether the
 transaction that represents the request should be committed, or rolled back.
 
-### Static files config
-
-Adds a static files config for the app.
-
 ### Async SAQ worker config
 
 A customized SAQ queue and worker that is started and shutdown using the Starlite lifecycle event

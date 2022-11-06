@@ -38,7 +38,6 @@ from . import (
     service,
     settings,
     sqlalchemy_plugin,
-    static_files,
     worker,
 )
 from .init_plugin import ConfigureApp, PluginConfig
@@ -61,7 +60,6 @@ __all__ = [
     "service",
     "settings",
     "sqlalchemy_plugin",
-    "static_files",
     "worker",
 ]
 

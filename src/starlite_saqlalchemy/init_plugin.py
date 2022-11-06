@@ -48,7 +48,6 @@ from starlite_saqlalchemy import (
     redis,
     sentry,
     sqlalchemy_plugin,
-    static_files,
 )
 from starlite_saqlalchemy.health import health_check
 from starlite_saqlalchemy.repository.exceptions import RepositoryException
@@ -139,11 +138,6 @@ class PluginConfig(BaseModel):
     Set the SQLAlchemy plugin on the application. Adds the plugin to
     [`AppConfig.plugins`][starlite.config.app.AppConfig.plugins].
     """
-    do_static_files: bool = True
-    """
-    Set the static files config object to
-    [`AppConfig.static_files_config`][starlite.config.app.AppConfig.static_files_config].
-    """
     do_worker: bool = True
     """
     Configure the async worker on the application. This action instantiates a worker instance and
@@ -202,7 +196,6 @@ class ConfigureApp:
         self.configure_response_class(app_config)
         self.configure_sentry(app_config)
         self.configure_sqlalchemy_plugin(app_config)
-        self.configure_static_files(app_config)
         self.configure_worker(app_config)
 
         app_config.on_shutdown.extend([http.Client.close, redis.client.close])
@@ -344,19 +337,6 @@ class ConfigureApp:
         """
         if self.config.do_sqlalchemy_plugin:
             app_config.plugins.append(SQLAlchemyPlugin(config=sqlalchemy_plugin.config))
-
-    def configure_static_files(self, app_config: AppConfig) -> None:
-        """Configure static files for the application.
-
-        No-op if
-        [`AppConfig.static_files_config`][starlite.config.app.AppConfig.static_files_config] is not
-        `None`.
-
-        Args:
-            app_config: The Starlite application config object.
-        """
-        if self.config.do_static_files and app_config.static_files_config is not None:
-            app_config.static_files_config = static_files.config
 
     def configure_worker(self, app_config: AppConfig) -> None:
         """Configure the `SAQ` async worker.
