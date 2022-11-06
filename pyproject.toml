@@ -63,8 +63,7 @@ saq = "*"
 sentry-sdk = "*"
 sqlalchemy = "==2.0.0b3"
 starlite = "~=1.32"
-# waiting on release to include https://github.com/hynek/structlog/pull/457
-structlog = { git = "https://github.com/hynek/structlog.git", rev = "6b06c062dbcd166bfba0da407e9af63432bedea2" }
+structlog = "*"
 
 [tool.poetry.urls]
 GitHub = "https://github.com/topsport-com-au"

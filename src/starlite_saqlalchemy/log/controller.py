@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from starlite.connection import Request
     from starlite.datastructures import State
     from starlite.types.asgi_types import ASGIApp, Message, Receive, Scope, Send
-    from structlog.typing import EventDict, WrappedLogger
+    from structlog.types import EventDict, WrappedLogger
 
 LOGGER = structlog.get_logger()
 

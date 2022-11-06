@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+import contextvars
 import logging
 import sys
 from typing import TYPE_CHECKING
@@ -16,8 +18,9 @@ from . import controller, worker
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from typing import Any
 
-    from structlog.typing import Processor
+    from structlog.types import Processor
 
 __all__ = (
     "default_processors",
@@ -46,6 +49,41 @@ else:
     )
 
 
+def _make_filtering_bound_logger(min_level: int) -> type[structlog.types.FilteringBoundLogger]:
+    """Wraps structlog's `FilteringBoundLogger` to add the `alog()` method,
+    which is in structlog's main branch, but not yet released.
+
+    Args:
+        min_level: Log level as an integer.
+
+    Returns:
+        Structlog's `FilteringBoundLogger` with an `alog()` method that does its work off the event
+        loop.
+    """
+    filtering_bound_logger = structlog.make_filtering_bound_logger(min_level=min_level)
+
+    # pylint: disable=too-few-public-methods
+    class _WrappedFilteringBoundLogger(filtering_bound_logger):  # type:ignore[misc,valid-type]
+        async def alog(self: Any, level: int, event: str, *args: Any, **kw: Any) -> Any:
+            """This method will exist in the next release of structlog."""
+            if level < min_level:
+                return None
+            # pylint: disable=protected-access
+            name = structlog._log_levels._LEVEL_TO_NAME[level]  # pyright: ignore
+
+            ctx = contextvars.copy_context()
+            return await asyncio.get_running_loop().run_in_executor(
+                None,
+                lambda: ctx.run(
+                    lambda: self._proxy_to_logger(  # type:ignore[no-any-return]
+                        name, event % args, **kw
+                    )
+                ),
+            )
+
+    return _WrappedFilteringBoundLogger
+
+
 def configure(processors: Sequence[Processor]) -> None:
     """Call to configure `structlog` on app startup.
 
@@ -58,7 +96,7 @@ def configure(processors: Sequence[Processor]) -> None:
         cache_logger_on_first_use=True,
         logger_factory=structlog.BytesLoggerFactory(),
         processors=processors,
-        wrapper_class=structlog.make_filtering_bound_logger(settings.log.LEVEL),
+        wrapper_class=_make_filtering_bound_logger(settings.log.LEVEL),
     )
 
 
