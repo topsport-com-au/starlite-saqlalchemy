@@ -317,22 +317,15 @@ description = "Distributed Python job queue with asyncio and redis"
 category = "main"
 optional = false
 python-versions = "*"
-develop = false
 
 [package.dependencies]
 croniter = ">=0.3.18"
 redis = ">=4.2.0"
 
 [package.extras]
-dev = ["black", "mypy", "pylint", "types-croniter", "types-redis", "types-setuptools"]
+dev = ["black (==22.3.0)", "pylint"]
 hiredis = ["redis[hiredis] (>=4.2.0)"]
-web = ["aiohttp", "aiohttp_basicauth"]
-
-[package.source]
-type = "git"
-url = "https://github.com/tobymao/saq.git"
-reference = "877c5dd5a72be4b4c41d9244a6bcd795982e7650"
-resolved_reference = "877c5dd5a72be4b4c41d9244a6bcd795982e7650"
+web = ["aiohttp", "aiohttp-basicauth"]
 
 [[package]]
 name = "sentry-sdk"
@@ -433,7 +426,7 @@ full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart", "pyyam
 
 [[package]]
 name = "starlite"
-version = "1.36.0"
+version = "1.37.0"
 description = "Light-weight and flexible ASGI API Framework"
 category = "main"
 optional = false
@@ -474,24 +467,16 @@ anyio = "*"
 
 [[package]]
 name = "structlog"
-version = "22.1.0.post1.dev192+g6b06c06"
+version = "22.1.0"
 description = "Structured Logging for Python"
 category = "main"
 optional = false
 python-versions = ">=3.7"
-develop = false
 
 [package.extras]
-dev = ["structlog[docs,tests,typing]"]
+dev = ["cogapp", "coverage[toml]", "freezegun (>=0.2.8)", "furo", "myst-parser", "pre-commit", "pretend", "pytest (>=6.0)", "pytest-asyncio (>=0.17)", "rich", "simplejson", "sphinx", "sphinx-notfound-page", "sphinxcontrib-mermaid", "tomli", "twisted"]
 docs = ["furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-mermaid", "twisted"]
 tests = ["coverage[toml]", "freezegun (>=0.2.8)", "pretend", "pytest (>=6.0)", "pytest-asyncio (>=0.17)", "simplejson"]
-typing = ["mypy", "rich", "twisted"]
-
-[package.source]
-type = "git"
-url = "https://github.com/hynek/structlog.git"
-reference = "6b06c062dbcd166bfba0da407e9af63432bedea2"
-resolved_reference = "6b06c062dbcd166bfba0da407e9af63432bedea2"
 
 [[package]]
 name = "typing-extensions"
@@ -525,7 +510,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "8fbe7046d74220420b4afb6ff9061f9d33a6f482dfae9b4427084452c3f238c1"
+content-hash = "181f782c1e83a96492e8475aa576b8a69e69a9aa63c5ef6251d3db23672f894a"
 
 [metadata.files]
 anyio = [
@@ -939,7 +924,10 @@ rfc3986 = [
     {file = "rfc3986-1.5.0-py2.py3-none-any.whl", hash = "sha256:a86d6e1f5b1dc238b218b012df0aa79409667bb209e58da56d0b94704e712a97"},
     {file = "rfc3986-1.5.0.tar.gz", hash = "sha256:270aaf10d87d0d4e095063c65bf3ddbc6ee3d0b226328ce21e036f946e421835"},
 ]
-saq = []
+saq = [
+    {file = "saq-0.9.0-py3-none-any.whl", hash = "sha256:0056ad4d42f639eb5c2d575326ae8ce7ffdec05b8ceeafb83de6e73ccff6fec5"},
+    {file = "saq-0.9.0.tar.gz", hash = "sha256:73c316c3e7b90e6e4546dec3c4d15926d85b70a71b2fd23df78723ae6a2803e8"},
+]
 sentry-sdk = [
     {file = "sentry-sdk-1.10.1.tar.gz", hash = "sha256:105faf7bd7b7fa25653404619ee261527266b14103fe1389e0ce077bd23a9691"},
     {file = "sentry_sdk-1.10.1-py2.py3-none-any.whl", hash = "sha256:06c0fa9ccfdc80d7e3b5d2021978d6eb9351fa49db9b5847cf4d1f2a473414ad"},
@@ -990,14 +978,17 @@ starlette = [
     {file = "starlette-0.21.0.tar.gz", hash = "sha256:b1b52305ee8f7cfc48cde383496f7c11ab897cd7112b33d998b1317dc8ef9027"},
 ]
 starlite = [
-    {file = "starlite-1.36.0-py3-none-any.whl", hash = "sha256:ceabc32554ebc74c208d5c4cf695e6c4002587a83e29a979ed3e885bdfeb862d"},
-    {file = "starlite-1.36.0.tar.gz", hash = "sha256:259df69e2c3641c0ac9e8dac770ec7da169db35fd65a17edd98735a44a8f6072"},
+    {file = "starlite-1.37.0-py3-none-any.whl", hash = "sha256:5ef04cc09daa0b965467a0aa4fa4f5560677d88f50ee66d25b3eac52b83e746d"},
+    {file = "starlite-1.37.0.tar.gz", hash = "sha256:65c832e3b5a85c4b56478269fcbe0efb55fa893a66553b0a1a48e419ad6d55b4"},
 ]
 starlite-multipart = [
     {file = "starlite-multipart-1.2.0.tar.gz", hash = "sha256:9ba2108cfd47de07240dc90e55397080ec9ca0c6992ec1097a02dd32ba4ca593"},
     {file = "starlite_multipart-1.2.0-py3-none-any.whl", hash = "sha256:ceb5667d6c58bcbc305d5922ead791f0b50f0b9f658747144577a3dccffc5335"},
 ]
-structlog = []
+structlog = [
+    {file = "structlog-22.1.0-py3-none-any.whl", hash = "sha256:760d37b8839bd4fe1747bed7b80f7f4de160078405f4b6a1db9270ccbfce6c30"},
+    {file = "structlog-22.1.0.tar.gz", hash = "sha256:94b29b1d62b2659db154f67a9379ec1770183933d6115d21f21aa25cfc9a7393"},
+]
 typing-extensions = [
     {file = "typing_extensions-4.4.0-py3-none-any.whl", hash = "sha256:16fa4864408f655d35ec496218b85f79b3437c829e93320c7c9215ccfd92489e"},
     {file = "typing_extensions-4.4.0.tar.gz", hash = "sha256:1511434bb92bf8dd198c12b1cc812e800d4181cfcb867674e0f8279cc93087aa"},
