@@ -15,8 +15,6 @@ from starlite_saqlalchemy.sqlalchemy_plugin import async_session_factory
 from starlite_saqlalchemy.worker import queue
 
 if TYPE_CHECKING:
-    from saq.types import Context
-
     from starlite_saqlalchemy.repository.abc import AbstractRepository
     from starlite_saqlalchemy.repository.types import FilterTypes
 
@@ -24,6 +22,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 ServiceT = TypeVar("ServiceT", bound="Service")
+Context = dict[str, Any]
 
 
 class ServiceException(Exception):

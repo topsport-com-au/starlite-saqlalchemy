@@ -9,10 +9,13 @@ import structlog
 from starlite_saqlalchemy import settings
 
 if TYPE_CHECKING:
-    from saq import Job
-    from saq.types import Context
+    from typing import Any, TypeAlias
+
+    from saq import Job  # type:ignore[import]
 
 LOGGER = structlog.get_logger()
+
+Context: TypeAlias = "dict[str, Any]"
 
 
 async def before_process(_: Context) -> None:
