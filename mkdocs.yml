@@ -2,8 +2,11 @@ site_name: starlite-saqlalchemy
 repo_url: https://github.com/topsport-com-au/starlite-saqlalchemy
 nav:
   - index.md
-  - Async Worker: async_worker.md
-  - Logging: logging.md
+  - Usage:
+    - Configuration: config.md
+    - DTOs: dto.md
+    - Async Worker: async_worker.md
+    - Logging: logging.md
   - Reference: reference/
 watch:
   - src/starlite_saqlalchemy
