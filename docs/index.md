@@ -1,10 +1,27 @@
 # starlite-saqlalchemy
 
-Starlite, SQLAlchemy 2.0 and SAQ configuration plugin.
+An API application pattern standing on the shoulders of:
+
+- [Starlite](https://starlite-api.github.io/starlite/): "...a light, opinionated and flexible ASGI
+  API framework built on top of pydantic".
+- [SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/): "The Python SQL Toolkit and Object
+  Relational Mapper".
+- [SAQ](https://github.com/tobymao/saq): "...a simple and performant job queueing framework built on
+  top of asyncio and redis".
+- [Structlog](https://www.structlog.org/en/stable/): "...makes logging in Python faster, less
+  painful, and more powerful".
+
+## Usage Example
+
+```py title="Simple Example"
+--8<-- "examples/basic_example.py"
+```
+
+Check out the [Usage](config/) section to see everything that is enabled by the framework!
 
 ## Pattern
 
-This is the pattern that this application encourages.
+This is the pattern encouraged by this framework:
 
 ``` mermaid
 sequenceDiagram
@@ -28,14 +45,27 @@ sequenceDiagram
   Depending on architecture, this may not be the same instance of the application that handled the
   request.
 
-## Usage Example
+## Motivation
 
-```py title="Simple Example"
---8<-- "examples/basic_example.py"
-```
+A modern, production-ready API application has a lot of components. Starlite, the backbone of this
+library, exposes a plethora of features and functionality that requires some amount of boilerplate
+and configuration that must be carried from one application implementation to the next.
 
-Configuration via environment.
+`starlite-saqlalchemy` is an example of how Starlite's `on_app_init` hook can be utilized to build
+application configuration libraries that support streamlining the application development process.
 
-```dotenv title="Example .env"
---8<-- ".env.example"
-```
+However, this library intends to be not only an example, but also an opinionated resource to support
+the efficient, and consistent rollout of production ready API applications built on top of Starlite.
+
+Use this library if the stack and design decisions suit your taste. If there are improvements or
+generalizations that could be made to the library to support your use case, we'd love to hear about
+them. Open [an issue](https://github.com/topsport-com-au/starlite-saqlalchemy/issues) or start
+[a discussion](https://github.com/topsport-com-au/starlite-saqlalchemy/discussions).
+
+## Backward compatibility and releases
+
+This project follows semantic versioning, and we use
+[semantic releases](https://python-semantic-release.readthedocs.io/en/latest/) in our toolchain.
+This means that bug fixes and new features will find there way into a release as soon they hit the
+main branch, and if we break something, we'll bump the major version number. However, until we hit
+v1.0, there will be breaking changes between minor versions, but v1.0 is close!

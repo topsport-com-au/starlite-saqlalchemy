@@ -107,7 +107,7 @@ as [PII](https://en.wikipedia.org/wiki/Personal_data) and secrets.
 Thankfully, we have mechanisms to ensure that this type of data is excluded from our logs!
 
 Our
-[LogSettings](/reference/starlite_saqlalchemy/settings/#starlite_saqlalchemy.settings.LogSettings)
+[LogSettings](../reference/starlite_saqlalchemy/settings/#starlite_saqlalchemy.settings.LogSettings)
 object provides a host of options that allow you to customize log output. This exposes the following
 environment variables:
 
@@ -218,7 +218,8 @@ contextvars for the job.
 If logging configuration is enabled, we use this SAQ `Worker` hook to extract the configured `Job`
 attributes and inject them into the log, and emit the log event. The attributes that are logged for
 each `Job` can be configured in
-[`LogSettings`](/reference/starlite_saqlalchemy/settings/#starlite_saqlalchemy.settings.LogSettings.JOB_FIELDS).
+[`LogSettings`](../reference/starlite_saqlalchemy/settings/#starlite_saqlalchemy.settings.
+LogSettings.JOB_FIELDS).
 
 If the `Job.error` attribute is truthy, we log at `ERROR` severity, otherwise log at `INFO`.
 

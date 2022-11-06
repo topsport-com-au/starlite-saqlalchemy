@@ -8,7 +8,7 @@
 You can leverage the async worker without needing to know anything specific about the worker
 implementation.
 
-The generic [Service](reference/starlite_saqlalchemy/service/#starlite_saqlalchemy.service.Service)
+The generic [Service](../reference/starlite_saqlalchemy/service/#starlite_saqlalchemy.service.Service)
 object includes a method that allows you to enqueue a background task.
 
 ### Example
