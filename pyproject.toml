@@ -59,8 +59,7 @@ httpx = "*"
 orjson = "*"
 pydantic = "*"
 redis = "*"
-# waiting on release to include https://github.com/tobymao/saq/pull/43
-saq = { git = "https://github.com/tobymao/saq.git", rev = "877c5dd5a72be4b4c41d9244a6bcd795982e7650" }
+saq = "*"
 sentry-sdk = "*"
 sqlalchemy = "==2.0.0b3"
 starlite = "~=1.32"

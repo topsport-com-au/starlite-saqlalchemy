@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     from pytest import MonkeyPatch
-    from saq.job import Job
+    from saq.job import Job  # type:ignore[import]
     from starlite import Starlite, State
     from starlite.types.asgi_types import (
         HTTPResponseBodyEvent,

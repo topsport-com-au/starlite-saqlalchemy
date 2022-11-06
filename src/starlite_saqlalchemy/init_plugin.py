@@ -60,8 +60,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from typing import Any
 
-    from saq.types import Function
-    from saq.worker import Worker
+    from saq.worker import Worker  # type:ignore[import]
     from starlite.config.app import AppConfig
     from structlog.types import Processor
 
@@ -79,7 +78,7 @@ class PluginConfig(BaseModel):
     """
 
     # why isn't the callback defined here?
-    worker_functions: list[Function | tuple[str, Function]] = [
+    worker_functions: list[Callable[..., Any] | tuple[str, Callable[..., Any]]] = [
         (make_service_callback.__qualname__, make_service_callback)
     ]
     """
