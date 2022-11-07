@@ -6,7 +6,7 @@ single log line per request or async worker invocation).
 
 The pattern is built upon the excellent [`structlog`](https://github.com/hynek/structlog) library,
 and is configured to be as efficient as possible while not blocking the event loop (it runs the
-logging in a processor thread, off the event loop).
+logging in a processor thread).
 
 ## Adding data to the log
 

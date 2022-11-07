@@ -75,6 +75,10 @@ class LogSettings(BaseSettings):
     # https://stackoverflow.com/a/1845097/6560549
     EXCLUDE_PATHS: str = r"\A(?!x)x"
     """Regex to exclude paths from logging."""
+    HTTP_EVENT: str = "HTTP"
+    """Log event name for logs from Starlite handlers."""
+    LEVEL: int = 20
+    """Stdlib log levels. Only emit logs at this level, or higher."""
     OBFUSCATE_COOKIES: set[str] = {"session"}
     """Request cookie keys to obfuscate."""
     OBFUSCATE_HEADERS: set[str] = {"Authorization", "X-API-KEY"}
@@ -112,12 +116,8 @@ class LogSettings(BaseSettings):
         "body",
     ]
     """Attributes of the [Response][starlite.response.Response] to be logged."""
-    HTTP_EVENT: str = "HTTP"
-    """Log event name for logs from Starlite handlers."""
     WORKER_EVENT: str = "Worker"
     """Log event name for logs from SAQ worker."""
-    LEVEL: int = 20
-    """Stdlib log levels. Only emit logs at this level, or higher."""
 
 
 # noinspection PyUnresolvedReferences
@@ -132,14 +132,14 @@ class OpenAPISettings(BaseSettings):
         env_prefix = "OPENAPI_"
         case_sensitive = True
 
-    TITLE: str | None
-    """Document title."""
-    VERSION: str
-    """Document version."""
     CONTACT_NAME: str
     """Name of contact on document."""
     CONTACT_EMAIL: str
     """Email for contact on document."""
+    TITLE: str | None
+    """Document title."""
+    VERSION: str
+    """Document version."""
 
 
 # noinspection PyUnresolvedReferences
