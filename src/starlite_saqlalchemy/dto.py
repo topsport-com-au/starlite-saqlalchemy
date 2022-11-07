@@ -9,21 +9,29 @@ should always be private, or read-only at the model declaration layer.
 from __future__ import annotations
 
 from enum import Enum, auto
-from typing import TYPE_CHECKING, Any, cast, get_args, get_origin, get_type_hints
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    NamedTuple,
+    cast,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
 
 from pydantic import BaseConfig, BaseModel, create_model
 from pydantic.fields import FieldInfo
 from sqlalchemy import inspect
 from sqlalchemy.orm import Mapped
 
+from starlite_saqlalchemy import settings
+
 if TYPE_CHECKING:
     from sqlalchemy import Column
     from sqlalchemy.orm import DeclarativeBase, Mapper
 
-DTO_INFO_KEY = "dto"
 
-
-class Mode(Enum):
+class Mark(str, Enum):
     """For marking column definitions on the domain models.
 
     Example:
@@ -31,12 +39,12 @@ class Mode(Enum):
     ```python
     class Model(Base):
         ...
-        updated_at: Mapped[datetime] = mapped_column(info={"dto": Mode.READ_ONLY})
+        updated_at: Mapped[datetime] = mapped_column(info={"dto": Mark.READ_ONLY})
     ```
     """
 
-    READ_ONLY = auto()
-    PRIVATE = auto()
+    READ_ONLY = "read-only"
+    SKIP = "skip"
 
 
 class Purpose(Enum):
@@ -56,6 +64,15 @@ class Purpose(Enum):
     WRITE = auto()
 
 
+class Attrib(NamedTuple):
+    """For configuring DTO behavior on SQLAlchemy model fields."""
+
+    mark: Mark | None = None
+    """Mark the field as read only, or skip."""
+    pydantic_field: FieldInfo | None = None
+    """If provided, used for the pydantic model for this attribute."""
+
+
 def _construct_field_info(column: Column, purpose: Purpose) -> FieldInfo:
     default = column.default
     if purpose is Purpose.READ or default is None:
@@ -67,13 +84,18 @@ def _construct_field_info(column: Column, purpose: Purpose) -> FieldInfo:
     raise ValueError("Unexpected default type")
 
 
-def _should_exclude_field(purpose: Purpose, column: Column, exclude: set[str]) -> bool:
+def _get_dto_attrib(column: Column) -> Attrib:
+    return column.info.get(settings.api.DTO_INFO_KEY, Attrib())
+
+
+def _should_exclude_field(
+    purpose: Purpose, column: Column, exclude: set[str], dto_attrib: Attrib
+) -> bool:
     if column.key in exclude:
         return True
-    mode = column.info.get(DTO_INFO_KEY)
-    if mode is Mode.PRIVATE:
+    if dto_attrib.mark is Mark.SKIP:
         return True
-    if purpose is Purpose.WRITE and mode is Mode.READ_ONLY:
+    if purpose is Purpose.WRITE and dto_attrib.mark is Mark.READ_ONLY:
         return True
     return False
 
@@ -89,15 +111,15 @@ def factory(
     ```python
     class User(DeclarativeBase):
         id: Mapped[UUID] = mapped_column(
-            default=uuid4, primary_key=True, info={"dto": dto.Mode.READ_ONLY}
+            default=uuid4, primary_key=True, info={"dto": Attrib(mark=dto.Mark.READ_ONLY)}
         )
         email: Mapped[str]
-        password_hash: Mapped[str] = mapped_column(info={"dto": dto.Mode.PRIVATE})
+        password_hash: Mapped[str] = mapped_column(info={"dto": Attrib(mark=dto.Mark.SKIP)})
     ```
 
     In the above example, a DTO generated for `Purpose.READ` will include the `id` and `email`
     fields, while a model generated for `Purpose.WRITE` will only include a field for `email`.
-    Notice that columns marked as `Mode.PRIVATE` will not have a field produced in any DTO object.
+    Notice that columns marked as `Mark.SKIP` will not have a field produced in any DTO object.
 
     Args:
         name: Name given to the DTO class.
@@ -112,15 +134,16 @@ def factory(
     exclude = exclude or set[str]()
     mapper = cast("Mapper", inspect(model))
     columns = mapper.columns
-    dto_fields: dict[str, tuple[Any, FieldInfo]] = {}
+    fields: dict[str, tuple[Any, FieldInfo]] = {}
     for key, type_hint in get_type_hints(model).items():
         if get_origin(type_hint) is not Mapped:
             continue
         column = columns[key]
-        if _should_exclude_field(purpose, column, exclude):
+        attrib = _get_dto_attrib(column)
+        if _should_exclude_field(purpose, column, exclude, attrib):
             continue
         (type_,) = get_args(type_hint)
-        dto_fields[key] = (type_, _construct_field_info(column, purpose))
+        fields[key] = (type_, _construct_field_info(column, purpose))
     return create_model(  # type:ignore[no-any-return,call-overload]
-        name, __config__=type("Config", (BaseConfig,), {"orm_mode": True}), **dto_fields
+        name, __config__=type("Config", (BaseConfig,), {"orm_mode": True}), **fields
     )

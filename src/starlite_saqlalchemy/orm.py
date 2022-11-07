@@ -17,12 +17,15 @@ from sqlalchemy.orm import (
     registry,
 )
 
-from starlite_saqlalchemy import dto
+from starlite_saqlalchemy import dto, settings
 
 if TYPE_CHECKING:
     from pydantic import BaseModel
 
 BaseT = TypeVar("BaseT", bound="Base")
+
+DTO_KEY = settings.api.DTO_INFO_KEY
+"""The key we use to reference `dto.Attrib` in the SQLAlchemy info dict."""
 
 convention = {
     "ix": "ix_%(column_0_label)s",
@@ -60,15 +63,15 @@ class Base(DeclarativeBase):
     )
 
     id: Mapped[UUID] = mapped_column(
-        default=uuid4, primary_key=True, info={"dto": dto.Mode.READ_ONLY}
+        default=uuid4, primary_key=True, info={DTO_KEY: dto.Attrib(mark=dto.Mark.READ_ONLY)}
     )
     """Primary key column."""
     created: Mapped[datetime] = mapped_column(
-        default=datetime.now, info={"dto": dto.Mode.READ_ONLY}
+        default=datetime.now, info={DTO_KEY: dto.Attrib(mark=dto.Mark.READ_ONLY)}
     )
     """Date/time of instance creation."""
     updated: Mapped[datetime] = mapped_column(
-        default=datetime.now, info={"dto": dto.Mode.READ_ONLY}
+        default=datetime.now, info={DTO_KEY: dto.Attrib(mark=dto.Mark.READ_ONLY)}
     )
     """Date/time of instance update."""
 

@@ -44,11 +44,25 @@ ReadDTO = dto.factory("UserReadDTO", model=User, purpose=dto.Purpose.READ)
 WriteDTO = dto.factory("UserWriteDTO", model=User, purpose=dto.Purpose.WRITE)
 ```
 
-#### DTO Mode
+#### DTO Attrib
+
+The `dto.Attrib` object is a container for configuration of how the generated DTO object should
+reflect the SQLAlchemy model field.
+
+Define this in the SQLAlchemy `info` parameter to `mapped_column()`, for example,
+`mapped_column(info={"dto": dto.Attrib()})`.
+
+The DTO Attrib object has two values that can be set:
+
+- `dto.Attrib.mark`: a value of the enum [`dto.Mark`][DTO-mark].
+- `dto.Attrib.pydantic_field`: return value of the pydantic `Field` function that will be used to
+  construct the pydantic model.
+
+#### DTO Mark
 
 We use the `info` parameter to `mapped_column()` to guide `dto.factory()`.
 
-The [dto.Mode](../reference/starlite_saqlalchemy/dto/#Mode) enumeration is used to indicate on the
+The [dto.Mark](../reference/starlite_saqlalchemy/dto/#Mark) enumeration is used to indicate on the
 SQLAlchemy ORM model, whether properties should always be private, or read-only.
 
 Take this model, for example:
@@ -62,8 +76,10 @@ from starlite_saqlalchemy import dto, orm
 
 class User(orm.Base):
     name: str
-    password_hash: str = mapped_column(info={"dto": dto.Mode.PRIVATE})
-    updated_at: datetime = mapped_column(info={"dto": dto.Mode.READ_ONLY})
+    password_hash: str = mapped_column(info={"dto": dto.Attrib(mark=dto.Mark.SKIP)})
+    updated_at: datetime = mapped_column(
+        info={"dto": dto.Attrib(mark=dto.Mark.READ_ONLY)}
+    )
 
 
 ReadDTO = dto.factory("UserReadDTO", model=User, purpose=dto.Purpose.READ)
@@ -73,12 +89,12 @@ WriteDTO = dto.factory("UserWriteDTO", model=User, purpose=dto.Purpose.WRITE)
 Both `ReadDTO` and `WriteDTO` are pydantic models that have a `name` attribute.
 
 Neither `ReadDTO` or `WriteDTO` have a `password_hash` attribute - this is the side effect of
-marking the column with `dto.Mode.PRIVATE`. Columns that are marked private will never be included
+marking the column with `dto.Mark.PRIVATE`. Columns that are marked private will never be included
 in any generated DTO model, meaning that in the context of the application, they are unable to be
 read or modified by the client.
 
 `ReadDTO` has an `updated_at` field, while `WriteDTO` does not. This is the side effect of marking
-the column with `dto.Mode.READ_ONLY` - these fields will only be included in DTOs generated for
+the column with `dto.Mark.READ_ONLY` - these fields will only be included in DTOs generated for
 `dto.Purpose.READ` and make sense for fields that have internally generated values.
 
 The following class is pretty much the same as
@@ -96,19 +112,21 @@ from starlite_saqlalchemy import dto
 
 class Base(DeclarativeBase):
     id: Mapped[UUID] = mapped_column(
-        default=uuid4, primary_key=True, info={"dto": dto.Mode.READ_ONLY}
+        default=uuid4,
+        primary_key=True,
+        info={"dto": dto.Attrib(mark=dto.Mark.READ_ONLY)},
     )
     """Primary key column."""
     created: Mapped[datetime] = mapped_column(
-        default=datetime.now, info={"dto": dto.Mode.READ_ONLY}
+        default=datetime.now, info={"dto": dto.Attrib(mark=dto.Mark.READ_ONLY)}
     )
     """Date/time of instance creation."""
     updated: Mapped[datetime] = mapped_column(
-        default=datetime.now, info={"dto": dto.Mode.READ_ONLY}
+        default=datetime.now, info={"dto": dto.Attrib(mark=dto.Mark.READ_ONLY)}
     )
 ```
 
-Notice that all these fields are marked as `dto.Mode.READ_ONLY`. This means that they are unable to
+Notice that all these fields are marked as `dto.Mark.READ_ONLY`. This means that they are unable to
 be modified by clients, even if they include values for them in the payloads to `POST`/`PUT`/`PATCH`
 routes.
 
