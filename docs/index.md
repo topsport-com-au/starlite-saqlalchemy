@@ -17,11 +17,9 @@ An API application pattern standing on the shoulders of:
 --8<-- "examples/basic_example.py"
 ```
 
-Check out the [Usage](config/) section to see everything that is enabled by the framework!
+Check out the [Usage](config/) section to see all the features this configures on the application!
 
 ## Pattern
-
-This is the pattern encouraged by this framework:
 
 ``` mermaid
 sequenceDiagram
@@ -47,16 +45,15 @@ sequenceDiagram
 
 ## Motivation
 
-A modern, production-ready API application has a lot of components. Starlite, the backbone of this
-library, exposes a plethora of features and functionality that requires some amount of boilerplate
-and configuration that must be carried from one implementation of an application to
-the next.
+A modern, production-ready API has a lot of components. Starlite, the backbone of this library,
+exposes a plethora of features and functionality that requires some amount of boilerplate and
+configuration that must be carried from one implementation of an application to the next.
 
 `starlite-saqlalchemy` is an example of how Starlite's `on_app_init` hook can be utilized to build
 application configuration libraries that support streamlining the application development process.
 
-However, this library intends to be not only an example, but also an opinionated resource to support
-the efficient, and consistent rollout of production ready API applications built on top of Starlite.
+However, more than just an example, this library intends to be an opinionated resource to support
+the efficient, and consistent rollout of production ready APIs built on top of Starlite.
 
 Use this library if the stack and design decisions suit your taste. If there are improvements or
 generalizations that could be made to the library to support your use case, we'd love to hear about
