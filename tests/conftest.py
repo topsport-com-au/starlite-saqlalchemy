@@ -11,7 +11,7 @@ from structlog.contextvars import clear_contextvars
 from structlog.testing import CapturingLogger
 
 import starlite_saqlalchemy
-from starlite_saqlalchemy import ConfigureApp
+from starlite_saqlalchemy import ConfigureApp, log
 
 
 @pytest.fixture(name="cap_logger")
@@ -32,7 +32,7 @@ def _patch_logger(cap_logger: CapturingLogger, monkeypatch: pytest.MonkeyPatch) 
     logger._logger = cap_logger
     # drop rendering processor to get a dict, not bytes
     # noinspection PyProtectedMember
-    logger._processors = logger._processors[:-1]
+    logger._processors = log.default_processors[:-1]
     monkeypatch.setattr(starlite_saqlalchemy.log.controller, "LOGGER", logger)
     monkeypatch.setattr(starlite_saqlalchemy.log.worker, "LOGGER", logger)
 

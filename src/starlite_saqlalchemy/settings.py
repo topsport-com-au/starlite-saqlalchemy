@@ -24,11 +24,11 @@ class AppSettings(BaseSettings):
     class Config:
         case_sensitive = True
 
-    BUILD_NUMBER: str
+    BUILD_NUMBER: str = ""
     """Identifier for CI build."""
-    DEBUG: bool
+    DEBUG: bool = False
     """Run `Starlite` with `debug=True`."""
-    ENVIRONMENT: str
+    ENVIRONMENT: str = "prod"
     """'dev', 'prod', etc."""
     NAME: str
     """Application name."""
@@ -55,15 +55,15 @@ class APISettings(BaseSettings):
         env_prefix = "API_"
         case_sensitive = True
 
-    CACHE_EXPIRATION: int
+    CACHE_EXPIRATION: int = 60
     """Default cache key expiration in seconds."""
-    DB_SESSION_DEPENDENCY_KEY: str
+    DB_SESSION_DEPENDENCY_KEY: str = "db_session"
     """Parameter name for SQLAlchemy session dependency injection."""
-    DEFAULT_PAGINATION_LIMIT: int
+    DEFAULT_PAGINATION_LIMIT: int = 100
     """Max records received for collection routes."""
     DTO_INFO_KEY: str = "dto"
     """Key used for DTO field config in SQLAlchemy info dict."""
-    HEALTH_PATH: str
+    HEALTH_PATH: str = "/health"
     """Route that the health check is served under."""
 
 
@@ -160,19 +160,19 @@ class DatabaseSettings(BaseSettings):
         env_prefix = "DB_"
         case_sensitive = True
 
-    ECHO: bool
+    ECHO: bool = False
     """Enable SQLAlchemy engine logs."""
-    ECHO_POOL: bool | Literal["debug"]
+    ECHO_POOL: bool | Literal["debug"] = False
     """Enable SQLAlchemy connection pool logs."""
-    POOL_DISABLE: bool
+    POOL_DISABLE: bool = False
     """Disable SQLAlchemy pooling, same as setting pool to
     [`NullPool`][sqlalchemy.pool.NullPool].
     """
-    POOL_MAX_OVERFLOW: int
+    POOL_MAX_OVERFLOW: int = 10
     """See [`max_overflow`][sqlalchemy.pool.QueuePool]."""
-    POOL_SIZE: int
+    POOL_SIZE: int = 5
     """See [`pool_size`][sqlalchemy.pool.QueuePool]."""
-    POOL_TIMEOUT: int
+    POOL_TIMEOUT: int = 30
     """See [`timeout`][sqlalchemy.pool.QueuePool]."""
     URL: PostgresDsn
 
@@ -200,9 +200,9 @@ class SentrySettings(BaseSettings):
         env_prefix = "SENTRY_"
         case_sensitive = True
 
-    DSN: str
+    DSN: str = ""
     """The sentry DSN. Set as empty string to disable sentry reporting."""
-    TRACES_SAMPLE_RATE: float
+    TRACES_SAMPLE_RATE: float = 0.0001
     """% of requests traced by sentry, `0.0` means none, `1.0` means all."""
 
 

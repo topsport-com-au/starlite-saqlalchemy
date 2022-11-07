@@ -38,11 +38,12 @@ default_processors = [
 ]
 
 if sys.stderr.isatty():  # pragma: no cover
+    LoggerFactory: Any = structlog.WriteLoggerFactory
     default_processors.extend([structlog.dev.ConsoleRenderer()])
 else:
+    LoggerFactory = structlog.BytesLoggerFactory
     default_processors.extend(
         [
-            structlog.processors.format_exc_info,
             structlog.processors.dict_tracebacks,
             structlog.processors.JSONRenderer(serializer=orjson.dumps),
         ]
@@ -94,7 +95,7 @@ def configure(processors: Sequence[Processor]) -> None:
     """
     structlog.configure(
         cache_logger_on_first_use=True,
-        logger_factory=structlog.BytesLoggerFactory(),
+        logger_factory=LoggerFactory(),
         processors=processors,
         wrapper_class=_make_filtering_bound_logger(settings.log.LEVEL),
     )
@@ -111,8 +112,14 @@ config = LoggingConfig(
         }
     },
     loggers={
+        "uvicorn.access": {
+            "propagate": False,
+            "level": logging.WARNING,
+            "handlers": ["queue_listener"],
+        },
         "uvicorn.error": {
             "propagate": False,
+            "level": logging.WARNING,
             "handlers": ["queue_listener"],
         },
         "saq": {

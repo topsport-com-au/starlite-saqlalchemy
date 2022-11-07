@@ -310,6 +310,8 @@ async def test_after_process(job: Job, cap_logger: CapturingLogger) -> None:
                 "result": None,
                 "error": None,
                 "event": "Worker",
+                "level": "info",
+                "timestamp": ANY,
             },
         )
     ] == cap_logger.calls
@@ -335,6 +337,8 @@ async def test_after_process_logs_at_error(job: Job, cap_logger: CapturingLogger
                 "result": None,
                 "error": "Yep, this is the traceback.",
                 "event": "Worker",
+                "level": "error",
+                "timestamp": ANY,
             },
         )
     ] == cap_logger.calls

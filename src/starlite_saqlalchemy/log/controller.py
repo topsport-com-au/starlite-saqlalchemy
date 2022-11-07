@@ -129,6 +129,8 @@ class BeforeSendHandler:
             scope["state"]["http.response.start"] = message
         # ignore intermediate content of streaming responses for now.
         elif message["type"] == "http.response.body" and message["more_body"] is False:
+            # Note: remove when https://github.com/starlite-api/starlite/pull/760 released
+            scope.setdefault("path_params", {})
             scope["state"]["http.response.body"] = message
             if self.do_log_request:
                 await self.log_request(scope)
