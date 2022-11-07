@@ -2,9 +2,9 @@ name: ci
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 env:
   FORCE_COLOR: "1"
@@ -180,7 +180,7 @@ jobs:
         with:
           languages: python
       - name: Initialize CodeQL Without Dependencies
-        if: github.event_name == 'pull_request'
+        if: github.ref_name != 'main'
         uses: github/codeql-action/init@v2
         with:
           languages: python
