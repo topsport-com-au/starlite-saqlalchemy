@@ -61,6 +61,8 @@ class APISettings(BaseSettings):
     """Parameter name for SQLAlchemy session dependency injection."""
     DEFAULT_PAGINATION_LIMIT: int
     """Max records received for collection routes."""
+    DTO_INFO_KEY: str = "dto"
+    """Key used for DTO field config in SQLAlchemy info dict."""
     HEALTH_PATH: str
     """Route that the health check is served under."""
 

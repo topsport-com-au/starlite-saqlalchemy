@@ -8,7 +8,7 @@ import pytest
 from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from starlite_saqlalchemy import dto
+from starlite_saqlalchemy import dto, settings
 from tests.utils.domain import Author
 
 
@@ -115,12 +115,13 @@ def test_read_dto_for_model_field_unsupported_default(base: type[DeclarativeBase
 
 @pytest.mark.parametrize("purpose", [dto.Purpose.WRITE, dto.Purpose.READ])
 def test_dto_for_private_model_field(purpose: dto.Purpose, base: type[DeclarativeBase]) -> None:
-    """Ensure that fields markets as PRIVATE are excluded from DTO."""
+    """Ensure that fields markets as SKIP are excluded from DTO."""
 
     class Model(base):
         __tablename__ = "smth"
         field: Mapped[datetime] = mapped_column(
-            default=datetime.now(), info={"dto": dto.Mode.PRIVATE}
+            default=datetime.now(),
+            info={settings.api.DTO_INFO_KEY: dto.Attrib(mark=dto.Mark.SKIP)},
         )
 
     dto_model = dto.factory("DTO", Model, purpose=purpose)

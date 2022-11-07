@@ -49,7 +49,8 @@ sequenceDiagram
 
 A modern, production-ready API application has a lot of components. Starlite, the backbone of this
 library, exposes a plethora of features and functionality that requires some amount of boilerplate
-and configuration that must be carried from one application implementation to the next.
+and configuration that must be carried from one implementation of an application to
+the next.
 
 `starlite-saqlalchemy` is an example of how Starlite's `on_app_init` hook can be utilized to build
 application configuration libraries that support streamlining the application development process.
