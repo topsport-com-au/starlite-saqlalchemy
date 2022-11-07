@@ -76,7 +76,6 @@ class PluginConfig(BaseModel):
     application.
     """
 
-    # why isn't the callback defined here?
     worker_functions: list[Callable[..., Any] | tuple[str, Callable[..., Any]]] = [
         (make_service_callback.__qualname__, make_service_callback)
     ]
@@ -193,6 +192,7 @@ class ConfigureApp:
         self.configure_exception_handlers(app_config)
         self.configure_health_check(app_config)
         self.configure_logging(app_config)
+        self.configure_openapi(app_config)
         self.configure_response_class(app_config)
         self.configure_sentry(app_config)
         self.configure_sqlalchemy_plugin(app_config)
@@ -208,8 +208,7 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_after_exception:
-            if not isinstance(app_config.after_exception, list):
-                app_config.after_exception = [app_config.after_exception]
+            app_config.after_exception = self._ensure_list(app_config.after_exception)
             app_config.after_exception.append(exceptions.after_exception_hook_handler)
 
     def configure_cache(self, app_config: AppConfig) -> None:
@@ -221,7 +220,7 @@ class ConfigureApp:
         Args:
             app_config: The Starlite application config object.
         """
-        if self.config.do_cache and app_config.cache_config is DEFAULT_CACHE_CONFIG:
+        if self.config.do_cache and app_config.cache_config == DEFAULT_CACHE_CONFIG:
             app_config.cache_config = cache.config
 
     def configure_collection_dependencies(self, app_config: AppConfig) -> None:
@@ -300,7 +299,7 @@ class ConfigureApp:
         Args:
             app_config: The Starlite application config object.
         """
-        if self.config.do_openapi and app_config.openapi_config is DEFAULT_OPENAPI_CONFIG:
+        if self.config.do_openapi and app_config.openapi_config == DEFAULT_OPENAPI_CONFIG:
             app_config.openapi_config = openapi.config
 
     def configure_response_class(self, app_config: AppConfig) -> None:

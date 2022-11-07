@@ -109,6 +109,8 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
                     self._filter_on_datetime_field(field_name, before, after)
                 case CollectionFilter(field_name, values):
                     self._filter_in_collection(field_name, values)
+                case _:
+                    raise RepositoryException(f"Unexpected filter: {filter}")
         self._filter_select_by_kwargs(**kwargs)
 
         with wrap_sqlalchemy_exception():

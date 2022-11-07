@@ -67,7 +67,7 @@ def _make_filtering_bound_logger(min_level: int) -> type[structlog.types.Filteri
     class _WrappedFilteringBoundLogger(filtering_bound_logger):  # type:ignore[misc,valid-type]
         async def alog(self: Any, level: int, event: str, *args: Any, **kw: Any) -> Any:
             """This method will exist in the next release of structlog."""
-            if level < min_level:
+            if level < min_level:  # pragma: no cover
                 return None
             # pylint: disable=protected-access
             name = structlog._log_levels._LEVEL_TO_NAME[level]  # pyright: ignore

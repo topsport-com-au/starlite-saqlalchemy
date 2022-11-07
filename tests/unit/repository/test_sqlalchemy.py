@@ -1,5 +1,7 @@
 """Unit tests for the SQLAlchemy Repository implementation."""
 # pylint: disable=protected-access,redefined-outer-name
+from __future__ import annotations
+
 from datetime import datetime
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, call
@@ -63,7 +65,7 @@ async def test_sqlalchemy_repo_add(mock_repo: SQLAlchemyRepository) -> None:
 
 
 async def test_sqlalchemy_repo_delete(
-    mock_repo: SQLAlchemyRepository, monkeypatch: "MonkeyPatch"
+    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
 ) -> None:
     """Test expected method calls for delete operation."""
     mock_instance = MagicMock()
@@ -77,7 +79,7 @@ async def test_sqlalchemy_repo_delete(
 
 
 async def test_sqlalchemy_repo_get_member(
-    mock_repo: SQLAlchemyRepository, monkeypatch: "MonkeyPatch"
+    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
 ) -> None:
     """Test expected method calls for member get operation."""
     mock_instance = MagicMock()
@@ -92,7 +94,7 @@ async def test_sqlalchemy_repo_get_member(
 
 
 async def test_sqlalchemy_repo_list(
-    mock_repo: SQLAlchemyRepository, monkeypatch: "MonkeyPatch"
+    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
 ) -> None:
     """Test expected method calls for list operation."""
     mock_instances = [MagicMock(), MagicMock()]
@@ -107,7 +109,7 @@ async def test_sqlalchemy_repo_list(
 
 
 async def test_sqlalchemy_repo_list_with_pagination(
-    mock_repo: SQLAlchemyRepository, monkeypatch: "MonkeyPatch"
+    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
 ) -> None:
     """Test list operation with pagination."""
     result_mock = MagicMock()
@@ -121,7 +123,7 @@ async def test_sqlalchemy_repo_list_with_pagination(
 
 
 async def test_sqlalchemy_repo_list_with_before_after_filter(
-    mock_repo: SQLAlchemyRepository, monkeypatch: "MonkeyPatch"
+    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
 ) -> None:
     """Test list operation with BeforeAfter filter."""
     field_name = "updated"
@@ -138,7 +140,7 @@ async def test_sqlalchemy_repo_list_with_before_after_filter(
 
 
 async def test_sqlalchemy_repo_list_with_collection_filter(
-    mock_repo: SQLAlchemyRepository, monkeypatch: "MonkeyPatch"
+    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
 ) -> None:
     """Test behavior of list operation given CollectionFilter."""
     field_name = "id"
@@ -152,8 +154,14 @@ async def test_sqlalchemy_repo_list_with_collection_filter(
     getattr(mock_repo.model_type, field_name).in_.assert_called_once_with(values)
 
 
+async def test_sqlalchemy_repo_unknown_filter_type_raises(mock_repo: SQLAlchemyRepository) -> None:
+    """Test that repo raises exception if list receives unknown filter type."""
+    with pytest.raises(RepositoryException):
+        await mock_repo.list("not a filter")  # type:ignore[arg-type]
+
+
 async def test_sqlalchemy_repo_update(
-    mock_repo: SQLAlchemyRepository, monkeypatch: "MonkeyPatch"
+    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
 ) -> None:
     """Test the sequence of repo calls for update operation."""
     id_ = 3
@@ -203,3 +211,21 @@ def test_filter_in_collection_noop_if_collection_empty(mock_repo: SQLAlchemyRepo
     """Ensures we don't filter on an empty collection."""
     mock_repo._filter_in_collection("id", [])
     mock_repo._select.where.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    ("before", "after"),
+    [
+        (datetime.max, datetime.min),
+        (None, datetime.min),
+        (datetime.max, None),
+    ],
+)
+def test__filter_on_datetime_field(
+    before: datetime, after: datetime, mock_repo: SQLAlchemyRepository
+) -> None:
+    """Test through branches of _filter_on_datetime_field()"""
+    field_mock = MagicMock()
+    field_mock.__gt__ = field_mock.__lt__ = lambda self, other: True
+    mock_repo.model_type.updated = field_mock
+    mock_repo._filter_on_datetime_field("updated", before, after)
