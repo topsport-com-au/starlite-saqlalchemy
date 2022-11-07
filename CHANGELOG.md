@@ -2,6 +2,21 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.0 (2022-11-07)
+### Feature
+* **dto:** Dto.Attrib and dto.Mark. ([`ca47028`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ca47028f674b696493564d07379b589756433cc1))
+
+### Fix
+* **log:** Fix dev config write to bytes logger. ([`2d8c69e`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/2d8c69ec93083d1d6dc42ebceb8e43b02cde9408))
+* Removes static files config. ([`bdf5ea5`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/bdf5ea56d4f04f6fa7b907492d305417e48be9f1))
+
+### Breaking
+* dto.Attrib and dto.Mark. ([`ca47028`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ca47028f674b696493564d07379b589756433cc1))
+* removes static files config. ([`bdf5ea5`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/bdf5ea56d4f04f6fa7b907492d305417e48be9f1))
+
+### Documentation
+* Restructures and adds to documentation ([`2f8875c`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/2f8875ce10eb4e212bc184b8b5f0f48170f3b2d1))
+
 ## v0.2.0 (2022-11-05)
 ### Feature
 * **worker:** Improves the worker pattern. ([#90](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/90)) ([`32714a5`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/32714a5ca2329bca1d67770b388c4b984f815aaf))
