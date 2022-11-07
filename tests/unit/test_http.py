@@ -1,3 +1,5 @@
+"""Tests for http.py."""
+# pylint: disable=protected-access
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
