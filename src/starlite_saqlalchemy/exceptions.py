@@ -5,6 +5,7 @@ into HTTP exceptions.
 """
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING
 
 from starlette.middleware.errors import ServerErrorMiddleware
@@ -47,16 +48,18 @@ class ForbiddenException(HTTPException):
     status_code = 403
 
 
-def after_exception_hook_handler(exc: Exception, _scope: Scope, _state: State) -> None:
+async def after_exception_hook_handler(_exc: Exception, _scope: Scope, _state: State) -> None:
     """Binds `exc_info` key with exception instance as value to structlog
     context vars.
 
+    This must be a coroutine so that it is not wrapped in a thread where we'll lose context.
+
     Args:
-        exc: the exception that was raised.
+        _exc: the exception that was raised.
         _scope: scope of the request
         _state: application state
     """
-    bind_contextvars(exc_info=exc)
+    bind_contextvars(exc_info=sys.exc_info())
 
 
 def _create_error_response_from_starlite_middleware(request: Request, exc: Exception) -> Response:

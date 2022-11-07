@@ -1,6 +1,6 @@
 """Tests for exception translation behavior."""
 from typing import TYPE_CHECKING
-from unittest.mock import MagicMock
+from unittest.mock import ANY, MagicMock
 
 import pytest
 from starlette.status import (
@@ -40,7 +40,7 @@ def test_after_exception_hook_handler_called(monkeypatch: pytest.MonkeyPatch) ->
         resp = client.get("/error")
         assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
 
-    logger_mock.assert_called_once_with(exc_info=exc)
+    logger_mock.assert_called_once_with(exc_info=(RuntimeError, exc, ANY))
 
 
 @pytest.mark.parametrize(
