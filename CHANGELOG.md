@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.0 (2022-11-11)
+### Feature
+* **service:** Removes the service authorization methods. ([`e7fcc2d`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/e7fcc2d26a67b448ce0a44e63e91511dd57e513d))
+
+### Breaking
+* removes the service authorization methods. ([`e7fcc2d`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/e7fcc2d26a67b448ce0a44e63e91511dd57e513d))
+
+### Documentation
+* Tidy up. ([`e524edf`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/e524edf83dc7e6fc5257b3bea59a446c8e6cb888))
+
 ## v0.3.0 (2022-11-07)
 ### Feature
 * **dto:** Dto.Attrib and dto.Mark. ([`ca47028`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ca47028f674b696493564d07379b589756433cc1))
