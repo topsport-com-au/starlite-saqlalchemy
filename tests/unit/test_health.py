@@ -2,7 +2,7 @@
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock
 
-from starlette.status import HTTP_200_OK, HTTP_503_SERVICE_UNAVAILABLE
+from starlite.status_codes import HTTP_200_OK, HTTP_503_SERVICE_UNAVAILABLE
 
 from starlite_saqlalchemy import settings
 from starlite_saqlalchemy.repository.sqlalchemy import SQLAlchemyRepository

@@ -8,12 +8,12 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-from starlette.middleware.errors import ServerErrorMiddleware
 from starlite.exceptions import (
     HTTPException,
     InternalServerException,
     NotFoundException,
 )
+from starlite.middleware.exceptions.debug_response import create_debug_response
 from starlite.utils.exception import create_exception_response
 from structlog.contextvars import bind_contextvars
 
@@ -62,13 +62,6 @@ async def after_exception_hook_handler(_exc: Exception, _scope: Scope, _state: S
     bind_contextvars(exc_info=sys.exc_info())
 
 
-def _create_error_response_from_starlite_middleware(request: Request, exc: Exception) -> Response:
-    server_middleware = ServerErrorMiddleware(app=request.app)  # type: ignore[arg-type]
-    return server_middleware.debug_response(  # type: ignore[return-value]
-        request=request, exc=exc  # type:ignore[arg-type]
-    )
-
-
 def repository_exception_to_http_response(
     request: Request[Any, Any], exc: RepositoryException
 ) -> Response[ExceptionResponseContent]:
@@ -89,7 +82,7 @@ def repository_exception_to_http_response(
     else:
         http_exc = InternalServerException
     if http_exc is InternalServerException and request.app.debug:
-        return _create_error_response_from_starlite_middleware(request, exc)
+        return create_debug_response(request, exc)
     return create_exception_response(http_exc())
 
 
@@ -111,5 +104,5 @@ def service_exception_to_http_response(
     else:
         http_exc = InternalServerException
     if http_exc is InternalServerException and request.app.debug:
-        return _create_error_response_from_starlite_middleware(request, exc)
+        return create_debug_response(request, exc)
     return create_exception_response(http_exc())

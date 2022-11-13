@@ -2,8 +2,8 @@
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.status import HTTP_200_OK
 from starlite import Dependency, delete, get, post, put
+from starlite.status_codes import HTTP_200_OK
 
 from starlite_saqlalchemy.repository.types import FilterTypes
 

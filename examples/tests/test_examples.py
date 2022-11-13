@@ -1,5 +1,5 @@
 """Tests the documentation examples."""
-from starlette.status import HTTP_200_OK
+from starlite.status_codes import HTTP_200_OK
 from starlite.testing import TestClient
 
 from examples import basic_example

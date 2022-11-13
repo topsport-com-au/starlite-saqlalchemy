@@ -62,7 +62,7 @@ redis = "*"
 saq = "*"
 sentry-sdk = "*"
 sqlalchemy = "==2.0.0b3"
-starlite = "~=1.32"
+starlite = "~=1.39"
 structlog = "*"
 
 [tool.poetry.urls]
