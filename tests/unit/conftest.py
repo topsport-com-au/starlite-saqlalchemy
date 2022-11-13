@@ -11,7 +11,7 @@ from starlite.enums import ScopeType
 from starlite.testing import TestClient
 
 from starlite_saqlalchemy import sqlalchemy_plugin, worker
-from starlite_saqlalchemy.testing.repository import GenericMockRepository
+from starlite_saqlalchemy.testing import GenericMockRepository
 
 from ..utils import controllers, domain
 
