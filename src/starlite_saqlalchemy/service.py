@@ -10,8 +10,8 @@ import inspect
 import logging
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
+from starlite_saqlalchemy.db import async_session_factory
 from starlite_saqlalchemy.repository.sqlalchemy import ModelT
-from starlite_saqlalchemy.sqlalchemy_plugin import async_session_factory
 from starlite_saqlalchemy.worker import queue
 
 if TYPE_CHECKING:

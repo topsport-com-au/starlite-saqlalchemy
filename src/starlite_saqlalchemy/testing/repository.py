@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 from uuid import uuid4
 
-from starlite_saqlalchemy.orm import Base
+from starlite_saqlalchemy.db.orm import Base
 from starlite_saqlalchemy.repository.abc import AbstractRepository
 from starlite_saqlalchemy.repository.exceptions import RepositoryConflictException
 

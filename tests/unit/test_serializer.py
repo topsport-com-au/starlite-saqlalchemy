@@ -9,6 +9,7 @@ from starlite_saqlalchemy import serializer
 
 
 def test_pg_uuid_serialization() -> None:
+    """Test response serializer handles PG UUID."""
     py_uuid = uuid4()
     pg_uuid = pgproto.UUID(py_uuid.bytes)
     assert serializer.default_serializer(pg_uuid) == str(py_uuid)

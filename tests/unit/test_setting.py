@@ -1,3 +1,4 @@
+"""Test settings module."""
 from starlite_saqlalchemy import settings
 
 

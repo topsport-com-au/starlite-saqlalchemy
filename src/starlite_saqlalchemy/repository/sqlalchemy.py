@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from sqlalchemy.engine import Result
     from sqlalchemy.ext.asyncio import AsyncSession
 
-    from starlite_saqlalchemy import orm
+    from starlite_saqlalchemy.db import orm
     from starlite_saqlalchemy.repository.types import FilterTypes
 
 __all__ = [

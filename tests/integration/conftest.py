@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async
 from sqlalchemy.pool import NullPool
 from starlite import Provide, Router
 
-from starlite_saqlalchemy import orm, sqlalchemy_plugin, worker
+from starlite_saqlalchemy import db, sqlalchemy_plugin, worker
 from tests.utils import controllers
 
 if TYPE_CHECKING:
@@ -169,7 +169,7 @@ async def _seed_db(
         engine: The SQLAlchemy engine instance.
     """
     # get models into metadata
-    metadata = orm.Base.registry.metadata
+    metadata = db.orm.Base.registry.metadata
     author_table = metadata.tables["author"]
     async with engine.begin() as conn:
         await conn.run_sync(metadata.create_all)

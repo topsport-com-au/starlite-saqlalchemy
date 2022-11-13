@@ -2,7 +2,7 @@
 import datetime
 from unittest.mock import MagicMock
 
-from starlite_saqlalchemy import orm
+from starlite_saqlalchemy.db import orm
 from tests.utils.domain import Author, CreateDTO
 
 

@@ -3,12 +3,11 @@ from datetime import date  # noqa: TC003
 
 from sqlalchemy.orm import Mapped
 
-from starlite_saqlalchemy import dto, orm, service
+from starlite_saqlalchemy import db, dto, service
 from starlite_saqlalchemy.repository.sqlalchemy import SQLAlchemyRepository
-from starlite_saqlalchemy.worker import queue
 
 
-class Author(orm.Base):  # pylint: disable=too-few-public-methods
+class Author(db.orm.Base):  # pylint: disable=too-few-public-methods
     """The Author domain object."""
 
     name: Mapped[str]
@@ -25,11 +24,6 @@ class Service(service.Service[Author]):
     """Author service object."""
 
     repository_type = Repository
-
-    async def create(self, data: Author) -> Author:
-        created = await super().create(data)
-        await queue.enqueue("author_created", data=ReadDTO.from_orm(created).dict())
-        return data
 
 
 CreateDTO = dto.factory("AuthorCreateDTO", Author, purpose=dto.Purpose.WRITE, exclude={"id"})
