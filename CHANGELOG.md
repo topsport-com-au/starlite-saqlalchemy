@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.0 (2022-11-13)
+### Breaking
+* flatten structure ([`2ba37be`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/2ba37be06e6b6879e196c3ec06b42f94def56071))
+* move sqlalchemy config into `db` sub-package. ([`fd3b6f6`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/fd3b6f661438862552d9988ecda190d3856a80a0))
+
 ## v0.4.0 (2022-11-11)
 ### Feature
 * **service:** Removes the service authorization methods. ([`e7fcc2d`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/e7fcc2d26a67b448ce0a44e63e91511dd57e513d))
