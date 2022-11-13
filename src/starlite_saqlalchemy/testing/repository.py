@@ -33,14 +33,15 @@ class GenericMockRepository(AbstractRepository[BaseT], Generic[BaseT]):
     def _find_or_raise_not_found(self, id_: Any) -> BaseT:
         return self.check_not_found(self.collection.get(id_))
 
-    async def add(self, data: BaseT) -> BaseT:
-        if self.get_id_attribute_value(data) is not None:
+    async def add(self, data: BaseT, _allow_id: bool = False) -> BaseT:
+        if _allow_id is False and self.get_id_attribute_value(data) is not None:
             raise RepositoryConflictException("`add()` received identified item.")
         now = datetime.now()
         data.updated = data.created = now
-        id_ = self._id_factory()
-        self.set_id_attribute_value(id_, data)
-        self.collection[id_] = data
+        if _allow_id is False:
+            id_ = self._id_factory()
+            self.set_id_attribute_value(id_, data)
+        self.collection[data.id] = data
         return data
 
     async def delete(self, id_: Any) -> BaseT:
@@ -67,6 +68,7 @@ class GenericMockRepository(AbstractRepository[BaseT], Generic[BaseT]):
         return item
 
     async def upsert(self, data: BaseT) -> BaseT:
-        if await self.get_id_attribute_value(data) is None:
-            return await self.add(data)
-        return await self.update(data)
+        id_ = self.get_id_attribute_value(data)
+        if id_ in self.collection:
+            return await self.update(data)
+        return await self.add(data, _allow_id=True)

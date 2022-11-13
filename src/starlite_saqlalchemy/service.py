@@ -123,7 +123,7 @@ class Service(Generic[ModelT]):
                     Must be JSON serializable.
         """
         module = inspect.getmodule(self)
-        if module is None:
+        if module is None:  # pragma: no cover
             logger.warning("Callback not enqueued, no module resolved for %s", self)
             return
         await queue.enqueue(
@@ -152,10 +152,10 @@ async def make_service_callback(
         service_method_name: Method to be called on the service object.
         **kwargs: Unpacked into the service method call as keyword arguments.
     """
-    service_module = importlib.import_module(service_module_name)
+    obj_: Any = importlib.import_module(service_module_name)
     for name in service_type_fqdn.split("."):
-        obj_ = getattr(service_module, name)
-        if issubclass(obj_, Service):
+        obj_ = getattr(obj_, name)
+        if inspect.isclass(obj_) and issubclass(obj_, Service):
             service_type = obj_
             break
     else:
