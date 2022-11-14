@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.1 (2022-11-14)
+### Fix
+* **run_app:** Fix run app script. ([`db1ecca`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/db1ecca96f472716bedc3c35089bd71948a95c22))
+
 ## v0.7.0 (2022-11-14)
 ### Feature
 * **app:** Startup script. ([`1781c7a`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/1781c7ae90057a163e1ab71f2dc182ecc56ea069))
