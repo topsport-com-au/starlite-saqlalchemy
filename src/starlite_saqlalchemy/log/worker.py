@@ -11,7 +11,7 @@ from starlite_saqlalchemy import settings
 if TYPE_CHECKING:
     from typing import Any, TypeAlias
 
-    from saq import Job  # type:ignore[import]
+    from saq import Job
 
 LOGGER = structlog.get_logger()
 

@@ -59,7 +59,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from typing import Any
 
-    from saq.worker import Worker  # type:ignore[import]
+    from saq.worker import Worker
     from starlite.config.app import AppConfig
     from structlog.types import Processor
 

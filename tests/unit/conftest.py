@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 from unittest.mock import MagicMock
 
 import pytest
-from saq.job import Job  # type:ignore[import]
+from saq.job import Job
 from starlite.datastructures import State
 from starlite.enums import ScopeType
 from starlite.testing import TestClient
