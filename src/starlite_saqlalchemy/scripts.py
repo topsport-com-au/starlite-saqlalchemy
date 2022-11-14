@@ -4,10 +4,13 @@
 import asyncio
 
 import uvicorn
+import uvloop
 from sqlalchemy import text
 
 from starlite_saqlalchemy import redis, settings
 from starlite_saqlalchemy.db import engine
+
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
 async def _db_ready() -> None:
@@ -39,13 +42,17 @@ async def _redis_ready() -> None:
 
 def run_app() -> None:
     """Run the application."""
-    asyncio.run(_db_ready())
-    asyncio.run(_redis_ready())
-    uvicorn.run(
-        settings.server.APP_LOC,
+    uvicorn_config = uvicorn.Config(
+        app=settings.server.APP_LOC,
         host=settings.server.HOST,
+        loop="none",
         port=settings.server.PORT,
         reload=settings.server.RELOAD,
         reload_dirs=settings.server.RELOAD_DIRS,
         timeout_keep_alive=settings.server.KEEPALIVE,
     )
+    server = uvicorn.Server(config=uvicorn_config)
+    with asyncio.Runner() as runner:
+        runner.run(_db_ready())
+        runner.run(_redis_ready())
+        runner.run(server.serve())
