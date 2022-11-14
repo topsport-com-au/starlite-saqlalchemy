@@ -212,6 +212,20 @@ class SentrySettings(BaseSettings):
     """% of requests traced by sentry, `0.0` means none, `1.0` means all."""
 
 
+class ServerSettings(BaseSettings):
+    """Server configurations."""
+
+    class Config:
+        env_prefix = "SENTRY_"
+        case_sensitive = True
+
+    HOST: str = "localhost"
+    KEEPALIVE: int = 65
+    PORT: int = 8000
+    RELOAD: bool = False
+    RELOAD_DIRS: list[str] = ["src/"]
+
+
 # `.parse_obj()` thing is a workaround for pyright and pydantic interplay, see:
 # https://github.com/pydantic/pydantic/issues/3753#issuecomment-1087417884
 api = APISettings.parse_obj({})
