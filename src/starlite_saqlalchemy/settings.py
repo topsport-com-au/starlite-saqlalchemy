@@ -23,6 +23,7 @@ class AppSettings(BaseSettings):
 
     class Config:
         case_sensitive = True
+        env_file = ".env"
 
     BUILD_NUMBER: str = ""
     """Identifier for CI build."""
@@ -52,8 +53,9 @@ class APISettings(BaseSettings):
     """
 
     class Config:
-        env_prefix = "API_"
         case_sensitive = True
+        env_file = ".env"
+        env_prefix = "API_"
 
     CACHE_EXPIRATION: int = 60
     """Default cache key expiration in seconds."""
@@ -69,8 +71,9 @@ class APISettings(BaseSettings):
 
 class LogSettings(BaseSettings):
     class Config:
-        env_prefix = "LOG_"
         case_sensitive = True
+        env_file = ".env"
+        env_prefix = "LOG_"
 
     # https://stackoverflow.com/a/1845097/6560549
     EXCLUDE_PATHS: str = r"\A(?!x)x"
@@ -129,8 +132,9 @@ class OpenAPISettings(BaseSettings):
     """
 
     class Config:
-        env_prefix = "OPENAPI_"
         case_sensitive = True
+        env_file = ".env"
+        env_prefix = "OPENAPI_"
 
     CONTACT_NAME: str
     """Name of contact on document."""
@@ -157,8 +161,9 @@ class DatabaseSettings(BaseSettings):
     """
 
     class Config:
-        env_prefix = "DB_"
         case_sensitive = True
+        env_file = ".env"
+        env_prefix = "DB_"
 
     ECHO: bool = False
     """Enable SQLAlchemy engine logs."""
@@ -185,8 +190,9 @@ class RedisSettings(BaseSettings):
     """
 
     class Config:
-        env_prefix = "REDIS_"
         case_sensitive = True
+        env_file = ".env"
+        env_prefix = "REDIS_"
 
     URL: AnyUrl
     """A Redis connection URL."""
