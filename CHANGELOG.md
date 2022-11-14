@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.0 (2022-11-14)
+### Feature
+* **app:** Startup script. ([`1781c7a`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/1781c7ae90057a163e1ab71f2dc182ecc56ea069))
+* **config:** Add uvicorn/uvloop deps and configuration. ([`06b6036`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/06b6036fbc2ec0061e605b6b561955d918831c00))
+
 ## v0.6.0 (2022-11-14)
 ### Feature
 * **config:** Support loading .env files. ([`9d3a505`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/9d3a505bb0e8823579105e0bee2b87434e280230))
