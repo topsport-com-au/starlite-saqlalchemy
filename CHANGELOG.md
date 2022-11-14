@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.0 (2022-11-14)
+### Feature
+* **config:** Support loading .env files. ([`9d3a505`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/9d3a505bb0e8823579105e0bee2b87434e280230))
+
 ## v0.5.0 (2022-11-13)
 ### Breaking
 * flatten structure ([`2ba37be`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/2ba37be06e6b6879e196c3ec06b42f94def56071))
