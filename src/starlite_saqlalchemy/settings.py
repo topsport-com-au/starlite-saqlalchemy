@@ -219,6 +219,7 @@ class ServerSettings(BaseSettings):
         env_prefix = "SENTRY_"
         case_sensitive = True
 
+    APP_LOC: str = "app.main:app"
     HOST: str = "localhost"
     KEEPALIVE: int = 65
     PORT: int = 8000
@@ -242,3 +243,5 @@ redis = RedisSettings.parse_obj({})
 """Redis settings."""
 sentry = SentrySettings.parse_obj({})
 """Sentry settings."""
+server = ServerSettings.parse_obj({})
+"""Server settings."""
