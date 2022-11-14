@@ -65,6 +65,8 @@ sentry-sdk = "*"
 sqlalchemy = "==2.0.0b3"
 starlite = "~=1.39"
 structlog = "*"
+uvicorn = "*"
+uvloop = "*"
 
 [tool.poetry.urls]
 GitHub = "https://github.com/topsport-com-au"
