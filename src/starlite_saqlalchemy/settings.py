@@ -203,8 +203,9 @@ class SentrySettings(BaseSettings):
     """Configures sentry for the application."""
 
     class Config:
-        env_prefix = "SENTRY_"
         case_sensitive = True
+        env_file = ".env"
+        env_prefix = "SENTRY_"
 
     DSN: str = ""
     """The sentry DSN. Set as empty string to disable sentry reporting."""
@@ -216,8 +217,9 @@ class ServerSettings(BaseSettings):
     """Server configurations."""
 
     class Config:
-        env_prefix = "SENTRY_"
         case_sensitive = True
+        env_file = ".env"
+        env_prefix = "SERVER_"
 
     APP_LOC: str = "app.main:app"
     HOST: str = "localhost"
