@@ -118,7 +118,7 @@ idna = ">=2.0.0"
 
 [[package]]
 name = "Faker"
-version = "15.3.1"
+version = "15.3.2"
 description = "Faker is a Python package that generates fake data for you."
 category = "main"
 optional = false
@@ -342,7 +342,7 @@ idna2008 = ["idna"]
 
 [[package]]
 name = "saq"
-version = "0.9.0"
+version = "0.9.1"
 description = "Distributed Python job queue with asyncio and redis"
 category = "main"
 optional = false
@@ -353,13 +353,13 @@ croniter = ">=0.3.18"
 redis = ">=4.2.0"
 
 [package.extras]
-dev = ["black (==22.3.0)", "pylint"]
+dev = ["black", "mypy", "pylint", "types-croniter", "types-redis", "types-setuptools"]
 hiredis = ["redis[hiredis] (>=4.2.0)"]
 web = ["aiohttp", "aiohttp-basicauth"]
 
 [[package]]
 name = "sentry-sdk"
-version = "1.10.1"
+version = "1.11.0"
 description = "Python client for Sentry (https://sentry.io)"
 category = "main"
 optional = false
@@ -381,6 +381,7 @@ fastapi = ["fastapi (>=0.79.0)"]
 flask = ["blinker (>=1.1)", "flask (>=0.11)"]
 httpx = ["httpx (>=0.16.0)"]
 pure_eval = ["asttokens", "executing", "pure-eval"]
+pymongo = ["pymongo (>=3.1)"]
 pyspark = ["pyspark (>=2.4.4)"]
 quart = ["blinker (>=1.1)", "quart (>=0.16.1)"]
 rq = ["rq (>=0.6)"]
@@ -553,7 +554,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "bf8fe18cb7d47b0af7a0a099544dee84eeb84d0b7c8bc70ab47a35b8956f7eea"
+content-hash = "07691a7f0125850062204a9f53d6e6f164adb324557c51ea344ae5103029a03f"
 
 [metadata.files]
 anyio = [
@@ -631,8 +632,8 @@ email-validator = [
     {file = "email_validator-1.3.0.tar.gz", hash = "sha256:553a66f8be2ec2dea641ae1d3f29017ab89e9d603d4a25cdaac39eefa283d769"},
 ]
 Faker = [
-    {file = "Faker-15.3.1-py3-none-any.whl", hash = "sha256:4a3465624515a6807e8aa7e8eeb85bdd86a2fa53de4e258892dd6be95362462e"},
-    {file = "Faker-15.3.1.tar.gz", hash = "sha256:b9dd2fd9a9ac68a4e0c5040cd9e9bfaa099fa8dd15bae5f01f224a45431818d5"},
+    {file = "Faker-15.3.2-py3-none-any.whl", hash = "sha256:43da04aae745018e8bded768e74c84423d9dc38e4c498a53439e749d90e20bc0"},
+    {file = "Faker-15.3.2.tar.gz", hash = "sha256:0094fe3340ad73c490d3ffccc59cc171b161acfccccd52925c70970ba23e6d6b"},
 ]
 greenlet = [
     {file = "greenlet-2.0.1-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:9ed358312e63bf683b9ef22c8e442ef6c5c02973f0c2a939ec1d7b50c974015c"},
@@ -980,12 +981,12 @@ rfc3986 = [
     {file = "rfc3986-1.5.0.tar.gz", hash = "sha256:270aaf10d87d0d4e095063c65bf3ddbc6ee3d0b226328ce21e036f946e421835"},
 ]
 saq = [
-    {file = "saq-0.9.0-py3-none-any.whl", hash = "sha256:0056ad4d42f639eb5c2d575326ae8ce7ffdec05b8ceeafb83de6e73ccff6fec5"},
-    {file = "saq-0.9.0.tar.gz", hash = "sha256:73c316c3e7b90e6e4546dec3c4d15926d85b70a71b2fd23df78723ae6a2803e8"},
+    {file = "saq-0.9.1-py3-none-any.whl", hash = "sha256:f8f2bff790de6b128a767f5a23cbaa36014c164128beae2910e6e3d5d1c3689c"},
+    {file = "saq-0.9.1.tar.gz", hash = "sha256:071348f2132d997f7bbbcfe0628554936a7080b4ae284c0220f9e2e3c945d84b"},
 ]
 sentry-sdk = [
-    {file = "sentry-sdk-1.10.1.tar.gz", hash = "sha256:105faf7bd7b7fa25653404619ee261527266b14103fe1389e0ce077bd23a9691"},
-    {file = "sentry_sdk-1.10.1-py2.py3-none-any.whl", hash = "sha256:06c0fa9ccfdc80d7e3b5d2021978d6eb9351fa49db9b5847cf4d1f2a473414ad"},
+    {file = "sentry-sdk-1.11.0.tar.gz", hash = "sha256:e7b78a1ddf97a5f715a50ab8c3f7a93f78b114c67307785ee828ef67a5d6f117"},
+    {file = "sentry_sdk-1.11.0-py2.py3-none-any.whl", hash = "sha256:f467e6c7fac23d4d42bc83eb049c400f756cd2d65ab44f0cc1165d0c7c3d40bc"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},

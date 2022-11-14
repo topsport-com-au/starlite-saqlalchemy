@@ -6,12 +6,12 @@ from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import orjson
-import saq  # type:ignore[import]
+import saq
 
 from starlite_saqlalchemy import redis
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Collection
+    from collections.abc import Awaitable, Callable, Collection
     from signal import Signals
 
 __all__ = [
@@ -22,7 +22,7 @@ __all__ = [
 ]
 
 
-class Queue(saq.Queue):  # type:ignore[misc]
+class Queue(saq.Queue):
     """[SAQ Queue](https://github.com/tobymao/saq/blob/master/saq/queue.py).
 
     Configures `orjson` for JSON serialization/deserialization if not otherwise configured.
@@ -38,7 +38,7 @@ class Queue(saq.Queue):  # type:ignore[misc]
         super().__init__(*args, **kwargs)
 
 
-class Worker(saq.Worker):  # type:ignore[misc]
+class Worker(saq.Worker):
     """Modify behavior of saq worker for orchestration by Starlite."""
 
     # same issue: https://github.com/samuelcolvin/arq/issues/182
@@ -59,8 +59,8 @@ queue = Queue(redis.client)
 
 def create_worker_instance(
     functions: Collection[Callable[..., Any] | tuple[str, Callable]],
-    before_process: Callable[[dict[str, Any]], None] | None = None,
-    after_process: Callable[[dict[str, Any]], None] | None = None,
+    before_process: Callable[[dict[str, Any]], Awaitable[Any]] | None = None,
+    after_process: Callable[[dict[str, Any]], Awaitable[Any]] | None = None,
 ) -> Worker:
     """
 
