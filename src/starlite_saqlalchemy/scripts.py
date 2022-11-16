@@ -44,6 +44,7 @@ def run_app() -> None:
     """Run the application."""
     uvicorn_config = uvicorn.Config(
         app=settings.server.APP_LOC,
+        factory=settings.server.APP_LOC_IS_FACTORY,
         host=settings.server.HOST,
         loop="none",
         port=settings.server.PORT,
