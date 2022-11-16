@@ -221,7 +221,8 @@ class ServerSettings(BaseSettings):
         env_file = ".env"
         env_prefix = "SERVER_"
 
-    APP_LOC: str = "app.main:app"
+    APP_LOC: str = "app.main:create_app"
+    APP_LOC_IS_FACTORY: bool = True
     HOST: str = "localhost"
     KEEPALIVE: int = 65
     PORT: int = 8000
