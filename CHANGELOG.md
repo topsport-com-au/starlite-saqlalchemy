@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.8.0 (2022-11-16)
+### Feature
+* **app:** Support for using app factory. ([`a176908`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/a1769085a61f09cf4991448313a6164f488adf79))
+
 ## v0.7.2 (2022-11-14)
 ### Fix
 * **saq:** Upgrade to typed release. ([`7ac37c3`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/7ac37c3ac6eddbd2b51e7e3a9b2512889eeddb53))
