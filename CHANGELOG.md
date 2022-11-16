@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.8.1 (2022-11-16)
+### Fix
+* **scripts:** Set `factory` setting on uvicorn config. ([`bce93f3`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/bce93f3817c6c8647fc3dc5521eb12b04f77bdad))
+
 ## v0.8.0 (2022-11-16)
 ### Feature
 * **app:** Support for using app factory. ([`a176908`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/a1769085a61f09cf4991448313a6164f488adf79))
