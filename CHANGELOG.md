@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.11.0 (2022-11-17)
+### Feature
+* **dto:** Relationship support + test for forward refs ([`1bb3fb3`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/1bb3fb3ceaddfb440531d582ea1b852792983629))
+* **logging:** Configurable dependency log levels. ([`a4fda6d`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/a4fda6dc5de64c8e4ca45ac42d96fa808677439d))
+
 ## v0.10.0 (2022-11-17)
 ### Feature
 * **service:** __class_getitem__ sets `repository_type` on service. ([`4127f3a`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/4127f3aec85560b1f17eaf90518f94d83e0ef5fd))
