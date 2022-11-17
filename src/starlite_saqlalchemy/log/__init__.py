@@ -114,21 +114,22 @@ config = LoggingConfig(
     loggers={
         "uvicorn.access": {
             "propagate": False,
-            "level": logging.WARNING,
+            "level": settings.log.UVICORN_ACCESS_LEVEL,
             "handlers": ["queue_listener"],
         },
         "uvicorn.error": {
             "propagate": False,
-            "level": logging.WARNING,
+            "level": settings.log.UVICORN_ERROR_LEVEL,
             "handlers": ["queue_listener"],
         },
         "saq": {
             "propagate": False,
-            "level": logging.WARNING,
+            "level": settings.log.SAQ_LEVEL,
             "handlers": ["queue_listener"],
         },
         "sqlalchemy.engine": {
             "propagate": False,
+            "level": settings.log.SQLALCHEMY_LEVEL,
             "handlers": ["queue_listener"],
         },
     },

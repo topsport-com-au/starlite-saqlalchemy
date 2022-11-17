@@ -121,6 +121,14 @@ class LogSettings(BaseSettings):
     """Attributes of the [Response][starlite.response.Response] to be logged."""
     WORKER_EVENT: str = "Worker"
     """Log event name for logs from SAQ worker."""
+    SAQ_LEVEL: int = 30
+    """Level to log SAQ logs."""
+    SQLALCHEMY_LEVEL: int = 30
+    """Level to log SAQ logs."""
+    UVICORN_ACCESS_LEVEL: int = 30
+    """Level to log uvicorn access logs."""
+    UVICORN_ERROR_LEVEL: int = 30
+    """Level to log uvicorn error logs."""
 
 
 # noinspection PyUnresolvedReferences
@@ -222,12 +230,19 @@ class ServerSettings(BaseSettings):
         env_prefix = "SERVER_"
 
     APP_LOC: str = "app.main:create_app"
+    """Path to app executable, or factory."""
     APP_LOC_IS_FACTORY: bool = True
+    """Indicate if APP_LOC points to an executable or factory."""
     HOST: str = "localhost"
+    """Server network host."""
     KEEPALIVE: int = 65
+    """Seconds to hold connections open (65 is > AWS lb idle timeout)."""
     PORT: int = 8000
+    """Server port."""
     RELOAD: bool = False
+    """Turn on hot reloading."""
     RELOAD_DIRS: list[str] = ["src/"]
+    """Directories to watch for reloading."""
 
 
 # `.parse_obj()` thing is a workaround for pyright and pydantic interplay, see:
