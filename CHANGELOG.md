@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v0.9.0 (2022-11-17)
+### Feature
+* **logging:** Improve dev logging experience ([`fc04a99`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/fc04a9914d8210e9729bfc3857bc555d4ccfa1d1))
+* **plugin:** Set starlite debug ([`1a9e01d`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/1a9e01d6e5a9b91e81c417e7af4bb5ce98dc586e))
+
+### Fix
+* **logging:** Don't log exceptions that are http and < 500 status ([`6b42e48`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/6b42e48053b09828ee220f0b6b6fc5f991e4536a))
+* **logging:** Don't log exceptions that are http and < 500 status ([`bce531d`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/bce531d6431c8d0b5f3cb74bf57367d25c078721))
+
 ## v0.8.1 (2022-11-16)
 ### Fix
 * **scripts:** Set `factory` setting on uvicorn config. ([`bce93f3`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/bce93f3817c6c8647fc3dc5521eb12b04f77bdad))
