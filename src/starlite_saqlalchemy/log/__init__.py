@@ -37,10 +37,10 @@ default_processors = [
     structlog.processors.TimeStamper(fmt="iso", utc=True),
 ]
 
-if sys.stderr.isatty():  # pragma: no cover
+if sys.stderr.isatty() or "pytest" in sys.modules:  # pragma: no cover
     LoggerFactory: Any = structlog.WriteLoggerFactory
     default_processors.extend([structlog.dev.ConsoleRenderer()])
-else:
+else:  # pragma: no cover
     LoggerFactory = structlog.BytesLoggerFactory
     default_processors.extend(
         [
