@@ -10,8 +10,9 @@ import inspect
 import logging
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from starlite_saqlalchemy.db import async_session_factory
-from starlite_saqlalchemy.repository.sqlalchemy import ModelT
+from starlite_saqlalchemy.db import async_session_factory, orm
+from starlite_saqlalchemy.repository.sqlalchemy import SQLAlchemyRepository
+from starlite_saqlalchemy.repository.types import ModelT
 from starlite_saqlalchemy.worker import queue
 
 if TYPE_CHECKING:
@@ -39,7 +40,13 @@ class Service(Generic[ModelT]):
     repository_type: type[AbstractRepository[ModelT]]
 
     def __init__(self, **repo_kwargs: Any) -> None:
-        self.repository: AbstractRepository[ModelT] = self.repository_type(**repo_kwargs)
+        self.repository = self.repository_type(**repo_kwargs)
+
+    @classmethod
+    def __class_getitem__(cls: type[ServiceT], item: type[ModelT]) -> type[ServiceT]:
+        if not getattr(cls, "repository_type", None) and issubclass(item, orm.Base):
+            cls.repository_type = SQLAlchemyRepository[item]  # type:ignore[valid-type]
+        return cls
 
     async def create(self, data: ModelT) -> ModelT:
         """Wraps repository instance creation.
@@ -154,7 +161,7 @@ async def make_service_callback(
     """
     obj_: Any = importlib.import_module(service_module_name)
     for name in service_type_fqdn.split("."):
-        obj_ = getattr(obj_, name)
+        obj_ = getattr(obj_, name, None)
         if inspect.isclass(obj_) and issubclass(obj_, Service):
             service_type = obj_
             break

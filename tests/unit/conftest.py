@@ -52,7 +52,6 @@ def _author_repository(raw_authors: list[dict[str, Any]], monkeypatch: pytest.Mo
         author = domain.Author(**raw_author)
         collection[getattr(author, AuthorRepository.id_attribute)] = author
     monkeypatch.setattr(AuthorRepository, "collection", collection)
-    monkeypatch.setattr(domain, "Repository", AuthorRepository)
     monkeypatch.setattr(domain.Service, "repository_type", AuthorRepository)
 
 
