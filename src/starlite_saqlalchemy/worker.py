@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 import orjson
 import saq
 
-from starlite_saqlalchemy import redis
+from starlite_saqlalchemy import redis, settings
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable, Collection
@@ -33,6 +33,7 @@ class Queue(saq.Queue):
     """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        kwargs.setdefault("name", settings.app.slug)
         kwargs.setdefault("dump", partial(orjson.dumps, default=str))
         kwargs.setdefault("load", orjson.loads)
         super().__init__(*args, **kwargs)
