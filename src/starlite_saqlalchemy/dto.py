@@ -9,6 +9,7 @@ should always be private, or read-only at the model declaration layer.
 from __future__ import annotations
 
 from enum import Enum, auto
+from inspect import isclass
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -22,13 +23,13 @@ from typing import (
 from pydantic import BaseConfig, BaseModel, create_model
 from pydantic.fields import FieldInfo
 from sqlalchemy import inspect
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import DeclarativeBase, Mapped
 
 from starlite_saqlalchemy import settings
 
 if TYPE_CHECKING:
     from sqlalchemy import Column
-    from sqlalchemy.orm import DeclarativeBase, Mapper
+    from sqlalchemy.orm import Mapper, RelationshipProperty
 
 
 class Mark(str, Enum):
@@ -73,25 +74,25 @@ class Attrib(NamedTuple):
     """If provided, used for the pydantic model for this attribute."""
 
 
-def _construct_field_info(column: Column, purpose: Purpose) -> FieldInfo:
-    default = column.default
+def _construct_field_info(elem: Column | RelationshipProperty, purpose: Purpose) -> FieldInfo:
+    default = getattr(elem, "default", None)
     if purpose is Purpose.READ or default is None:
         return FieldInfo(...)
     if default.is_scalar:
-        return FieldInfo(default=default.arg)  # type:ignore[attr-defined]
+        return FieldInfo(default=default.arg)
     if default.is_callable:
-        return FieldInfo(default_factory=lambda: default.arg({}))  # type:ignore[attr-defined]
+        return FieldInfo(default_factory=lambda: default.arg({}))
     raise ValueError("Unexpected default type")
 
 
-def _get_dto_attrib(column: Column) -> Attrib:
-    return column.info.get(settings.api.DTO_INFO_KEY, Attrib())
+def _get_dto_attrib(elem: Column | RelationshipProperty) -> Attrib:
+    return elem.info.get(settings.api.DTO_INFO_KEY, Attrib())
 
 
 def _should_exclude_field(
-    purpose: Purpose, column: Column, exclude: set[str], dto_attrib: Attrib
+    purpose: Purpose, elem: Column | RelationshipProperty, exclude: set[str], dto_attrib: Attrib
 ) -> bool:
-    if column.key in exclude:
+    if elem.key in exclude:
         return True
     if dto_attrib.mark is Mark.SKIP:
         return True
@@ -134,16 +135,26 @@ def factory(
     exclude = exclude or set[str]()
     mapper = cast("Mapper", inspect(model))
     columns = mapper.columns
+    relationships = mapper.relationships
     fields: dict[str, tuple[Any, FieldInfo]] = {}
     for key, type_hint in get_type_hints(model).items():
         if get_origin(type_hint) is not Mapped:
             continue
-        column = columns[key]
-        attrib = _get_dto_attrib(column)
-        if _should_exclude_field(purpose, column, exclude, attrib):
+        elem: Column | RelationshipProperty
+        try:
+            elem = columns[key]
+        except KeyError:
+            elem = relationships[key]
+        attrib = _get_dto_attrib(elem)
+        if _should_exclude_field(purpose, elem, exclude, attrib):
             continue
         (type_,) = get_args(type_hint)
-        fields[key] = (type_, _construct_field_info(column, purpose))
+        if isclass(type_) and issubclass(type_, DeclarativeBase):
+            type_ = factory(f"{name}_{type_.__name__}", type_, purpose=purpose)
+        fields[key] = (type_, _construct_field_info(elem, purpose))
     return create_model(  # type:ignore[no-any-return,call-overload]
-        name, __config__=type("Config", (BaseConfig,), {"orm_mode": True}), **fields
+        name,
+        __config__=type("Config", (BaseConfig,), {"orm_mode": True}),
+        __module__=getattr(model, "__module__", "starlite_saqlalchemy.dto"),
+        **fields,
     )

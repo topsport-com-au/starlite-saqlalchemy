@@ -1,9 +1,11 @@
 """Config that can be shared between all test types."""
 from __future__ import annotations
 
+import importlib
+import sys
 from datetime import date, datetime
-from typing import TYPE_CHECKING
-from uuid import UUID
+from typing import TYPE_CHECKING, TypeVar
+from uuid import UUID, uuid4
 
 import pytest
 from starlite import Starlite
@@ -14,6 +16,9 @@ import starlite_saqlalchemy
 from starlite_saqlalchemy import ConfigureApp, log
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+    from pathlib import Path
+    from types import ModuleType
     from typing import Any
 
     from pytest import MonkeyPatch
@@ -76,3 +81,35 @@ def raw_authors() -> list[dict[str, Any]]:
             "updated": datetime.min,
         },
     ]
+
+
+@pytest.fixture()
+def create_module(tmp_path: Path, monkeypatch: MonkeyPatch) -> Callable[[str], ModuleType]:
+    """Utility fixture for dynamic module creation."""
+
+    def wrapped(source: str) -> ModuleType:
+        """
+
+        Args:
+            source: Source code as a string.
+
+        Returns:
+            An imported module.
+        """
+        T = TypeVar("T")
+
+        def not_none(val: T | None) -> T:
+            assert val is not None
+            return val
+
+        module_name = uuid4().hex
+        path = tmp_path / f"{module_name}.py"
+        path.write_text(source)
+        # https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
+        spec = not_none(importlib.util.spec_from_file_location(module_name, path))  # pyright:ignore
+        module = not_none(importlib.util.module_from_spec(spec))  # pyright:ignore
+        monkeypatch.setitem(sys.modules, module_name, module)
+        not_none(spec.loader).exec_module(module)
+        return module
+
+    return wrapped

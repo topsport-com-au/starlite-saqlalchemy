@@ -8,7 +8,7 @@ from __future__ import annotations
 # pylint: disable=too-few-public-methods,missing-class-docstring
 from typing import Literal
 
-from pydantic import AnyUrl, BaseSettings, PostgresDsn
+from pydantic import AnyUrl, BaseSettings, PostgresDsn, parse_obj_as
 from starlite.utils.extractors import RequestExtractorField, ResponseExtractorField
 
 
@@ -31,7 +31,7 @@ class AppSettings(BaseSettings):
     """Run `Starlite` with `debug=True`."""
     ENVIRONMENT: str = "prod"
     """'dev', 'prod', etc."""
-    NAME: str
+    NAME: str = "my-starlite-saqlalchemy-app"
     """Application name."""
 
     @property
@@ -144,13 +144,13 @@ class OpenAPISettings(BaseSettings):
         env_file = ".env"
         env_prefix = "OPENAPI_"
 
-    CONTACT_NAME: str
+    CONTACT_NAME: str = "Peter"
     """Name of contact on document."""
-    CONTACT_EMAIL: str
+    CONTACT_EMAIL: str = "peter.github@proton.me"
     """Email for contact on document."""
-    TITLE: str | None
+    TITLE: str | None = "My Starlite-SAQAlchemy App"
     """Document title."""
-    VERSION: str
+    VERSION: str = "v1.0"
     """Document version."""
 
 
@@ -187,7 +187,9 @@ class DatabaseSettings(BaseSettings):
     """See [`pool_size`][sqlalchemy.pool.QueuePool]."""
     POOL_TIMEOUT: int = 30
     """See [`timeout`][sqlalchemy.pool.QueuePool]."""
-    URL: PostgresDsn
+    URL: PostgresDsn = parse_obj_as(
+        PostgresDsn, "postgresql+asyncpg://postgres:mysecretpassword@localhost:5432/postgres"
+    )
 
 
 # noinspection PyUnresolvedReferences
@@ -202,7 +204,7 @@ class RedisSettings(BaseSettings):
         env_file = ".env"
         env_prefix = "REDIS_"
 
-    URL: AnyUrl
+    URL: AnyUrl = parse_obj_as(AnyUrl, "redis://localhost:6379/0")
     """A Redis connection URL."""
 
 
