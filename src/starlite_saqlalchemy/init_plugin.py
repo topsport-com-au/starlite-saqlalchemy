@@ -47,6 +47,7 @@ from starlite_saqlalchemy import (
     openapi,
     redis,
     sentry,
+    settings,
     sqlalchemy_plugin,
 )
 from starlite_saqlalchemy.health import health_check
@@ -132,6 +133,11 @@ class PluginConfig(BaseModel):
     Configure the application to initialize Sentry on startup. Adds a handler to
     [`AppConfig.on_startup`][starlite.config.app.AppConfig.on_startup].
     """
+    do_set_debug: bool = True
+    """
+    Allow the plugin to set the starlite `debug` parameter. Parameter set to value of
+    [`AppConfig.debug`][starlite_saqlalchemy.settings.AppConfig.debug].
+    """
     do_sqlalchemy_plugin: bool = True
     """
     Set the SQLAlchemy plugin on the application. Adds the plugin to
@@ -189,6 +195,7 @@ class ConfigureApp:
         self.configure_cache(app_config)
         self.configure_collection_dependencies(app_config)
         self.configure_compression(app_config)
+        self.configure_debug(app_config)
         self.configure_exception_handlers(app_config)
         self.configure_health_check(app_config)
         self.configure_logging(app_config)
@@ -247,6 +254,16 @@ class ConfigureApp:
         """
         if self.config.do_compression and app_config.compression_config is None:
             app_config.compression_config = compression.config
+
+    def configure_debug(self, app_config: AppConfig) -> None:
+        """Set Starlite's `debug` parameter.
+
+        Args:
+            app_config: The Starlite application config object.
+        """
+
+        if self.config.do_set_debug:
+            app_config.debug = settings.app.DEBUG
 
     def configure_exception_handlers(self, app_config: AppConfig) -> None:
         """Add the handlers that translate service and repository exceptions

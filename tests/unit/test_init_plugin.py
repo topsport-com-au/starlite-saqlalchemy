@@ -31,6 +31,7 @@ def test_config_switches() -> None:
         do_openapi=False,
         do_response_class=False,
         do_sentry=False,
+        do_set_debug=False,
         do_sqlalchemy_plugin=False,
         do_worker=False,
     )
@@ -40,6 +41,7 @@ def test_config_switches() -> None:
         on_app_init=[init_plugin.ConfigureApp(config=config)],
     )
     assert app.compression_config is None
+    assert app.debug is False
     assert app.logging_config is None
     assert app.openapi_config is None
     assert app.response_class is None
