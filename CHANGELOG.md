@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.0 (2022-11-17)
+### Feature
+* **service:** __class_getitem__ sets `repository_type` on service. ([`4127f3a`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/4127f3aec85560b1f17eaf90518f94d83e0ef5fd))
+* **repository:** __class_getitem__ sets `model_type` on repo. ([`d81e6c6`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/d81e6c6df972c5d8d919e8d9c398404b57acfd8f))
+
 ## v0.9.0 (2022-11-17)
 ### Feature
 * **logging:** Improve dev logging experience ([`fc04a99`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/fc04a9914d8210e9729bfc3857bc555d4ccfa1d1))
