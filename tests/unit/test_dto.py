@@ -1,7 +1,7 @@
 """Tests for the dto factory."""
 # pylint: disable=redefined-outer-name,too-few-public-methods,missing-class-docstring
 from datetime import date, datetime
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 from uuid import UUID, uuid4
 
 import pytest
@@ -10,6 +10,10 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from starlite_saqlalchemy import dto, settings
 from tests.utils.domain import Author
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from types import ModuleType
 
 
 def test_model_write_dto(raw_authors: list[dict[str, Any]]) -> None:
@@ -138,3 +142,28 @@ def test_dto_for_non_mapped_model_field(purpose: dto.Purpose, base: type[Declara
 
     dto_model = dto.factory("DTO", Model, purpose=purpose)
     assert "field" not in dto_model.__fields__
+
+
+def test_dto_factory_forward_ref_annotations(create_module: "Callable[[str], ModuleType]") -> None:
+    """Test that dto generated from module with forward ref annotations
+    works."""
+    module = create_module(
+        """
+from __future__ import annotations
+from uuid import UUID
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from starlite_saqlalchemy.db import orm
+
+class Related(orm.Base):
+    test_id: Mapped[UUID] = mapped_column(ForeignKey("test.id"))
+
+class Test(orm.Base):
+    hello: Mapped[str]
+    related: Mapped[Related] = relationship()
+"""
+    )
+    model = module.Test
+    assert all(isinstance(model.__annotations__[k], str) for k in ("hello", "related"))
+    dto_model = dto.factory("TestDTO", module.Test, purpose=dto.Purpose.READ)
+    assert all(not isinstance(dto_model.__annotations__[k], str) for k in ("hello", "related"))
