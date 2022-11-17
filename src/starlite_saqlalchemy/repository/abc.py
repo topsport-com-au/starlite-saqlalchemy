@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 __all__ = ["AbstractRepository"]
 
 T = TypeVar("T")
+RepoT = TypeVar("RepoT", bound="AbstractRepository")
 
 
 class AbstractRepository(Generic[T], metaclass=ABCMeta):
@@ -26,6 +27,12 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
+
+    @classmethod
+    def __class_getitem__(cls: type[RepoT], item: type[T]) -> type[RepoT]:
+        if not isinstance(item, TypeVar) and not getattr(cls, "model_type", None):
+            cls.model_type = item
+        return cls
 
     @abstractmethod
     async def add(self, data: T) -> T:
