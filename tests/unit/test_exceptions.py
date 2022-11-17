@@ -4,7 +4,9 @@ from unittest.mock import ANY, MagicMock
 
 import pytest
 from starlite import Starlite, get
+from starlite.exceptions import ValidationException
 from starlite.status_codes import (
+    HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_409_CONFLICT,
@@ -41,6 +43,25 @@ def test_after_exception_hook_handler_called(monkeypatch: pytest.MonkeyPatch) ->
         assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
 
     logger_mock.assert_called_once_with(exc_info=(RuntimeError, exc, ANY))
+
+
+def test_after_exception_hook_handler_doesnt_log_400(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Tests that the handler doesn't call the logger if 400 exception."""
+    logger_mock = MagicMock()
+    monkeypatch.setattr(exceptions, "bind_contextvars", logger_mock)
+    exc = ValidationException()
+
+    @get("/error")
+    def raises() -> None:
+        raise exc
+
+    with create_test_client(
+        route_handlers=[raises], after_exception=exceptions.after_exception_hook_handler
+    ) as client:
+        resp = client.get("/error")
+        assert resp.status_code == HTTP_400_BAD_REQUEST
+
+    logger_mock.assert_not_called()
 
 
 @pytest.mark.parametrize(

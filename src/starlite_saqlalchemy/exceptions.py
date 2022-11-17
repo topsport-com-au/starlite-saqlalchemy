@@ -48,17 +48,19 @@ class ForbiddenException(HTTPException):
     status_code = 403
 
 
-async def after_exception_hook_handler(_exc: Exception, _scope: Scope, _state: State) -> None:
+async def after_exception_hook_handler(exc: Exception, _scope: Scope, _state: State) -> None:
     """Binds `exc_info` key with exception instance as value to structlog
     context vars.
 
     This must be a coroutine so that it is not wrapped in a thread where we'll lose context.
 
     Args:
-        _exc: the exception that was raised.
+        exc: the exception that was raised.
         _scope: scope of the request
         _state: application state
     """
+    if isinstance(exc, HTTPException) and exc.status_code < 500:
+        return
     bind_contextvars(exc_info=sys.exc_info())
 
 
