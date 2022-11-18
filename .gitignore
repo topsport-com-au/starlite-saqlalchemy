@@ -9,7 +9,7 @@ site/
 *.env*
 !.env.example
 !tests.env
-coverage.json
+coverage.*
 .coverage
 .coverage.*
 .dmypy.json
