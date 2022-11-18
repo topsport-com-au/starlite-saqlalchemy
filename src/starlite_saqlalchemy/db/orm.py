@@ -41,10 +41,11 @@ Templates for automated constraint name generation.
 
 @listens_for(Session, "before_flush")
 def touch_updated_timestamp(session: Session, *_: Any) -> None:
-    """Called from SQLAlchemy's.
+    """Set timestamp on update.
 
-    [`before_flush`][sqlalchemy.orm.SessionEvents.before_flush] event to bump
-    the `updated` timestamp on modified instances.
+    Called from SQLAlchemy's
+    [`before_flush`][sqlalchemy.orm.SessionEvents.before_flush] event to bump the `updated`
+    timestamp on modified instances.
 
     Args:
         session: The sync [`Session`][sqlalchemy.orm.Session] instance that underlies the async
@@ -78,6 +79,7 @@ class Base(DeclarativeBase):
     # noinspection PyMethodParameters
     @declared_attr.directive
     def __tablename__(cls) -> str:  # pylint: disable=no-self-argument
+        """Infer table name from class name."""
         return cls.__name__.lower()
 
     @classmethod

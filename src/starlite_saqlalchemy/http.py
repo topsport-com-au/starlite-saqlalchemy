@@ -23,9 +23,10 @@ class Client:
     _client = httpx.AsyncClient()
 
     async def request(self, *args: Any, **kwargs: Any) -> httpx.Response:
-        """Passes `*args`, `**kwargs` straight through to
-        ``httpx.AsyncClient.request``, we  call `raise_for_status()` on the
-        response and wrap any `HTTPX` error in a `ClientException`.
+        """Make a HTTP request.
+
+        Passes `*args`, `**kwargs` straight through to `httpx.AsyncClient.request`, we call
+        `raise_for_status()` on the response and wrap any `HTTPX` error in a `ClientException`.
 
         Args:
             *args: Unpacked into `httpx.AsyncClient.request()`.
@@ -48,7 +49,8 @@ class Client:
         return req
 
     def json(self, response: httpx.Response) -> Any:
-        """
+        """Parse response as JSON.
+
         Abstracts deserializing to allow for optional unwrapping of server response, e.g.,
         `{"data": []}`.
 
@@ -62,8 +64,10 @@ class Client:
 
     @staticmethod
     def unwrap_json(data: Any) -> Any:
-        """Overwrite this method for pre-processing response data, for example
-        unwrapping enveloped data.
+        """Receive parsed JSON.
+
+        Override this method for pre-processing response data, for example unwrapping enveloped
+        data.
 
         Args:
             data: Value returned from `response.json()`.
@@ -75,5 +79,5 @@ class Client:
 
     @classmethod
     async def close(cls) -> None:
-        """Closes the underlying client transport and proxies."""
+        """Close underlying client transport and proxies."""
         await cls._client.aclose()

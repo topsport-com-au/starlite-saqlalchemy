@@ -11,5 +11,4 @@ class RepositoryConflictException(RepositoryException):
 
 
 class RepositoryNotFoundException(RepositoryException):
-    """Raised when a method referencing a specific instance by identity is
-    called and no instance with that identity exists."""
+    """Identity not present in collection."""

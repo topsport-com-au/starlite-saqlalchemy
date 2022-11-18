@@ -23,16 +23,19 @@ __all__ = [
 
 
 class Queue(saq.Queue):
-    """[SAQ Queue](https://github.com/tobymao/saq/blob/master/saq/queue.py).
-
-    Configures `orjson` for JSON serialization/deserialization if not otherwise configured.
-
-    Args:
-        *args: Passed through to `saq.Queue.__init__()`
-        **kwargs: Passed through to `saq.Queue.__init__()`
-    """
+    """Async task queue."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """[SAQ
+        Queue](https://github.com/tobymao/saq/blob/master/saq/queue.py).
+
+        Configures `orjson` for JSON serialization/deserialization if not
+        otherwise configured.
+
+        Args:
+            *args: Passed through to `saq.Queue.__init__()`
+            **kwargs: Passed through to `saq.Queue.__init__()`
+        """
         kwargs.setdefault("name", settings.app.slug)
         kwargs.setdefault("dump", partial(orjson.dumps, default=str))
         kwargs.setdefault("load", orjson.loads)

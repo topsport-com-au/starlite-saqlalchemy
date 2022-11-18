@@ -51,8 +51,7 @@ else:  # pragma: no cover
 
 
 def _make_filtering_bound_logger(min_level: int) -> type[structlog.types.FilteringBoundLogger]:
-    """Wraps structlog's `FilteringBoundLogger` to add the `alog()` method,
-    which is in structlog's main branch, but not yet released.
+    """Wrap structlog's `FilteringBoundLogger` to add the `alog()` method.
 
     Args:
         min_level: Log level as an integer.
@@ -66,7 +65,7 @@ def _make_filtering_bound_logger(min_level: int) -> type[structlog.types.Filteri
     # pylint: disable=too-few-public-methods
     class _WrappedFilteringBoundLogger(filtering_bound_logger):  # type:ignore[misc,valid-type]
         async def alog(self: Any, level: int, event: str, *args: Any, **kw: Any) -> Any:
-            """This method will exist in the next release of structlog."""
+            """Log in executor thread."""
             if level < min_level:  # pragma: no cover
                 return None
             # pylint: disable=protected-access

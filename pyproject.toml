@@ -75,6 +75,11 @@ Bugs = "https://github.com/topsport-com-au/starlite-saqlalchemy/issues"
 [tool.pycln]
 all = true
 
+[tool.pydocstyle]
+add-ignore = "D106,D205,D212,D415"
+add-select = "D401,D404,D417"
+convention = "google"
+
 [tool.pytest.ini_options]
 addopts = ["-ra", "--strict-config"]
 asyncio_mode = "auto"

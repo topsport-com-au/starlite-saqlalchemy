@@ -60,23 +60,31 @@ def wrap_sqlalchemy_exception() -> Any:
 
 
 class SQLAlchemyRepository(AbstractRepository[ModelT]):
-    """SQLAlchemy based implementation of the repository interface.
-
-    Args:
-        session: Session managing the unit-of-work for the operation.
-        select_: To facilitate customization of the underlying select query.
-    """
+    """SQLAlchemy based implementation of the repository interface."""
 
     model_type: type[ModelT]
 
     def __init__(
         self, *, session: AsyncSession, select_: Select[tuple[ModelT]] | None = None, **kwargs: Any
     ) -> None:
+        """
+        Args:
+            session: Session managing the unit-of-work for the operation.
+            select_: To facilitate customization of the underlying select query.
+        """
         super().__init__(**kwargs)
         self.session = session
         self._select = select(self.model_type) if select_ is None else select_
 
     async def add(self, data: ModelT) -> ModelT:
+        """Add `data` to the collection.
+
+        Args:
+            data: Instance to be added to the collection.
+
+        Returns:
+            The added instance.
+        """
         with wrap_sqlalchemy_exception():
             instance = await self._attach_to_session(data)
             await self.session.flush()
@@ -85,6 +93,17 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
             return instance
 
     async def delete(self, id_: Any) -> ModelT:
+        """Delete instance identified by `id_`.
+
+        Args:
+            id_: Identifier of instance to be deleted.
+
+        Returns:
+            The deleted instance.
+
+        Raises:
+            RepositoryNotFoundException: If no instance found identified by `id_`.
+        """
         with wrap_sqlalchemy_exception():
             instance = await self.get(id_)
             await self.session.delete(instance)
@@ -93,6 +112,17 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
             return instance
 
     async def get(self, id_: Any) -> ModelT:
+        """Get instance identified by `id_`.
+
+        Args:
+            id_: Identifier of the instance to be retrieved.
+
+        Returns:
+            The retrieved instance.
+
+        Raises:
+            RepositoryNotFoundException: If no instance found identified by `id_`.
+        """
         with wrap_sqlalchemy_exception():
             self._filter_select_by_kwargs(**{self.id_attribute: id_})
             instance = (await self._execute()).scalar_one_or_none()
@@ -101,6 +131,15 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
             return instance
 
     async def list(self, *filters: FilterTypes, **kwargs: Any) -> list[ModelT]:
+        """Get a list of instances, optionally filtered.
+
+        Args:
+            *filters: Types for specific filtering operations.
+            **kwargs: Instance attribute value filters.
+
+        Returns:
+            The list of instances, after filtering applied.
+        """
         for filter_ in filters:
             match filter_:
                 case LimitOffset(limit, offset):
@@ -121,6 +160,18 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
             return instances
 
     async def update(self, data: ModelT) -> ModelT:
+        """Update instance with the attribute values present on `data`.
+
+        Args:
+            data: An instance that should have a value for `self.id_attribute` that exists in the
+                collection.
+
+        Returns:
+            The updated instance.
+
+        Raises:
+            RepositoryNotFoundException: If no instance found with same identifier as `data`.
+        """
         with wrap_sqlalchemy_exception():
             id_ = self.get_id_attribute_value(data)
             # this will raise for not found, and will put the item in the session
@@ -133,6 +184,22 @@ class SQLAlchemyRepository(AbstractRepository[ModelT]):
             return instance
 
     async def upsert(self, data: ModelT) -> ModelT:
+        """Update or create instance.
+
+        Updates instance with the attribute values present on `data`, or creates a new instance if
+        one doesn't exist.
+
+        Args:
+            data: Instance to update existing, or be created. Identifier used to determine if an
+                existing instance exists is the value of an attribute on `data` named as value of
+                `self.id_attribute`.
+
+        Returns:
+            The updated or created instance.
+
+        Raises:
+            RepositoryNotFoundException: If no instance found with same identifier as `data`.
+        """
         with wrap_sqlalchemy_exception():
             instance = await self._attach_to_session(data, strategy="merge")
             await self.session.flush()

@@ -61,7 +61,7 @@ def middleware_factory(app: ASGIApp) -> ASGIApp:
     """
 
     async def middleware(scope: Scope, receive: Receive, send: Send) -> None:
-        """Cleans up the structlog contextvars.
+        """Clean up structlog contextvars.
 
         Args:
             scope: ASGI connection scope.
@@ -87,6 +87,7 @@ class BeforeSendHandler:
     )
 
     def __init__(self) -> None:
+        """Configure the handler."""
         self.exclude_paths = re.compile(settings.log.EXCLUDE_PATHS)
         self.do_log_request = bool(settings.log.REQUEST_FIELDS)
         self.do_log_response = bool(settings.log.RESPONSE_FIELDS)
@@ -140,10 +141,11 @@ class BeforeSendHandler:
             await LOGGER.alog(scope["state"]["log_level"], settings.log.HTTP_EVENT)
 
     async def log_request(self, scope: "Scope") -> None:
-        """Handles extracting the request data and logging the message.
+        """Handle extracting the request data and logging the message.
 
         Args:
             scope: The ASGI connection scope.
+
         Returns:
             None
         """
@@ -151,10 +153,11 @@ class BeforeSendHandler:
         structlog.contextvars.bind_contextvars(request=extracted_data)
 
     async def log_response(self, scope: "Scope") -> None:
-        """Handles extracting the response data and logging the message.
+        """Handle extracting the response data and logging the message.
 
         Args:
             scope: The ASGI connection scope.
+
         Returns:
             None
         """
@@ -162,10 +165,11 @@ class BeforeSendHandler:
         structlog.contextvars.bind_contextvars(response=extracted_data)
 
     async def extract_request_data(self, request: Request) -> dict[str, Any]:
-        """Creates a dictionary of values for the log.
+        """Create a dictionary of values for the log.
 
         Args:
             request: A [Request][starlite.connection.request.Request] instance.
+
         Returns:
             An OrderedDict.
         """
@@ -182,10 +186,11 @@ class BeforeSendHandler:
         return data
 
     def extract_response_data(self, scope: Scope) -> dict[str, Any]:
-        """Extracts data from the response.
+        """Extract data from the response.
 
         Args:
             scope: The ASGI connection scope.
+
         Returns:
             An OrderedDict.
         """

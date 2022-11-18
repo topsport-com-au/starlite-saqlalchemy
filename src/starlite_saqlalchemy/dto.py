@@ -36,7 +36,6 @@ class Mark(str, Enum):
     """For marking column definitions on the domain models.
 
     Example:
-
     ```python
     class Model(Base):
         ...
@@ -55,7 +54,6 @@ class Purpose(Enum):
     on the purpose of the DTO.
 
     Example:
-
     ```python
     ReadDTO = dto.factory("AuthorReadDTO", Author, purpose=dto.Purpose.READ)
     ```
