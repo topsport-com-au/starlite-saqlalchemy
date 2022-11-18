@@ -18,7 +18,7 @@ from starlite.utils.extractors import ConnectionDataExtractor, ResponseDataExtra
 from starlite_saqlalchemy import settings
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Literal
 
     from starlite.connection import Request
     from starlite.datastructures import State
@@ -26,6 +26,9 @@ if TYPE_CHECKING:
     from structlog.types import EventDict, WrappedLogger
 
 LOGGER = structlog.get_logger()
+
+HTTP_RESPONSE_START: Literal["http.response.start"] = "http.response.start"
+HTTP_RESPONSE_BODY: Literal["http.response.body"] = "http.response.body"
 
 
 def drop_health_logs(_: WrappedLogger, __: str, event_dict: EventDict) -> EventDict:
@@ -122,14 +125,14 @@ class BeforeSendHandler:
         if scope["type"] == ScopeType.HTTP and self.exclude_paths.findall(scope["path"]):
             return
 
-        if message["type"] == "http.response.start":
+        if message["type"] == HTTP_RESPONSE_START:
             scope["state"]["log_level"] = (
                 logging.ERROR if message["status"] >= 500 else logging.INFO
             )
-            scope["state"]["http.response.start"] = message
+            scope["state"][HTTP_RESPONSE_START] = message
         # ignore intermediate content of streaming responses for now.
-        elif message["type"] == "http.response.body" and message["more_body"] is False:
-            scope["state"]["http.response.body"] = message
+        elif message["type"] == HTTP_RESPONSE_BODY and message["more_body"] is False:
+            scope["state"][HTTP_RESPONSE_BODY] = message
             if self.do_log_request:
                 await self.log_request(scope)
             if self.do_log_response:
@@ -188,10 +191,7 @@ class BeforeSendHandler:
         """
         data: dict[str, Any] = {}
         extracted_data = self.response_extractor(
-            messages=(
-                scope["state"]["http.response.start"],
-                scope["state"]["http.response.body"],
-            )
+            messages=(scope["state"][HTTP_RESPONSE_START], scope["state"][HTTP_RESPONSE_BODY])
         )
         missing = object()
         for key in settings.log.RESPONSE_FIELDS:
