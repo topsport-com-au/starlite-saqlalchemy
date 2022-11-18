@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.12.0 (2022-11-17)
+### Feature
+* **worker:** Set queue name so saq keys unique to application ([`c56a12f`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/c56a12f9390c2f8185fa5831115cca79d65e3120))
+
 ## v0.11.0 (2022-11-17)
 ### Feature
 * **dto:** Relationship support + test for forward refs ([`1bb3fb3`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/1bb3fb3ceaddfb440531d582ea1b852792983629))
