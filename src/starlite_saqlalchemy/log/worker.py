@@ -19,12 +19,12 @@ Context: TypeAlias = "dict[str, Any]"
 
 
 async def before_process(_: Context) -> None:
-    """Clears the structlog contextvars for this task."""
+    """Clear the structlog contextvars for this task."""
     structlog.contextvars.clear_contextvars()
 
 
 async def after_process(ctx: Context) -> None:
-    """Parses log context and logs it along with the contextvars context."""
+    """Parse log context and log it along with the contextvars context."""
     # parse log context from `ctx`
     job: Job = ctx["job"]
     log_ctx = {k: getattr(job, k) for k in settings.log.JOB_FIELDS}

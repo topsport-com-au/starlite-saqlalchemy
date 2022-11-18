@@ -36,7 +36,7 @@ class AppSettings(BaseSettings):
 
     @property
     def slug(self) -> str:
-        """A slugified name.
+        """Return a slugified name.
 
         Returns:
             `self.NAME`, all lowercase and hyphens instead of spaces.
@@ -46,11 +46,7 @@ class AppSettings(BaseSettings):
 
 # noinspection PyUnresolvedReferences
 class APISettings(BaseSettings):
-    """API specific configuration.
-
-    Prefix all environment variables with `API_`, e.g.,
-    `API_CACHE_EXPIRATION`.
-    """
+    """API specific configuration."""
 
     class Config:
         case_sensitive = True
@@ -70,6 +66,8 @@ class APISettings(BaseSettings):
 
 
 class LogSettings(BaseSettings):
+    """Logging config for the application."""
+
     class Config:
         case_sensitive = True
         env_file = ".env"
@@ -133,11 +131,7 @@ class LogSettings(BaseSettings):
 
 # noinspection PyUnresolvedReferences
 class OpenAPISettings(BaseSettings):
-    """Configures OpenAPI for the application.
-
-    Prefix all environment variables with `OPENAPI_`, e.g.,
-    `OPENAPI_TITLE`.
-    """
+    """Configures OpenAPI for the application."""
 
     class Config:
         case_sensitive = True
@@ -156,17 +150,7 @@ class OpenAPISettings(BaseSettings):
 
 # noinspection PyUnresolvedReferences
 class DatabaseSettings(BaseSettings):
-    """Configures the database for the application.
-
-    Prefix all environment variables with `DB_`, e.g., `DB_URL`.
-
-    Attributes
-    ----------
-    ECHO : bool
-        Enables SQLAlchemy engine logs.
-    URL : PostgresDsn
-        URL for database connection.
-    """
+    """Configures the database for the application."""
 
     class Config:
         case_sensitive = True
@@ -194,10 +178,7 @@ class DatabaseSettings(BaseSettings):
 
 # noinspection PyUnresolvedReferences
 class RedisSettings(BaseSettings):
-    """Cache settings for the application.
-
-    Prefix all environment variables with `REDIS_`, e.g., `REDIS_URL`.
-    """
+    """Redis settings for the application."""
 
     class Config:
         case_sensitive = True

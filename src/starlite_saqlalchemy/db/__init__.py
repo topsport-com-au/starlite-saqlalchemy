@@ -49,8 +49,7 @@ Database session factory. See [`async_sessionmaker()`][sqlalchemy.ext.asyncio.as
 
 @event.listens_for(engine.sync_engine, "connect")
 def _sqla_on_connect(dbapi_connection: Any, _: Any) -> Any:  # pragma: no cover
-    """Using orjson for serialization of the json column values means that the
-    output is binary, not `str` like `json.dumps` would output.
+    """Handle orjson binary output.
 
     SQLAlchemy expects that the json serializer returns `str` and calls `.encode()` on the value to
     turn it to bytes before writing to the JSONB column. I'd need to either wrap `orjson.dumps` to

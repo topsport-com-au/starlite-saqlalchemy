@@ -1,5 +1,6 @@
-"""This `@endpoint` decorator pattern comes from.
+"""Attribution for `@endpoint` decorator pattern.
 
+Sourced from
 [api-client](https://github.com/MikeWooster/api-client/blob/master/apiclient/decorates.py) and the
 following license applies to that original code:
 
@@ -30,8 +31,7 @@ from typing import Any
 
 
 def endpoint(cls_: Any = None, base_url: Any = None) -> Any:
-    """Decorator for automatically constructing urls from a base and defined
-    resources.
+    """Construct URL from a base and defined resource.
 
     ```python-repl
     >>> @endpoint(base_url="https://somewhere.com")

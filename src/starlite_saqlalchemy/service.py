@@ -40,16 +40,22 @@ class Service(Generic[ModelT]):
     repository_type: type[AbstractRepository[ModelT]]
 
     def __init__(self, **repo_kwargs: Any) -> None:
+        """Configure the service object.
+
+        Args:
+            **repo_kwargs: passed as keyword args to repo instantiation.
+        """
         self.repository = self.repository_type(**repo_kwargs)
 
     @classmethod
     def __class_getitem__(cls: type[ServiceT], item: type[ModelT]) -> type[ServiceT]:
+        """Set `repository_type` from generic parameter."""
         if not getattr(cls, "repository_type", None) and issubclass(item, orm.Base):
             cls.repository_type = SQLAlchemyRepository[item]  # type:ignore[valid-type]
         return cls
 
     async def create(self, data: ModelT) -> ModelT:
-        """Wraps repository instance creation.
+        """Wrap repository instance creation.
 
         Args:
             data: Representation to be created.
@@ -60,7 +66,7 @@ class Service(Generic[ModelT]):
         return await self.repository.add(data)
 
     async def list(self, *filters: "FilterTypes", **kwargs: Any) -> list[ModelT]:
-        """Wraps repository scalars operation.
+        """Wrap repository scalars operation.
 
         Args:
             *filters: Collection route filters.
@@ -72,7 +78,7 @@ class Service(Generic[ModelT]):
         return await self.repository.list(*filters, **kwargs)
 
     async def update(self, id_: Any, data: ModelT) -> ModelT:
-        """Wraps repository update operation.
+        """Wrap repository update operation.
 
         Args:
             id_: Identifier of item to be updated.
@@ -85,7 +91,7 @@ class Service(Generic[ModelT]):
         return await self.repository.update(data)
 
     async def upsert(self, id_: Any, data: ModelT) -> ModelT:
-        """Wraps repository upsert operation.
+        """Wrap repository upsert operation.
 
         Args:
             id_: Identifier of the object for upsert.
@@ -98,7 +104,7 @@ class Service(Generic[ModelT]):
         return await self.repository.upsert(data)
 
     async def get(self, id_: Any) -> ModelT:
-        """Wraps repository scalar operation.
+        """Wrap repository scalar operation.
 
         Args:
             id_: Identifier of instance to be retrieved.
@@ -109,7 +115,7 @@ class Service(Generic[ModelT]):
         return await self.repository.get(id_)
 
     async def delete(self, id_: Any) -> ModelT:
-        """Wraps repository delete operation.
+        """Wrap repository delete operation.
 
         Args:
             id_: Identifier of instance to be deleted.
@@ -124,10 +130,7 @@ class Service(Generic[ModelT]):
 
         Args:
             method_name: Method on the service object that should be called by the async worker.
-            **kwargs: Arguments to be passed to the method when called.
-
-                Note:
-                    Must be JSON serializable.
+            **kwargs: Arguments to be passed to the method when called. Must be JSON serializable.
         """
         module = inspect.getmodule(self)
         if module is None:  # pragma: no cover
@@ -150,7 +153,7 @@ async def make_service_callback(
     service_method_name: str,
     **kwargs: Any,
 ) -> None:
-    """Function that makes the async service callbacks.
+    """Make an async service callback.
 
     Args:
         _ctx: the SAQ context

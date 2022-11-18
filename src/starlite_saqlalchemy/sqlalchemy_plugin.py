@@ -20,8 +20,7 @@ __all__ = ["config", "plugin"]
 
 
 async def before_send_handler(message: "Message", _: "State", scope: "Scope") -> None:
-    """Custom `before_send_handler` for SQLAlchemy plugin that inspects the
-    status of response and commits, or rolls back the database.
+    """Inspect status of response and commit, or rolls back.
 
     Args:
         message: ASGI message

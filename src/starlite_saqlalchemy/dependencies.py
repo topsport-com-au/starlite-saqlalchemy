@@ -96,8 +96,9 @@ def provide_filter_dependencies(
     id_filter: CollectionFilter[UUID] = Dependency(skip_validation=True),
     limit_offset: LimitOffset = Dependency(skip_validation=True),
 ) -> list[FilterTypes]:
-    """Common collection route filtering dependencies. Add all filters to any
-    route by including this function as a dependency, e.g:
+    """Inject filtering dependencies.
+
+    Add all filters to any route by including this function as a dependency, e.g:
 
     ```python
     @get
@@ -126,7 +127,8 @@ def provide_filter_dependencies(
 
 
 def create_collection_dependencies() -> dict[str, Provide]:
-    """
+    """Build mapping of collection dependencies.
+
     Returns:
         A dictionary of provides for pagination endpoints.
     """

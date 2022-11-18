@@ -1,5 +1,4 @@
-"""Datastructures used by repository to apply filtering to collection
-queries."""
+"""Collection filter datastructures."""
 from __future__ import annotations
 
 from collections import abc

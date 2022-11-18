@@ -5,7 +5,6 @@ starlite-saqlalchemy
 An implementation of a `Starlite` application configuration plugin.
 
 Example:
-
 ```python
 from starlite import Starlite, get
 

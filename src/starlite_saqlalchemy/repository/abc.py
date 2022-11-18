@@ -1,5 +1,4 @@
-"""AbstractRepository defines the interface for interacting with the
-application persistent data."""
+"""Data persistence interface."""
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
@@ -17,8 +16,7 @@ RepoT = TypeVar("RepoT", bound="AbstractRepository")
 
 
 class AbstractRepository(Generic[T], metaclass=ABCMeta):
-    """Defines the interface for interacting with the application persistent
-    data."""
+    """Interface for persistent data interaction."""
 
     model_type: type[T]
     """Type of object represented by the repository."""
@@ -26,10 +24,12 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
     """Name of the primary identifying attribute on `model_type`."""
 
     def __init__(self, **kwargs: Any) -> None:
+        """Repository constructors accept arbitrary kwargs."""
         super().__init__(**kwargs)
 
     @classmethod
     def __class_getitem__(cls: type[RepoT], item: type[T]) -> type[RepoT]:
+        """Set `model_type` attribute, using generic parameter."""
         if not isinstance(item, TypeVar) and not getattr(cls, "model_type", None):
             cls.model_type = item
         return cls
@@ -47,7 +47,7 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
 
     @abstractmethod
     async def delete(self, id_: Any) -> T:
-        """Delete instance identified by `id_`
+        """Delete instance identified by `id_`.
 
         Args:
             id_: Identifier of instance to be deleted.
@@ -87,8 +87,7 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
 
     @abstractmethod
     async def update(self, data: T) -> T:
-        """Update an existing instance with the attribute values present on
-        `data`.
+        """Update instance with the attribute values present on `data`.
 
         Args:
             data: An instance that should have a value for `self.id_attribute` that exists in the
@@ -103,8 +102,10 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
 
     @abstractmethod
     async def upsert(self, data: T) -> T:
-        """Update an existing instance with the attribute values present on
-        `data`, or create a new instance if one doesn't exist.
+        """Update or create instance.
+
+        Updates instance with the attribute values present on `data`, or creates a new instance if
+        one doesn't exist.
 
         Args:
             data: Instance to update existing, or be created. Identifier used to determine if an
@@ -134,8 +135,7 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
 
     @classmethod
     def get_id_attribute_value(cls, item: T) -> Any:
-        """Return the value of attribute named as `self.id_attribute` on
-        `item`.
+        """Get value of attribute named as `self.id_attribute` on `item`.
 
         Args:
             item: Anything that should have an attribute named as `self.id_attribute` value.

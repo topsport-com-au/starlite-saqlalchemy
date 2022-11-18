@@ -1,7 +1,6 @@
 """The application configuration plugin and config object.
 
 Example:
-
     ```python
     from starlite import Starlite, get
 
@@ -60,7 +59,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from typing import Any
 
-    from saq.worker import Worker
     from starlite.config.app import AppConfig
     from structlog.types import Processor
 
@@ -167,17 +165,15 @@ class PluginConfig(BaseModel):
 
 
 class ConfigureApp:
-    """Starlite application configuration.
+    """Starlite application configuration."""
 
-    Args:
-        config: Provide a config object to customize the behavior of the plugin.
-    """
-
-    __slots__ = ("config", "worker_instance")
-
-    worker_instance: Worker
+    __slots__ = ("config",)
 
     def __init__(self, config: PluginConfig = PluginConfig()) -> None:
+        """
+        Args:
+            config: Plugin configuration object.
+        """
         self.config = config
 
     def __call__(self, app_config: AppConfig) -> AppConfig:
@@ -261,7 +257,6 @@ class ConfigureApp:
         Args:
             app_config: The Starlite application config object.
         """
-
         if self.config.do_set_debug:
             app_config.debug = settings.app.DEBUG
 
@@ -285,7 +280,7 @@ class ConfigureApp:
         )
 
     def configure_health_check(self, app_config: AppConfig) -> None:
-        """Adds the health check controller.
+        """Add health check controller.
 
         Args:
             app_config: The Starlite application config object.
@@ -294,8 +289,7 @@ class ConfigureApp:
             app_config.route_handlers.append(health_check)
 
     def configure_logging(self, app_config: AppConfig) -> None:
-        """Configures application logging if it has not already been
-        configured.
+        """Configure application logging.
 
         Args:
             app_config: The Starlite application config object.
@@ -308,8 +302,7 @@ class ConfigureApp:
             app_config.before_send.append(log.controller.BeforeSendHandler())
 
     def configure_openapi(self, app_config: AppConfig) -> None:
-        """Configures the OpenAPI docs if they have not already been
-        configured.
+        """Configure the OpenAPI docs.
 
         We only overwrite if `DEFAULT_OPENAPI_CONFIG` is the standing configuration.
 
