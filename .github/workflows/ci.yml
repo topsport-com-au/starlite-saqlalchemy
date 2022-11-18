@@ -202,6 +202,9 @@ jobs:
         uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # @v3.0.1
         with:
           name: xml-report
+      - name: Fix coverage file for sonarcloud
+        # https://community.sonarsource.com/t/sonar-on-github-actions-with-python-coverage-source-issue/36057
+        run: sed -i "s/home\/runner\/work\/starlite-saqlalchemy\/starlite-saqlalchemy/github\/workspace/g" coverage.xml
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@156db6fef3e168e4972abb76de0b32bbce8ec77a # @v1.7
         env:
