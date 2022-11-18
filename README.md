@@ -23,6 +23,26 @@
     <img alt="Actions: CI" src="https://github.com/topsport-com-au/starlite-saqlalchemy/actions/workflows/ci.yml/badge.svg?branch=main&event=push"/>
   </a>
 </p>
+<p align="center">
+  <a href="https://sonarcloud.io/summary/new_code?id=topsport-com-au_starlite-saqlalchemy">
+    <img alt="Reliability Rating" src="https://sonarcloud.io/api/project_badges/measure?project=topsport-com-au_starlite-saqlalchemy&metric=reliability_rating"/>
+  </a>
+  <a href="https://sonarcloud.io/summary/new_code?id=topsport-com-au_starlite-saqlalchemy">
+    <img alt="Quality Gate Status" src="https://sonarcloud.io/api/project_badges/measure?project=topsport-com-au_starlite-saqlalchemy&metric=alert_status"/>
+  </a>
+  <a href="https://sonarcloud.io/summary/new_code?id=topsport-com-au_starlite-saqlalchemy">
+    <img alt="Quality Gate Status" src="https://sonarcloud.io/api/project_badges/measure?project=topsport-com-au_starlite-saqlalchemy&metric=sqale_rating"/>
+  </a>
+  <a href="https://sonarcloud.io/summary/new_code?id=topsport-com-au_starlite-saqlalchemy">
+    <img alt="Quality Gate Status" src="https://sonarcloud.io/api/project_badges/measure?project=topsport-com-au_starlite-saqlalchemy&metric=security_rating"/>
+  </a>
+  <a href="https://sonarcloud.io/summary/new_code?id=topsport-com-au_starlite-saqlalchemy">
+    <img alt="Quality Gate Status" src="https://sonarcloud.io/api/project_badges/measure?project=topsport-com-au_starlite-saqlalchemy&metric=bugs"/>
+  </a>
+  <a href="https://sonarcloud.io/summary/new_code?id=topsport-com-au_starlite-saqlalchemy">
+    <img alt="Quality Gate Status" src="https://sonarcloud.io/api/project_badges/measure?project=topsport-com-au_starlite-saqlalchemy&metric=vulnerabilities"/>
+  </a>
+</p>
 
 Configuration for a [Starlite](https://github.com/starlite-api/starlite) application that features:
 

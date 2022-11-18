@@ -54,7 +54,6 @@ class GenericMockRepository(AbstractRepository[BaseT], Generic[BaseT]):
         return self._find_or_raise_not_found(id_)
 
     async def list(self, *filters: "FilterTypes", **kwargs: Any) -> list[BaseT]:
-        # TODO: support filters here  # pylint: disable=fixme
         return list(self.collection.values())
 
     async def update(self, data: BaseT) -> BaseT:
