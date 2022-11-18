@@ -31,6 +31,9 @@
     <img alt="Quality Gate Status" src="https://sonarcloud.io/api/project_badges/measure?project=topsport-com-au_starlite-saqlalchemy&metric=alert_status"/>
   </a>
   <a href="https://sonarcloud.io/summary/new_code?id=topsport-com-au_starlite-saqlalchemy">
+    <img alt="Quality Gate Status" src="https://sonarcloud.io/api/project_badges/measure?project=topsport-com-au_starlite-saqlalchemy&metric=coverage"/>
+  </a>
+  <a href="https://sonarcloud.io/summary/new_code?id=topsport-com-au_starlite-saqlalchemy">
     <img alt="Quality Gate Status" src="https://sonarcloud.io/api/project_badges/measure?project=topsport-com-au_starlite-saqlalchemy&metric=sqale_rating"/>
   </a>
   <a href="https://sonarcloud.io/summary/new_code?id=topsport-com-au_starlite-saqlalchemy">
