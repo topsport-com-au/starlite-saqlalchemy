@@ -27,13 +27,6 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """Repository constructors accept arbitrary kwargs."""
         super().__init__(**kwargs)
 
-    @classmethod
-    def __class_getitem__(cls: type[RepoT], item: type[T]) -> type[RepoT]:
-        """Set `model_type` attribute, using generic parameter."""
-        if not isinstance(item, TypeVar) and not getattr(cls, "model_type", None):
-            cls.model_type = item
-        return cls
-
     @abstractmethod
     async def add(self, data: T) -> T:
         """Add `data` to the collection.
