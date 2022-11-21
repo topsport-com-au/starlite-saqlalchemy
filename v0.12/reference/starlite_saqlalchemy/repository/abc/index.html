@@ -803,6 +803,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.repository.abc.AbstractRepository.__class_getitem__" class="md-nav__link">
+    __class_getitem__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#starlite_saqlalchemy.repository.abc.AbstractRepository.add" class="md-nav__link">
     add()
   </a>
@@ -1095,8 +1102,7 @@
 
   <div class="doc doc-contents first">
   
-      <p>AbstractRepository defines the interface for interacting with the
-application persistent data.</p>
+      <p>Data persistence interface.</p>
 
   
 
@@ -1126,8 +1132,7 @@ application persistent data.</p>
         Bases: <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="starlite_saqlalchemy.repository.abc.T">T</span>]</code></p>
 
   
-      <p>Defines the interface for interacting with the application persistent
-data.</p>
+      <p>Interface for persistent data interaction.</p>
 
 
 
@@ -1193,13 +1198,37 @@ data.</p>
 
 
 
+<h3 id="starlite_saqlalchemy.repository.abc.AbstractRepository.__class_getitem__" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">__class_getitem__</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.repository.abc.AbstractRepository.__class_getitem__" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">__class_getitem__</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Set <code>model_type</code> attribute, using generic parameter.</p>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
 <h3 id="starlite_saqlalchemy.repository.abc.AbstractRepository.add" class="doc doc-heading">
         <span class="doc doc-object-name doc-function-name">add</span>
 
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
   </span>
 
 <a href="#starlite_saqlalchemy.repository.abc.AbstractRepository.add" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -1331,8 +1360,8 @@ data.</p>
 
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
   </span>
 
 <a href="#starlite_saqlalchemy.repository.abc.AbstractRepository.delete" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -1341,7 +1370,7 @@ data.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Delete instance identified by <code>id_</code></p>
+      <p>Delete instance identified by <code>id_</code>.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1416,8 +1445,8 @@ data.</p>
 
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
   </span>
 
 <a href="#starlite_saqlalchemy.repository.abc.AbstractRepository.get" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -1510,8 +1539,7 @@ data.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Return the value of attribute named as <code>self.id_attribute</code> on
-<code>item</code>.</p>
+      <p>Get value of attribute named as <code>self.id_attribute</code> on <code>item</code>.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1568,8 +1596,8 @@ data.</p>
 
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
   </span>
 
 <a href="#starlite_saqlalchemy.repository.abc.AbstractRepository.list" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -1721,8 +1749,8 @@ data.</p>
 
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
   </span>
 
 <a href="#starlite_saqlalchemy.repository.abc.AbstractRepository.update" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -1731,8 +1759,7 @@ data.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Update an existing instance with the attribute values present on
-<code>data</code>.</p>
+      <p>Update instance with the attribute values present on <code>data</code>.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1808,8 +1835,8 @@ collection.</p></td>
 
   
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
   </span>
 
 <a href="#starlite_saqlalchemy.repository.abc.AbstractRepository.upsert" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -1818,8 +1845,9 @@ collection.</p></td>
 
   <div class="doc doc-contents ">
   
-      <p>Update an existing instance with the attribute values present on
-<code>data</code>, or create a new instance if one doesn't exist.</p>
+      <p>Update or create instance.</p>
+<p>Updates instance with the attribute values present on <code>data</code>, or creates a new instance if
+one doesn't exist.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>

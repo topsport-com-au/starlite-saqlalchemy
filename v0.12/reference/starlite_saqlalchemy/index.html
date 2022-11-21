@@ -975,7 +975,7 @@
   
       <h3 id="starlite_saqlalchemy--starlite-saqlalchemy">starlite-saqlalchemy<a class="headerlink" href="#starlite_saqlalchemy--starlite-saqlalchemy" title="Permanent link">&para;</a></h3>
 <p>An implementation of a <code>Starlite</code> application configuration plugin.</p>
-<p>Example:</p>
+<p>Example:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">starlite</span> <span class="kn">import</span> <span class="n">Starlite</span><span class="p">,</span> <span class="n">get</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span> <span class="nn">starlite_saqlalchemy</span> <span class="kn">import</span> <span class="n">ConfigureApp</span>
@@ -987,7 +987,7 @@
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">app</span> <span class="o">=</span> <span class="n">Starlite</span><span class="p">(</span><span class="n">route_handlers</span><span class="o">=</span><span class="p">[</span><span class="n">example_handler</span><span class="p">],</span> <span class="n">on_app_init</span><span class="o">=</span><span class="p">[</span><span class="n">ConfigureApp</span><span class="p">()])</span>
-</code></pre></div>
+</code></pre></div></p>
 
   
 
@@ -1016,30 +1016,6 @@
 
   
       <p>Starlite application configuration.</p>
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>config</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="starlite_saqlalchemy.init_plugin.PluginConfig" href="init_plugin/#starlite_saqlalchemy.init_plugin.PluginConfig">PluginConfig</a></code>
-          </td>
-          <td><p>Provide a config object to customize the behavior of the plugin.</p></td>
-          <td>
-                <code>PluginConfig()</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
 
 
 
@@ -1404,7 +1380,7 @@ into HTTP exceptions.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Adds the health check controller.</p>
+      <p>Add health check controller.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1448,8 +1424,7 @@ into HTTP exceptions.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Configures application logging if it has not already been
-configured.</p>
+      <p>Configure application logging.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1493,8 +1468,7 @@ configured.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Configures the OpenAPI docs if they have not already been
-configured.</p>
+      <p>Configure the OpenAPI docs.</p>
 <p>We only overwrite if <code>DEFAULT_OPENAPI_CONFIG</code> is the standing configuration.</p>
 
   <p><strong>Parameters:</strong></p>

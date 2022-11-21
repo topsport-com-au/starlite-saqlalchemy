@@ -1117,7 +1117,7 @@
 
   <div class="doc doc-contents ">
   
-      <p>Closes the underlying client transport and proxies.</p>
+      <p>Close underlying client transport and proxies.</p>
 
   </div>
 
@@ -1137,7 +1137,8 @@
 
   <div class="doc doc-contents ">
   
-      <p>Abstracts deserializing to allow for optional unwrapping of server response, e.g.,
+      <p>Parse response as JSON.</p>
+<p>Abstracts deserializing to allow for optional unwrapping of server response, e.g.,
 <code>{"data": []}</code>.</p>
 
   <p><strong>Parameters:</strong></p>
@@ -1204,9 +1205,9 @@
 
   <div class="doc doc-contents ">
   
-      <p>Passes <code>*args</code>, <code>**kwargs</code> straight through to
-<code>httpx.AsyncClient.request</code>, we  call <code>raise_for_status()</code> on the
-response and wrap any <code>HTTPX</code> error in a <code>ClientException</code>.</p>
+      <p>Make a HTTP request.</p>
+<p>Passes <code>*args</code>, <code>**kwargs</code> straight through to <code>httpx.AsyncClient.request</code>, we call
+<code>raise_for_status()</code> on the response and wrap any <code>HTTPX</code> error in a <code>ClientException</code>.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1307,8 +1308,9 @@ check.</p></td>
 
   <div class="doc doc-contents ">
   
-      <p>Overwrite this method for pre-processing response data, for example
-unwrapping enveloped data.</p>
+      <p>Receive parsed JSON.</p>
+<p>Override this method for pre-processing response data, for example unwrapping enveloped
+data.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>

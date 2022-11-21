@@ -1073,6 +1073,7 @@
 
   <div class="doc doc-contents ">
   
+      <p>Build mapping of collection dependencies.</p>
 
   <p><strong>Returns:</strong></p>
   <table>
@@ -1189,8 +1190,8 @@
 
   <div class="doc doc-contents ">
   
-      <p>Common collection route filtering dependencies. Add all filters to any
-route by including this function as a dependency, e.g:</p>
+      <p>Inject filtering dependencies.</p>
+<p>Add all filters to any route by including this function as a dependency, e.g:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nd">@get</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">def</span> <span class="nf">get_collection_handler</span><span class="p">(</span><span class="n">filters</span><span class="p">:</span> <span class="n">Filters</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="o">...</span><span class="p">:</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">...</span>
@@ -1305,7 +1306,7 @@ it is required.</p>
           <td>
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a>] | None</code>
           </td>
-          <td><p>Parsed out of comma separated list of values in query params.</p></td>
+          <td><p>Parsed out of query params.</p></td>
           <td>
                 <code>Parameter(query=&#39;ids&#39;, default=None, required=False)</code>
           </td>

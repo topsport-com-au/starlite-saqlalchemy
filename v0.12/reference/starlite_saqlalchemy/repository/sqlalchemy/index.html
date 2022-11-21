@@ -831,8 +831,50 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.add" class="md-nav__link">
+    add()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.check_health" class="md-nav__link">
     check_health()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.delete" class="md-nav__link">
+    delete()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.get" class="md-nav__link">
+    get()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.list" class="md-nav__link">
+    list()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.update" class="md-nav__link">
+    update()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.upsert" class="md-nav__link">
+    upsert()
   </a>
   
 </li>
@@ -1064,40 +1106,9 @@
   
       <p>SQLAlchemy based implementation of the repository interface.</p>
 
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>session</code></td>
-          <td>
-                <code><a class="autorefs autorefs-external" title="sqlalchemy.ext.asyncio.AsyncSession" href="https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#sqlalchemy.ext.asyncio.AsyncSession">AsyncSession</a></code>
-          </td>
-          <td><p>Session managing the unit-of-work for the operation.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>select_</code></td>
-          <td>
-                <code><span title="sqlalchemy.Select">Select</span>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="starlite_saqlalchemy.repository.sqlalchemy.ModelT">ModelT</span>]] | None</code>
-          </td>
-          <td><p>To facilitate customization of the underlying select query.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
+  
+      <div class="highlight"><pre><span></span><code>select_: To facilitate customization of the underlying select query.
+</code></pre></div>
 
 
   
@@ -1111,6 +1122,72 @@
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.add" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">add</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.add" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">add</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Add <code>data</code> to the collection.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>data</code></td>
+          <td>
+                <code><span title="starlite_saqlalchemy.repository.sqlalchemy.ModelT">ModelT</span></code>
+          </td>
+          <td><p>Instance to be added to the collection.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="starlite_saqlalchemy.repository.sqlalchemy.ModelT">ModelT</span></code>
+          </td>
+          <td><p>The added instance.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
@@ -1171,6 +1248,423 @@
                 <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
           </td>
           <td><p><code>True</code> if healthy.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.delete" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">delete</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.delete" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">delete</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Delete instance identified by <code>id_</code>.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>id_</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+          </td>
+          <td><p>Identifier of instance to be deleted.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="starlite_saqlalchemy.repository.sqlalchemy.ModelT">ModelT</span></code>
+          </td>
+          <td><p>The deleted instance.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>RepositoryNotFoundException</code>
+          </td>
+          <td><p>If no instance found identified by <code>id_</code>.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.get" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">get</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.get" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">get</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Get instance identified by <code>id_</code>.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>id_</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+          </td>
+          <td><p>Identifier of the instance to be retrieved.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="starlite_saqlalchemy.repository.sqlalchemy.ModelT">ModelT</span></code>
+          </td>
+          <td><p>The retrieved instance.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>RepositoryNotFoundException</code>
+          </td>
+          <td><p>If no instance found identified by <code>id_</code>.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.list" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">list</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.list" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">list</span><span class="p">(</span><span class="o">*</span><span class="n">filters</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Get a list of instances, optionally filtered.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>*filters</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="starlite_saqlalchemy.repository.types.FilterTypes" href="../types/#starlite_saqlalchemy.repository.types.FilterTypes">FilterTypes</a></code>
+          </td>
+          <td><p>Types for specific filtering operations.</p></td>
+          <td>
+                <code>()</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+          </td>
+          <td><p>Instance attribute value filters.</p></td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<span title="starlite_saqlalchemy.repository.sqlalchemy.ModelT">ModelT</span>]</code>
+          </td>
+          <td><p>The list of instances, after filtering applied.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.update" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">update</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.update" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Update instance with the attribute values present on <code>data</code>.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>data</code></td>
+          <td>
+                <code><span title="starlite_saqlalchemy.repository.sqlalchemy.ModelT">ModelT</span></code>
+          </td>
+          <td><p>An instance that should have a value for <code>self.id_attribute</code> that exists in the
+collection.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="starlite_saqlalchemy.repository.sqlalchemy.ModelT">ModelT</span></code>
+          </td>
+          <td><p>The updated instance.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>RepositoryNotFoundException</code>
+          </td>
+          <td><p>If no instance found with same identifier as <code>data</code>.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.upsert" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">upsert</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.repository.sqlalchemy.SQLAlchemyRepository.upsert" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">upsert</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Update or create instance.</p>
+<p>Updates instance with the attribute values present on <code>data</code>, or creates a new instance if
+one doesn't exist.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>data</code></td>
+          <td>
+                <code><span title="starlite_saqlalchemy.repository.sqlalchemy.ModelT">ModelT</span></code>
+          </td>
+          <td><p>Instance to update existing, or be created. Identifier used to determine if an
+existing instance exists is the value of an attribute on <code>data</code> named as value of
+<code>self.id_attribute</code>.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="starlite_saqlalchemy.repository.sqlalchemy.ModelT">ModelT</span></code>
+          </td>
+          <td><p>The updated or created instance.</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>RepositoryNotFoundException</code>
+          </td>
+          <td><p>If no instance found with same identifier as <code>data</code>.</p></td>
         </tr>
     </tbody>
   </table>

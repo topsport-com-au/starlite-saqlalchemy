@@ -578,6 +578,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.db.orm.Base.__tablename__" class="md-nav__link">
+    __tablename__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#starlite_saqlalchemy.db.orm.Base.from_dto" class="md-nav__link">
     from_dto()
   </a>
@@ -1243,6 +1250,26 @@
 
 
 
+<h3 id="starlite_saqlalchemy.db.orm.Base.__tablename__" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">__tablename__</span>
+
+
+<a href="#starlite_saqlalchemy.db.orm.Base.__tablename__" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">__tablename__</span><span class="p">()</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Infer table name from class name.</p>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
 <h3 id="starlite_saqlalchemy.db.orm.Base.from_dto" class="doc doc-heading">
         <span class="doc doc-object-name doc-function-name">from_dto</span>
 
@@ -1328,9 +1355,10 @@
 
   <div class="doc doc-contents ">
   
-      <p>Called from SQLAlchemy's.</p>
-<p><a class="autorefs autorefs-external" href="https://docs.sqlalchemy.org/en/20/orm/events.html#sqlalchemy.orm.SessionEvents.before_flush"><code>before_flush</code></a> event to bump
-the <code>updated</code> timestamp on modified instances.</p>
+      <p>Set timestamp on update.</p>
+<p>Called from SQLAlchemy's
+<a class="autorefs autorefs-external" href="https://docs.sqlalchemy.org/en/20/orm/events.html#sqlalchemy.orm.SessionEvents.before_flush"><code>before_flush</code></a> event to bump the <code>updated</code>
+timestamp on modified instances.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>

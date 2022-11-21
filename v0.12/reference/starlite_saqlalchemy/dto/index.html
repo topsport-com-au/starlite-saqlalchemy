@@ -1172,11 +1172,11 @@ should always be private, or read-only at the model declaration layer.</p>
 
   
       <p>For marking column definitions on the domain models.</p>
-<p>Example:</p>
+<p>Example:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">...</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">updated_at</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">mapped_column</span><span class="p">(</span><span class="n">info</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;dto&quot;</span><span class="p">:</span> <span class="n">Mark</span><span class="o">.</span><span class="n">READ_ONLY</span><span class="p">})</span>
-</code></pre></div>
+</code></pre></div></p>
 
 
 
@@ -1219,9 +1219,9 @@ should always be private, or read-only at the model declaration layer.</p>
       <p>For identifying the purpose of a DTO to the factory.</p>
 <p>The factory will exclude fields marked as private or read-only on the domain model depending
 on the purpose of the DTO.</p>
-<p>Example:</p>
+<p>Example:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ReadDTO</span> <span class="o">=</span> <span class="n">dto</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="s2">&quot;AuthorReadDTO&quot;</span><span class="p">,</span> <span class="n">Author</span><span class="p">,</span> <span class="n">purpose</span><span class="o">=</span><span class="n">dto</span><span class="o">.</span><span class="n">Purpose</span><span class="o">.</span><span class="n">READ</span><span class="p">)</span>
-</code></pre></div>
+</code></pre></div></p>
 
 
 

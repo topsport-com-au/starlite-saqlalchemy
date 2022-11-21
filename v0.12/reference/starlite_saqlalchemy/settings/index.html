@@ -1072,13 +1072,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#starlite_saqlalchemy.settings.DatabaseSettings--attributes" class="md-nav__link">
-    Attributes
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#starlite_saqlalchemy.settings.DatabaseSettings.ECHO" class="md-nav__link">
     ECHO
   </a>
@@ -1143,6 +1136,13 @@
           <li class="md-nav__item">
   <a href="#starlite_saqlalchemy.settings.LogSettings.HTTP_EVENT" class="md-nav__link">
     HTTP_EVENT
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.INCLUDE_COMPRESSED_BODY" class="md-nav__link">
+    INCLUDE_COMPRESSED_BODY
   </a>
   
 </li>
@@ -1687,8 +1687,6 @@ settings class, except <code>AppSettings</code>.</p>
 
   
       <p>API specific configuration.</p>
-<p>Prefix all environment variables with <code>API_</code>, e.g.,
-<code>API_CACHE_EXPIRATION</code>.</p>
 
 
 
@@ -1972,7 +1970,7 @@ exclude them from serialization in the <code>Config</code> object.</p>
 
   <div class="doc doc-contents ">
   
-      <p>A slugified name.</p>
+      <p>Return a slugified name.</p>
 
   <p><strong>Returns:</strong></p>
   <table>
@@ -2021,17 +2019,7 @@ exclude them from serialization in the <code>Config</code> object.</p>
 
   
       <p>Configures the database for the application.</p>
-<p>Prefix all environment variables with <code>DB_</code>, e.g., <code>DB_URL</code>.</p>
-<h4 id="starlite_saqlalchemy.settings.DatabaseSettings--attributes">Attributes<a class="headerlink" href="#starlite_saqlalchemy.settings.DatabaseSettings--attributes" title="Permanent link">&para;</a></h4>
 
-<details class="echo-">
-  <summary>bool</summary>
-  <p>Enables SQLAlchemy engine logs.</p>
-</details>
-<details class="url-">
-  <summary>PostgresDsn</summary>
-  <p>URL for database connection.</p>
-</details>
 
 
   
@@ -2208,6 +2196,8 @@ exclude them from serialization in the <code>Config</code> object.</p>
       <p class="doc doc-class-bases">
         Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
 
+  
+      <p>Logging config for the application.</p>
 
 
 
@@ -2263,6 +2253,29 @@ exclude them from serialization in the <code>Config</code> object.</p>
   <div class="doc doc-contents ">
   
       <p>Log event name for logs from Starlite handlers.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.INCLUDE_COMPRESSED_BODY" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">INCLUDE_COMPRESSED_BODY</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.INCLUDE_COMPRESSED_BODY" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">INCLUDE_COMPRESSED_BODY</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Include 'body' of compressed responses in log output.</p>
   </div>
 
 </div>
@@ -2568,8 +2581,6 @@ to be logged.</p>
 
   
       <p>Configures OpenAPI for the application.</p>
-<p>Prefix all environment variables with <code>OPENAPI_</code>, e.g.,
-<code>OPENAPI_TITLE</code>.</p>
 
 
 
@@ -2701,8 +2712,7 @@ to be logged.</p>
         Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
 
   
-      <p>Cache settings for the application.</p>
-<p>Prefix all environment variables with <code>REDIS_</code>, e.g., <code>REDIS_URL</code>.</p>
+      <p>Redis settings for the application.</p>
 
 
 
