@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Literal, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 
 from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -36,6 +36,7 @@ __all__ = [
 
 T = TypeVar("T")
 ModelT = TypeVar("ModelT", bound="orm.Base")
+SQLARepoT = TypeVar("SQLARepoT", bound="SQLAlchemyRepository")
 
 
 @contextmanager
@@ -59,10 +60,8 @@ def wrap_sqlalchemy_exception() -> Any:
         raise RepositoryException(f"An exception occurred: {exc}") from exc
 
 
-class SQLAlchemyRepository(AbstractRepository[ModelT]):
+class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
     """SQLAlchemy based implementation of the repository interface."""
-
-    model_type: type[ModelT]
 
     def __init__(
         self, *, session: AsyncSession, select_: Select[tuple[ModelT]] | None = None, **kwargs: Any

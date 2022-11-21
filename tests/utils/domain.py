@@ -5,7 +5,7 @@ from datetime import date  # noqa: TC003
 
 from sqlalchemy.orm import Mapped
 
-from starlite_saqlalchemy import db, dto, service
+from starlite_saqlalchemy import db, dto, repository, service
 
 
 class Author(db.orm.Base):  # pylint: disable=too-few-public-methods
@@ -15,8 +15,17 @@ class Author(db.orm.Base):  # pylint: disable=too-few-public-methods
     dob: Mapped[date]
 
 
-Service = service.Service[Author]
-"""Author service object."""
+class Repository(repository.sqlalchemy.SQLAlchemyRepository[Author]):
+    """Author repository."""
+
+    model_type = Author
+
+
+class Service(service.Service[Author]):
+    """Author service object."""
+
+    repository_type = Repository
+
 
 CreateDTO = dto.factory("AuthorCreateDTO", Author, purpose=dto.Purpose.WRITE, exclude={"id"})
 """

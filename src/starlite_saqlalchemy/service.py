@@ -5,17 +5,17 @@ SQLAlchemy model.
 """
 from __future__ import annotations
 
-import importlib
 import inspect
 import logging
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 
-from starlite_saqlalchemy.db import async_session_factory, orm
-from starlite_saqlalchemy.repository.sqlalchemy import SQLAlchemyRepository
+from starlite_saqlalchemy.db import async_session_factory
 from starlite_saqlalchemy.repository.types import ModelT
 from starlite_saqlalchemy.worker import queue
 
 if TYPE_CHECKING:
+    from saq.types import Context
+
     from starlite_saqlalchemy.repository.abc import AbstractRepository
     from starlite_saqlalchemy.repository.types import FilterTypes
 
@@ -23,7 +23,8 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 ServiceT = TypeVar("ServiceT", bound="Service")
-Context = dict[str, Any]
+
+service_object_identity_map: dict[str, type[Service]] = {}
 
 
 class ServiceException(Exception):
@@ -37,6 +38,7 @@ class UnauthorizedException(ServiceException):
 class Service(Generic[ModelT]):
     """Generic Service object."""
 
+    __id__: ClassVar[str]
     repository_type: type[AbstractRepository[ModelT]]
 
     def __init__(self, **repo_kwargs: Any) -> None:
@@ -47,12 +49,17 @@ class Service(Generic[ModelT]):
         """
         self.repository = self.repository_type(**repo_kwargs)
 
-    @classmethod
-    def __class_getitem__(cls: type[ServiceT], item: type[ModelT]) -> type[ServiceT]:
-        """Set `repository_type` from generic parameter."""
-        if not getattr(cls, "repository_type", None) and issubclass(item, orm.Base):
-            cls.repository_type = SQLAlchemyRepository[item]  # type:ignore[valid-type]
-        return cls
+    def __init_subclass__(cls, *_: Any, **__: Any) -> None:
+        """Map the service object to a unique identifier.
+
+        Important that the id is deterministic across running
+        application instances, e.g., using something like `hash()` or
+        `id()` won't work as those would be different on different
+        instances of the running application. So we use the full import
+        path to the object.
+        """
+        cls.__id__ = f"{cls.__module__}.{cls.__name__}"
+        service_object_identity_map[cls.__id__] = cls
 
     async def create(self, data: ModelT) -> ModelT:
         """Wrap repository instance creation.
@@ -138,8 +145,7 @@ class Service(Generic[ModelT]):
             return
         await queue.enqueue(
             make_service_callback.__qualname__,
-            service_module_name=module.__name__,
-            service_type_fqdn=type(self).__qualname__,
+            service_type_id=self.__id__,
             service_method_name=method_name,
             **kwargs,
         )
@@ -148,8 +154,7 @@ class Service(Generic[ModelT]):
 async def make_service_callback(
     _ctx: Context,
     *,
-    service_module_name: str,
-    service_type_fqdn: str,
+    service_type_id: str,
     service_method_name: str,
     **kwargs: Any,
 ) -> None:
@@ -157,19 +162,11 @@ async def make_service_callback(
 
     Args:
         _ctx: the SAQ context
-        service_module_name: Module of service type to instantiate.
-        service_type_fqdn: Reference to service type in module.
+        service_type_id: Value of `__id__` class var on service type.
         service_method_name: Method to be called on the service object.
         **kwargs: Unpacked into the service method call as keyword arguments.
     """
-    obj_: Any = importlib.import_module(service_module_name)
-    for name in service_type_fqdn.split("."):
-        obj_ = getattr(obj_, name, None)
-        if inspect.isclass(obj_) and issubclass(obj_, Service):
-            service_type = obj_
-            break
-    else:
-        raise RuntimeError("Couldn't find a service type with given module and fqdn")
+    service_type = service_object_identity_map[service_type_id]
     async with async_session_factory() as session:
         service_object: Service = service_type(session=session)
     method = getattr(service_object, service_method_name)

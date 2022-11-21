@@ -85,8 +85,7 @@ async def test_make_service_callback(
     monkeypatch.setattr(service.Service, "receive_callback", recv_cb_mock, raising=False)
     await service.make_service_callback(
         {},
-        service_module_name="starlite_saqlalchemy.service",
-        service_type_fqdn="Service",
+        service_type_id="tests.utils.domain.Service",
         service_method_name="receive_callback",
         raw_obj=orjson.loads(orjson.dumps(raw_authors[0], default=str)),
     )
@@ -105,11 +104,10 @@ async def test_make_service_callback_raises_runtime_error(
     raw_authors: list[dict[str, Any]]
 ) -> None:
     """Tests loading and retrieval of service object types."""
-    with pytest.raises(RuntimeError):
+    with pytest.raises(KeyError):
         await service.make_service_callback(
             {},
-            service_module_name="starlite_saqlalchemy.service",
-            service_type_fqdn="TheService",
+            service_type_id="tests.utils.domain.LSKDFJ",
             service_method_name="receive_callback",
             raw_obj=orjson.loads(orjson.dumps(raw_authors[0], default=str)),
         )
@@ -123,8 +121,7 @@ async def test_enqueue_service_callback(monkeypatch: "MonkeyPatch") -> None:
     await service_instance.enqueue_background_task("receive_callback", raw_obj={"a": "b"})
     enqueue_mock.assert_called_once_with(
         "make_service_callback",
-        service_module_name="starlite_saqlalchemy.service",
-        service_type_fqdn="Service",
+        service_type_id="tests.utils.domain.Service",
         service_method_name="receive_callback",
         raw_obj={"a": "b"},
     )
