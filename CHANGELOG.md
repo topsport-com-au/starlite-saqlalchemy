@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.12.1 (2022-11-21)
+### Fix
+* **log:** Exclude compressed body from log output. ([`4d47df5`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/4d47df59a7a2b4968921a5204a912be045075a93))
+
+### Documentation
+* **readme:** Add coverage badge. ([`3c44375`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/3c44375c81f94cf8214906af25312f1d52547fd0))
+
 ## v0.12.0 (2022-11-17)
 ### Feature
 * **worker:** Set queue name so saq keys unique to application ([`c56a12f`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/c56a12f9390c2f8185fa5831115cca79d65e3120))
