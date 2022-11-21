@@ -1,4 +1,5 @@
 """Application dependency providers."""
+from __future__ import annotations
 
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -32,7 +33,7 @@ def provide_id_filter(
 ) -> CollectionFilter[UUID]:
     """
     Args:
-        ids: Parsed out of comma separated list of values in query params.
+        ids: Parsed out of query params.
 
     Returns:
         Type consumed by `AbstractRepository.filter_in_collection()`

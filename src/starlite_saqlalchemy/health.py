@@ -2,6 +2,8 @@
 
 Returns the app settings as details if successful, otherwise a 503.
 """
+from __future__ import annotations
+
 import contextlib
 
 from sqlalchemy.ext.asyncio import AsyncSession
