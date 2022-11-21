@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.0 (2022-11-21)
+### Feature
+* Simplify service and repo. ([#134](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/134)) ([`ed3b59a`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ed3b59aea64d82bdc75ef4fca65b93b6fcf45d4c))
+
+### Breaking
+* simplify service and repo. ([#134](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/134)) ([`ed3b59a`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ed3b59aea64d82bdc75ef4fca65b93b6fcf45d4c))
+
 ## v0.12.1 (2022-11-21)
 ### Fix
 * **log:** Exclude compressed body from log output. ([`4d47df5`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/4d47df59a7a2b4968921a5204a912be045075a93))
