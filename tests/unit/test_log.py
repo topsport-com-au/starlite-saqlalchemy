@@ -9,8 +9,10 @@ from unittest.mock import ANY, AsyncMock, MagicMock
 
 import pytest
 import structlog
+from starlite.constants import SCOPE_STATE_RESPONSE_COMPRESSED
 from starlite.status_codes import HTTP_200_OK, HTTP_500_INTERNAL_SERVER_ERROR
 from starlite.testing import RequestFactory
+from starlite.utils.scope import set_starlite_scope_state
 from structlog import DropEvent
 
 from starlite_saqlalchemy import log, settings
@@ -247,6 +249,31 @@ async def test_before_send_handler_log_response(
     await before_send_handler.log_response(http_scope)
     extractor_mock.assert_called_once_with(scope=http_scope)
     bind_mock.assert_called_once_with(response=ret_val)
+
+
+@pytest.mark.parametrize("include", [True, False])
+async def test_before_send_handler_exclude_body_from_log(
+    include: bool,
+    before_send_handler: log.controller.BeforeSendHandler,
+    http_response_start: HTTPResponseStartEvent,
+    http_response_body: HTTPResponseBodyEvent,
+    http_scope: HTTPScope,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Check inclusion/exclusion of 'body' key in `log_response()"""
+    set_starlite_scope_state(http_scope, SCOPE_STATE_RESPONSE_COMPRESSED, True)
+    ret_val = {"body": "sdl;kjasdlkfjsdlkfjsdlkfj"}
+    extractor_mock = MagicMock(return_value=ret_val)
+    monkeypatch.setattr(log.controller.BeforeSendHandler, "response_extractor", extractor_mock)
+    monkeypatch.setattr(log.controller.BeforeSendHandler, "include_compressed_body", include)
+    http_scope["state"]["http.response.start"] = http_response_start
+    http_scope["state"]["http.response.body"] = http_response_body
+    data = before_send_handler.extract_response_data(http_scope)
+    extractor_mock.assert_called_once_with(messages=(http_response_start, http_response_body))
+    if include:
+        assert "body" in data
+    else:
+        assert "body" not in data
 
 
 async def test_before_send_handler_extract_request_data(

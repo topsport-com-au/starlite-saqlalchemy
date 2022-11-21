@@ -12,8 +12,10 @@ from inspect import isawaitable
 from typing import TYPE_CHECKING
 
 import structlog
+from starlite.constants import SCOPE_STATE_RESPONSE_COMPRESSED
 from starlite.enums import ScopeType
 from starlite.utils.extractors import ConnectionDataExtractor, ResponseDataExtractor
+from starlite.utils.scope import get_starlite_scope_state
 
 from starlite_saqlalchemy import settings
 
@@ -81,6 +83,7 @@ class BeforeSendHandler:
         "do_log_request",
         "do_log_response",
         "exclude_paths",
+        "include_compressed_body",
         "logger",
         "request_extractor",
         "response_extractor",
@@ -91,6 +94,7 @@ class BeforeSendHandler:
         self.exclude_paths = re.compile(settings.log.EXCLUDE_PATHS)
         self.do_log_request = bool(settings.log.REQUEST_FIELDS)
         self.do_log_response = bool(settings.log.RESPONSE_FIELDS)
+        self.include_compressed_body = settings.log.INCLUDE_COMPRESSED_BODY
         self.request_extractor = ConnectionDataExtractor(
             extract_body="body" in settings.log.REQUEST_FIELDS,
             extract_client="client" in settings.log.REQUEST_FIELDS,
@@ -199,9 +203,11 @@ class BeforeSendHandler:
             messages=(scope["state"][HTTP_RESPONSE_START], scope["state"][HTTP_RESPONSE_BODY])
         )
         missing = object()
+        response_body_compressed = get_starlite_scope_state(scope, SCOPE_STATE_RESPONSE_COMPRESSED)
         for key in settings.log.RESPONSE_FIELDS:
-            # https://github.com/starlite-api/starlite/issues/740
             value = extracted_data.get(key, missing)
+            if key == "body" and response_body_compressed and not self.include_compressed_body:
+                continue
             if value is missing:  # pragma: no cover
                 continue
             data[key] = value

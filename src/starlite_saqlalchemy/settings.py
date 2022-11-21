@@ -78,6 +78,8 @@ class LogSettings(BaseSettings):
     """Regex to exclude paths from logging."""
     HTTP_EVENT: str = "HTTP"
     """Log event name for logs from Starlite handlers."""
+    INCLUDE_COMPRESSED_BODY: bool = False
+    """Include 'body' of compressed responses in log output."""
     LEVEL: int = 20
     """Stdlib log levels. Only emit logs at this level, or higher."""
     OBFUSCATE_COOKIES: set[str] = {"session"}
