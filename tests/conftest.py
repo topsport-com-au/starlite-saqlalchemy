@@ -54,7 +54,7 @@ def app() -> Starlite:
     Returns:
         The application instance.
     """
-    return Starlite(route_handlers=[], on_app_init=[ConfigureApp()])
+    return Starlite(route_handlers=[], on_app_init=[ConfigureApp()], openapi_config=None)
 
 
 @pytest.fixture()

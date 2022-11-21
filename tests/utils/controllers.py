@@ -1,4 +1,6 @@
 """Example set of controllers and a router to use for testing."""
+from __future__ import annotations
+
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
