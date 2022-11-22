@@ -20,6 +20,7 @@ from typing import (
     get_args,
     get_origin,
     get_type_hints,
+    Callable
 )
 
 from pydantic import BaseConfig as BaseConfig_
@@ -52,9 +53,6 @@ class Mark(str, Enum):
     SKIP = "skip"
 
 
-class DTOInfo(TypedDict):
-    dto: Mark
-
 
 class Purpose(Enum):
     """For identifying the purpose of a DTO to the factory.
@@ -72,6 +70,9 @@ class Purpose(Enum):
     WRITE = auto()
 
 
+class DTOInfo(TypedDict):
+    dto: Attrib
+
 class Attrib(NamedTuple):
     """For configuring DTO behavior on SQLAlchemy model fields."""
 
@@ -86,22 +87,24 @@ class BaseConfig(BaseConfig_):
 
 
 class MapperBind(BaseModel):
+    __sqla_model__: type[DeclarativeBase]
+
     class Config(BaseConfig):
         pass
 
-    def __init_subclass__(cls, model) -> None:
+    def __init_subclass__(cls, model: type[DeclarativeBase]) -> None:
         cls.__sqla_model__ = model
         return super().__init_subclass__()
 
-    def mapper(self):
+    def mapper(self) -> DeclarativeBase:
         """Fill the binded SQLAlchemy model recursively with values from this
         dataclass."""
         as_model = {}
         for f in self.__fields__.values():
             v = getattr(self, f.name)
             if isinstance(v, (list, tuple)):
-                v = [el.mapper() if isinstance(el, BaseModel) else el for el in v]
-            if isinstance(v, BaseModel):
+                v = [el.mapper() if isinstance(el, MapperBind) else el for el in v]
+            if isinstance(v, MapperBind):
                 v = v.mapper()
             as_model[f.name] = v
         return self.__sqla_model__(**as_model)
@@ -110,10 +113,13 @@ class MapperBind(BaseModel):
 def _construct_field_info(elem: Column | RelationshipProperty, purpose: Purpose) -> FieldInfo:
     default = getattr(elem, "default", None)
     nullable = getattr(elem, "nullable", False)
-    if purpose is Purpose.READ or (not nullable and default is None):
+    if purpose is Purpose.READ:
         return FieldInfo(...)
-    if nullable and default is None:
-        return FieldInfo(default=None)
+    if default is None:
+        if not nullable:
+            return FieldInfo(default=None)
+        else:
+            return FieldInfo(...)
     if default.is_scalar:
         return FieldInfo(default=default.arg)
     if default.is_callable:
@@ -227,7 +233,7 @@ def dto(
     purpose: Purpose,
     exclude: set[str] | None = None,
     mapper_bind: bool = True,
-) -> type[BaseModel]:
+) -> Callable[[type], type[BaseModel]]:
     """Create a pydantic model class from a SQLAlchemy declarative ORM class
     with validation support.
 
@@ -280,8 +286,8 @@ def dto(
         `exclude`, except relationship fields.
     """
 
-    def wrapper(cls):
-        def wrapped():
+    def wrapper(cls: type) -> type[BaseModel]:
+        def wrapped() -> type[BaseModel]:
             exclude_ = exclude or set[str]()
             mapper = cast("Mapper", inspect(model))
             columns = mapper.columns
@@ -309,7 +315,7 @@ def dto(
                 if key in relationships and key not in cls.__annotations__:
                     continue
                 fields[key] = (type_, _construct_field_info(elem, purpose))
-            return create_model(  # type:ignore[no-any-return,call-overload]
+            return create_model( # type:ignore[no-any-return,call-overload]
                 name,
                 __module__=getattr(model, "__module__", __name__),
                 __base__=MapperBind if mapper_bind else None,

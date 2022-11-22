@@ -1,6 +1,6 @@
 from collections import defaultdict
 from collections.abc import Callable
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, TypeVar, Optional
 
 from pydantic import validator as pydantic_validator
 
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 SQLAlchemyModel = TypeVar("SQLAlchemyModel")
 
-_VALIDATORS = defaultdict(dict)
+_VALIDATORS: dict[str, dict[str, "AnyClassMethod"]] = defaultdict(dict)
 
 
 def validator(
@@ -18,13 +18,13 @@ def validator(
     each_item: bool = False,
     always: bool = False,
     check_fields: bool = True,
-    whole: bool = None,
+    whole: bool = True,
     allow_reuse: bool = False,
-) -> Callable[["AnyCallable"], "AnyClassMethod"]:
+) -> Callable[["AnyCallable"], "AnyCallable"]:
     """Same as `pydantic.validator` but works with models created with the
     `dto` decorator."""
 
-    def wrapper(f: "AnyCallable") -> "AnyClassMethod":
+    def wrapper(f: "AnyCallable") -> "AnyCallable":
         dec = pydantic_validator(
             *fields,
             pre=pre,
