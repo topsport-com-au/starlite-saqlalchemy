@@ -9,6 +9,7 @@ should always be private, or read-only at the model declaration layer.
 from __future__ import annotations
 
 import sys
+from collections.abc import Callable
 from enum import Enum, auto
 from inspect import isclass
 from typing import (
@@ -20,7 +21,6 @@ from typing import (
     get_args,
     get_origin,
     get_type_hints,
-    Callable
 )
 
 from pydantic import BaseConfig as BaseConfig_
@@ -53,7 +53,6 @@ class Mark(str, Enum):
     SKIP = "skip"
 
 
-
 class Purpose(Enum):
     """For identifying the purpose of a DTO to the factory.
 
@@ -72,6 +71,7 @@ class Purpose(Enum):
 
 class DTOInfo(TypedDict):
     dto: Attrib
+
 
 class Attrib(NamedTuple):
     """For configuring DTO behavior on SQLAlchemy model fields."""
@@ -315,7 +315,7 @@ def dto(
                 if key in relationships and key not in cls.__annotations__:
                     continue
                 fields[key] = (type_, _construct_field_info(elem, purpose))
-            return create_model( # type:ignore[no-any-return,call-overload]
+            return create_model(  # type:ignore[no-any-return,call-overload]
                 name,
                 __module__=getattr(model, "__module__", __name__),
                 __base__=MapperBind if mapper_bind else None,

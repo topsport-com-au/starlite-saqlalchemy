@@ -1,6 +1,6 @@
 from collections import defaultdict
 from collections.abc import Callable
-from typing import TYPE_CHECKING, TypeVar, Optional
+from typing import TYPE_CHECKING, Optional, TypeVar
 
 from pydantic import validator as pydantic_validator
 
