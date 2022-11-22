@@ -1,5 +1,6 @@
 from collections import defaultdict
-from typing import TYPE_CHECKING, Callable, TypeVar
+from collections.abc import Callable
+from typing import TYPE_CHECKING, TypeVar
 
 from pydantic import validator as pydantic_validator
 
@@ -20,7 +21,9 @@ def validator(
     whole: bool = None,
     allow_reuse: bool = False,
 ) -> Callable[["AnyCallable"], "AnyClassMethod"]:
-    """Same as `pydantic.validator` but works with models created with the `dto` decorator."""
+    """Same as `pydantic.validator` but works with models created with the
+    `dto` decorator."""
+
     def wrapper(f: "AnyCallable") -> "AnyClassMethod":
         dec = pydantic_validator(
             *fields,

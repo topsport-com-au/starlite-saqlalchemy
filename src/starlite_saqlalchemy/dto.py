@@ -15,11 +15,11 @@ from typing import (
     TYPE_CHECKING,
     Any,
     NamedTuple,
+    TypedDict,
     cast,
     get_args,
     get_origin,
     get_type_hints,
-    TypedDict,
 )
 
 from pydantic import BaseConfig as BaseConfig_
@@ -94,7 +94,8 @@ class MapperBind(BaseModel):
         return super().__init_subclass__()
 
     def mapper(self):
-        """Fill the binded SQLAlchemy model recursively with values from this dataclass."""
+        """Fill the binded SQLAlchemy model recursively with values from this
+        dataclass."""
         as_model = {}
         for f in self.__fields__.values():
             v = getattr(self, f.name)
@@ -137,8 +138,8 @@ def _should_exclude_field(
 
 
 def mark(mark_type: Mark) -> DTOInfo:
-    """Shortcut for
-    ```python
+    """Shortcut for ```python.
+
     {"dto": Attrib(mark=mark_type)}
     ```
 
@@ -160,7 +161,6 @@ def mark(mark_type: Mark) -> DTOInfo:
         A `DTOInfo` suitable to pass to `info` param of `mapped_column`
     """
     return {"dto": Attrib(mark=mark_type)}
-
 
 
 def factory(
@@ -228,7 +228,8 @@ def dto(
     exclude: set[str] | None = None,
     mapper_bind: bool = True,
 ) -> type[BaseModel]:
-    """Create a pydantic model class from a SQLAlchemy declarative ORM class with validation support.
+    """Create a pydantic model class from a SQLAlchemy declarative ORM class
+    with validation support.
 
     This decorator is not recursive so relationships will be ignored (but can be
     overridden on the decorated class).
@@ -247,6 +248,7 @@ def dto(
         email: Mapped[str]
         password_hash: Mapped[str] = mapped_column(info={"dto": Attrib(mark=dto.Mark.SKIP)})
 
+
     @dto.dto(User, Purpose.WRITE)
     class UserCreate:
         @dto.validator("email")
@@ -263,8 +265,9 @@ def dto(
     class UserCreate:
         pass
 
+
     user = UserCreate(email="john@email.me")
-    user_model = user.mapper() # user_model is a User instance
+    user_model = user.mapper()  # user_model is a User instance
     ```
 
     Args:
