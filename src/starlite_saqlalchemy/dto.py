@@ -31,11 +31,12 @@ from sqlalchemy.orm import DeclarativeBase, Mapped
 
 from starlite_saqlalchemy import settings
 
+from .pydantic import _VALIDATORS
+
 if TYPE_CHECKING:
     from sqlalchemy import Column
     from sqlalchemy.orm import Mapper, RelationshipProperty
 
-from .pydantic import _VALIDATORS
 
 
 class Mark(str, Enum):
@@ -70,6 +71,7 @@ class Purpose(Enum):
 
 
 class DTOInfo(TypedDict):
+    """Represent dto infos suitable for info mapped_column infos param."""
     dto: Attrib
 
 
@@ -83,14 +85,16 @@ class Attrib(NamedTuple):
 
 
 class BaseConfig(BaseConfig_):
+    """Base config for generated pydantic models"""
     orm_mode = True
 
 
 class MapperBind(BaseModel):
+    """Produce an SQLAlchemy instance with values from a pydantic model."""
     __sqla_model__: type[DeclarativeBase]
 
     class Config(BaseConfig):
-        pass
+        """Config for MapperBind pydantic models."""
 
     def __init_subclass__(cls, model: type[DeclarativeBase]) -> None:
         cls.__sqla_model__ = model
@@ -100,13 +104,13 @@ class MapperBind(BaseModel):
         """Fill the binded SQLAlchemy model recursively with values from this
         dataclass."""
         as_model = {}
-        for f in self.__fields__.values():
-            v = getattr(self, f.name)
-            if isinstance(v, (list, tuple)):
-                v = [el.mapper() if isinstance(el, MapperBind) else el for el in v]
-            if isinstance(v, MapperBind):
-                v = v.mapper()
-            as_model[f.name] = v
+        for field in self.__fields__.values():
+            value = getattr(self, field.name)
+            if isinstance(value, (list, tuple)):
+                value = [el.mapper() if isinstance(el, MapperBind) else el for el in value]
+            if isinstance(value, MapperBind):
+                value = value.mapper()
+            as_model[field.name] = value
         return self.__sqla_model__(**as_model)
 
 
@@ -118,8 +122,7 @@ def _construct_field_info(elem: Column | RelationshipProperty, purpose: Purpose)
     if default is None:
         if not nullable:
             return FieldInfo(default=None)
-        else:
-            return FieldInfo(...)
+        return FieldInfo(...)
     if default.is_scalar:
         return FieldInfo(default=default.arg)
     if default.is_callable:

@@ -1,6 +1,10 @@
+"""
+Helpers for dto generated pydantic models.
+"""
+
 from collections import defaultdict
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Optional, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from pydantic import validator as pydantic_validator
 
@@ -24,7 +28,7 @@ def validator(
     """Same as `pydantic.validator` but works with models created with the
     `dto` decorator."""
 
-    def wrapper(f: "AnyCallable") -> "AnyCallable":
+    def wrapper(func: "AnyCallable") -> "AnyCallable":
         dec = pydantic_validator(
             *fields,
             pre=pre,
@@ -34,9 +38,9 @@ def validator(
             whole=whole,
             allow_reuse=allow_reuse,
         )
-        cls_name, f_name = f.__qualname__.split(".", maxsplit=1)
-        ref = f"{f.__module__}.{cls_name}"
-        _VALIDATORS[ref][f_name] = dec(f)
+        cls_name, f_name = func.__qualname__.split(".", maxsplit=1)
+        ref = f"{func.__module__}.{cls_name}"
+        _VALIDATORS[ref][f_name] = dec(func)
         return dec
 
     return wrapper
