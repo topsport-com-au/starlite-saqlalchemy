@@ -1,6 +1,4 @@
-"""
-Helpers for dto generated pydantic models.
-"""
+"""Helpers for dto generated pydantic models."""
 
 from collections import defaultdict
 from collections.abc import Callable

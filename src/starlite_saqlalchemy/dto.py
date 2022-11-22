@@ -38,7 +38,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Mapper, RelationshipProperty
 
 
-
 class Mark(str, Enum):
     """For marking column definitions on the domain models.
 
@@ -72,6 +71,7 @@ class Purpose(Enum):
 
 class DTOInfo(TypedDict):
     """Represent dto infos suitable for info mapped_column infos param."""
+
     dto: Attrib
 
 
@@ -85,12 +85,14 @@ class Attrib(NamedTuple):
 
 
 class BaseConfig(BaseConfig_):
-    """Base config for generated pydantic models"""
+    """Base config for generated pydantic models."""
+
     orm_mode = True
 
 
 class MapperBind(BaseModel):
     """Produce an SQLAlchemy instance with values from a pydantic model."""
+
     __sqla_model__: type[DeclarativeBase]
 
     class Config(BaseConfig):
