@@ -8,6 +8,7 @@ should always be private, or read-only at the model declaration layer.
 """
 from __future__ import annotations
 
+import sys
 from enum import Enum, auto
 from inspect import isclass
 from typing import (
@@ -18,9 +19,11 @@ from typing import (
     get_args,
     get_origin,
     get_type_hints,
+    TypedDict,
 )
 
-from pydantic import BaseConfig, BaseModel, create_model
+from pydantic import BaseConfig as BaseConfig_
+from pydantic import BaseModel, create_model
 from pydantic.fields import FieldInfo
 from sqlalchemy import inspect
 from sqlalchemy.orm import DeclarativeBase, Mapped
@@ -30,6 +33,8 @@ from starlite_saqlalchemy import settings
 if TYPE_CHECKING:
     from sqlalchemy import Column
     from sqlalchemy.orm import Mapper, RelationshipProperty
+
+from .pydantic import _VALIDATORS
 
 
 class Mark(str, Enum):
@@ -45,6 +50,10 @@ class Mark(str, Enum):
 
     READ_ONLY = "read-only"
     SKIP = "skip"
+
+
+class DTOInfo(TypedDict):
+    dto: Mark
 
 
 class Purpose(Enum):
@@ -72,10 +81,38 @@ class Attrib(NamedTuple):
     """If provided, used for the pydantic model for this attribute."""
 
 
+class BaseConfig(BaseConfig_):
+    orm_mode = True
+
+
+class MapperBind(BaseModel):
+    class Config(BaseConfig):
+        pass
+
+    def __init_subclass__(cls, model) -> None:
+        cls.__sqla_model__ = model
+        return super().__init_subclass__()
+
+    def mapper(self):
+        """Fill the binded SQLAlchemy model recursively with values from this dataclass."""
+        as_model = {}
+        for f in self.__fields__.values():
+            v = getattr(self, f.name)
+            if isinstance(v, (list, tuple)):
+                v = [el.mapper() if isinstance(el, BaseModel) else el for el in v]
+            if isinstance(v, BaseModel):
+                v = v.mapper()
+            as_model[f.name] = v
+        return self.__sqla_model__(**as_model)
+
+
 def _construct_field_info(elem: Column | RelationshipProperty, purpose: Purpose) -> FieldInfo:
     default = getattr(elem, "default", None)
-    if purpose is Purpose.READ or default is None:
+    nullable = getattr(elem, "nullable", False)
+    if purpose is Purpose.READ or (not nullable and default is None):
         return FieldInfo(...)
+    if nullable and default is None:
+        return FieldInfo(default=None)
     if default.is_scalar:
         return FieldInfo(default=default.arg)
     if default.is_callable:
@@ -97,6 +134,33 @@ def _should_exclude_field(
     if purpose is Purpose.WRITE and dto_attrib.mark is Mark.READ_ONLY:
         return True
     return False
+
+
+def mark(mark_type: Mark) -> DTOInfo:
+    """Shortcut for
+    ```python
+    {"dto": Attrib(mark=mark_type)}
+    ```
+
+    Example:
+
+    ```python
+    class User(DeclarativeBase):
+        id: Mapped[UUID] = mapped_column(
+            default=uuid4, primary_key=True, info=dto.mark(dto.Mark.READ_ONLY)
+        )
+        email: Mapped[str]
+        password_hash: Mapped[str] = mapped_column(info=dto.mark(dto.Mark.SKIP))
+    ```
+
+    Args:
+        mark_type: dto Mark
+
+    Returns:
+        A `DTOInfo` suitable to pass to `info` param of `mapped_column`
+    """
+    return {"dto": Attrib(mark=mark_type)}
+
 
 
 def factory(
@@ -152,7 +216,105 @@ def factory(
         fields[key] = (type_, _construct_field_info(elem, purpose))
     return create_model(  # type:ignore[no-any-return,call-overload]
         name,
-        __config__=type("Config", (BaseConfig,), {"orm_mode": True}),
+        __config__=type("Config", (BaseConfig,), {}),
         __module__=getattr(model, "__module__", "starlite_saqlalchemy.dto"),
         **fields,
     )
+
+
+def dto(
+    model: type[DeclarativeBase],
+    purpose: Purpose,
+    exclude: set[str] | None = None,
+    mapper_bind: bool = True,
+) -> type[BaseModel]:
+    """Create a pydantic model class from a SQLAlchemy declarative ORM class with validation support.
+
+    This decorator is not recursive so relationships will be ignored (but can be
+    overridden on the decorated class).
+
+    Pydantic validation is supported using `validator` decorator from `starlite_sqlalchemy.pydantic`
+
+    As for the `factory` function, included fields can be controlled on the SQLAlchemy class
+    definition by including a "dto" key in the `Column.info` mapping.
+
+    Example:
+    ```python
+    class User(DeclarativeBase):
+        id: Mapped[UUID] = mapped_column(
+            default=uuid4, primary_key=True, info={"dto": Attrib(mark=dto.Mark.READ_ONLY)}
+        )
+        email: Mapped[str]
+        password_hash: Mapped[str] = mapped_column(info={"dto": Attrib(mark=dto.Mark.SKIP)})
+
+    @dto.dto(User, Purpose.WRITE)
+    class UserCreate:
+        @dto.validator("email")
+        def val_email(cls, v):
+            if "@" not in v:
+                raise ValueError("Invalid email")
+    ```
+
+    When setting `mapper_bind` (default to `True`), the resulting pydantic model will have a `mapper` method
+    that can be used to create an instance of the original SQLAlchemy model with values from the pydantic one:
+
+    ```python
+    @dto.dto(User, Purpose.WRITE)
+    class UserCreate:
+        pass
+
+    user = UserCreate(email="john@email.me")
+    user_model = user.mapper() # user_model is a User instance
+    ```
+
+    Args:
+        model: The SQLAlchemy model class.
+        purpose: Is the DTO for write or read operations?
+        exclude: Explicitly exclude attributes from the DTO.
+        mapper_bind: Add a `mapper()` method that return an instance of the original SQLAlchemy model with values from the pydantic model.
+    Returns:
+        A Pydantic model that includes only fields that are appropriate to `purpose` and not in
+        `exclude`, except relationship fields.
+    """
+
+    def wrapper(cls):
+        def wrapped():
+            exclude_ = exclude or set[str]()
+            mapper = cast("Mapper", inspect(model))
+            columns = mapper.columns
+            relationships = mapper.relationships
+            fields: dict[str, tuple[Any, FieldInfo]] = {}
+            name = cls.__name__
+            namespace = {
+                **sys.modules[model.__module__].__dict__,
+                **sys.modules[cls.__module__].__dict__,
+            }
+            type_hints = {
+                **get_type_hints(model, localns=namespace),
+                **cls.__annotations__,
+            }
+            for key, type_hint in type_hints.items():
+                elem: Column | RelationshipProperty
+                try:
+                    elem = columns[key]
+                except KeyError:
+                    elem = relationships[key]
+                attrib = _get_dto_attrib(elem)
+                if _should_exclude_field(purpose, elem, exclude_, attrib):
+                    continue
+                type_ = type_hint
+                if key in relationships and key not in cls.__annotations__:
+                    continue
+                fields[key] = (type_, _construct_field_info(elem, purpose))
+            return create_model(  # type:ignore[no-any-return,call-overload]
+                name,
+                __module__=getattr(model, "__module__", __name__),
+                __base__=MapperBind if mapper_bind else None,
+                __cls_kwargs__={"model": model},
+                __validators__=_VALIDATORS[f"{cls.__module__}.{cls.__name__}"],
+                **fields,
+            )
+
+        return wrapped()
+
+    return wrapper
