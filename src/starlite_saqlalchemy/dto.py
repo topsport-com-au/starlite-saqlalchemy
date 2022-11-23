@@ -287,7 +287,7 @@ def decorator(
     model: type[DeclarativeBase],
     purpose: Purpose,
     exclude: set[str] | None = None,
-    base: type[BaseModel] | None = None,
+    base: type[BaseModel] | None = MapperBind,
 ) -> Callable[[type], type[BaseModel]]:
     """Create a pydantic model class from a SQLAlchemy declarative ORM class
     with validation support.
