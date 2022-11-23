@@ -8,13 +8,12 @@ should always be private, or read-only at the model declaration layer.
 """
 from __future__ import annotations
 
-import sys
-from collections.abc import Callable
 from enum import Enum, auto
-from inspect import isclass
+from inspect import get_annotations, getmodule, isclass
 from typing import (
     TYPE_CHECKING,
     Any,
+    ClassVar,
     NamedTuple,
     TypedDict,
     cast,
@@ -34,8 +33,13 @@ from starlite_saqlalchemy import settings
 from .pydantic import _VALIDATORS
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from pydantic.typing import AnyClassMethod
     from sqlalchemy import Column
     from sqlalchemy.orm import Mapper, RelationshipProperty
+    from sqlalchemy.sql.base import ReadOnlyColumnCollection
+    from sqlalchemy.util import ReadOnlyProperties
 
 
 class Mark(str, Enum):
@@ -93,25 +97,34 @@ class BaseConfig(BaseConfig_):
 class MapperBind(BaseModel):
     """Produce an SQLAlchemy instance with values from a pydantic model."""
 
-    __sqla_model__: type[DeclarativeBase]
+    __sqla_model__: ClassVar[type[DeclarativeBase]]
 
     class Config(BaseConfig):
         """Config for MapperBind pydantic models."""
 
-    def __init_subclass__(cls, model: type[DeclarativeBase]) -> None:
-        cls.__sqla_model__ = model
-        return super().__init_subclass__()
+    @classmethod
+    def __init_subclass__(cls, model: type[DeclarativeBase], *args: Any, **kwargs: Any) -> None:
+        """Set `__sqla_model__` class var.
 
-    def mapper(self) -> DeclarativeBase:
-        """Fill the binded SQLAlchemy model recursively with values from this
-        dataclass."""
+        Args:
+            model: SQLAlchemy model represented by the DTO.
+        """
+        cls.__sqla_model__ = model
+        return super().__init_subclass__(*args, **kwargs)
+
+    def to_mapped(self) -> DeclarativeBase:
+        """Create an instance of `self.__sqla_model__`
+
+        Fill the bound SQLAlchemy model recursively with values from
+        this dataclass.
+        """
         as_model = {}
         for field in self.__fields__.values():
             value = getattr(self, field.name)
             if isinstance(value, (list, tuple)):
-                value = [el.mapper() if isinstance(el, MapperBind) else el for el in value]
+                value = [el.to_mapped() if isinstance(el, MapperBind) else el for el in value]
             if isinstance(value, MapperBind):
-                value = value.mapper()
+                value = value.to_mapped()
             as_model[field.name] = value
         return self.__sqla_model__(**as_model)
 
@@ -148,6 +161,15 @@ def _should_exclude_field(
     return False
 
 
+def _inspect_model(
+    model: type[DeclarativeBase],
+) -> tuple[ReadOnlyColumnCollection[str, Column], ReadOnlyProperties[RelationshipProperty]]:
+    mapper = cast("Mapper", inspect(model))
+    columns = mapper.columns
+    relationships = mapper.relationships
+    return columns, relationships
+
+
 def mark(mark_type: Mark) -> DTOInfo:
     """Shortcut for ```python.
 
@@ -174,8 +196,15 @@ def mark(mark_type: Mark) -> DTOInfo:
     return {"dto": Attrib(mark=mark_type)}
 
 
-def factory(
-    name: str, model: type[DeclarativeBase], purpose: Purpose, exclude: set[str] | None = None
+def factory(  # pylint: disable=too-many-locals
+    name: str,
+    model: type[DeclarativeBase],
+    purpose: Purpose,
+    exclude: set[str] | None = None,
+    namespace: dict[str, Any] | None = None,
+    annotations: dict[str, Any] | None = None,
+    validators: dict[str, AnyClassMethod] | None = None,
+    base: type[BaseModel] | None = MapperBind,
 ) -> type[BaseModel]:
     """Create a pydantic model class from a SQLAlchemy declarative ORM class.
 
@@ -200,44 +229,65 @@ def factory(
         model: The SQLAlchemy model class.
         purpose: Is the DTO for write or read operations?
         exclude: Explicitly exclude attributes from the DTO.
+        namespace: Additional namespace used to resolve forward references. The default namespace
+            used is that of the module of `model`.
+        annotations: Annotations that override and supplement the annotations derived from `model`.
+        validators: Mapping of attribute name, to pydantic validators.
+        base: A subclass of `pydantic.BaseModel` to be used as the base class of the DTO.
 
     Returns:
         A Pydantic model that includes only fields that are appropriate to `purpose` and not in
         `exclude`.
     """
-    exclude = exclude or set[str]()
-    mapper = cast("Mapper", inspect(model))
-    columns = mapper.columns
-    relationships = mapper.relationships
+    exclude_ = exclude or set[str]()
+    annotations_ = annotations or {}
+    namespace_ = namespace or {}
+    validators_ = validators or {}
+    del exclude, annotations, namespace, validators
+    columns, relationships = _inspect_model(model)
+    model_module = getmodule(model)
+    localns = vars(model_module) if model_module is not None else {}
+    localns.update(namespace_)
+    type_hints = get_type_hints(model, localns=localns)
+    type_hints.update(annotations_)
     fields: dict[str, tuple[Any, FieldInfo]] = {}
-    for key, type_hint in get_type_hints(model).items():
-        if get_origin(type_hint) is not Mapped:
+    for key, type_hint in type_hints.items():
+        if get_origin(type_hint) is Mapped:
+            (type_,) = get_args(type_hint)
+        elif type_hint in annotations_:
+            type_ = type_hint
+        else:
             continue
+
         elem: Column | RelationshipProperty
         try:
             elem = columns[key]
         except KeyError:
             elem = relationships[key]
         attrib = _get_dto_attrib(elem)
-        if _should_exclude_field(purpose, elem, exclude, attrib):
+        if _should_exclude_field(purpose, elem, exclude_, attrib):
             continue
-        (type_,) = get_args(type_hint)
+
         if isclass(type_) and issubclass(type_, DeclarativeBase):
             type_ = factory(f"{name}_{type_.__name__}", type_, purpose=purpose)
+
         fields[key] = (type_, _construct_field_info(elem, purpose))
+
     return create_model(  # type:ignore[no-any-return,call-overload]
         name,
-        __config__=type("Config", (BaseConfig,), {}),
-        __module__=getattr(model, "__module__", "starlite_saqlalchemy.dto"),
+        __module__=getattr(model, "__module__", __name__),
+        __base__=base,
+        __cls_kwargs__={"model": model},
+        __validators__=validators_ or {},
         **fields,
     )
 
 
-def dto(
+def decorator(
     model: type[DeclarativeBase],
     purpose: Purpose,
     exclude: set[str] | None = None,
-    mapper_bind: bool = True,
+    base: type[BaseModel] | None = MapperBind,
 ) -> Callable[[type], type[BaseModel]]:
     """Create a pydantic model class from a SQLAlchemy declarative ORM class
     with validation support.
@@ -285,7 +335,8 @@ def dto(
         model: The SQLAlchemy model class.
         purpose: Is the DTO for write or read operations?
         exclude: Explicitly exclude attributes from the DTO.
-        mapper_bind: Add a `mapper()` method that return an instance of the original SQLAlchemy model with values from the pydantic model.
+        base: Used as base class for DTO if provided.
+
     Returns:
         A Pydantic model that includes only fields that are appropriate to `purpose` and not in
         `exclude`, except relationship fields.
@@ -293,40 +344,18 @@ def dto(
 
     def wrapper(cls: type) -> type[BaseModel]:
         def wrapped() -> type[BaseModel]:
-            exclude_ = exclude or set[str]()
-            mapper = cast("Mapper", inspect(model))
-            columns = mapper.columns
-            relationships = mapper.relationships
-            fields: dict[str, tuple[Any, FieldInfo]] = {}
             name = cls.__name__
-            namespace = {
-                **sys.modules[model.__module__].__dict__,
-                **sys.modules[cls.__module__].__dict__,
-            }
-            type_hints = {
-                **get_type_hints(model, localns=namespace),
-                **cls.__annotations__,
-            }
-            for key, type_hint in type_hints.items():
-                elem: Column | RelationshipProperty
-                try:
-                    elem = columns[key]
-                except KeyError:
-                    elem = relationships[key]
-                attrib = _get_dto_attrib(elem)
-                if _should_exclude_field(purpose, elem, exclude_, attrib):
-                    continue
-                type_ = type_hint
-                if key in relationships and key not in cls.__annotations__:
-                    continue
-                fields[key] = (type_, _construct_field_info(elem, purpose))
-            return create_model(  # type:ignore[no-any-return,call-overload]
-                name,
-                __module__=getattr(model, "__module__", __name__),
-                __base__=MapperBind if mapper_bind else None,
-                __cls_kwargs__={"model": model},
-                __validators__=_VALIDATORS[f"{cls.__module__}.{cls.__name__}"],
-                **fields,
+            cls_module = getmodule(cls)
+            namespace = vars(cls_module) if cls_module is not None else {}
+            return factory(
+                name=name,
+                model=model,
+                purpose=purpose,
+                exclude=exclude,
+                namespace=namespace,
+                annotations=get_annotations(cls),
+                validators=_VALIDATORS[f"{cls.__module__}.{cls.__name__}"],
+                base=base,
             )
 
         return wrapped()
