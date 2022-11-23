@@ -1,17 +1,19 @@
 """Helpers for dto generated pydantic models."""
+from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Callable
 from typing import TYPE_CHECKING, TypeVar
 
 from pydantic import validator as pydantic_validator
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from pydantic.typing import AnyCallable, AnyClassMethod
 
 SQLAlchemyModel = TypeVar("SQLAlchemyModel")
 
-_VALIDATORS: dict[str, dict[str, "AnyClassMethod"]] = defaultdict(dict)
+_VALIDATORS: dict[str, dict[str, AnyClassMethod]] = defaultdict(dict)
 
 
 def validator(
@@ -22,11 +24,14 @@ def validator(
     check_fields: bool = True,
     whole: bool = True,
     allow_reuse: bool = False,
-) -> Callable[["AnyCallable"], "AnyCallable"]:
-    """Same as `pydantic.validator` but works with models created with the
-    `dto` decorator."""
+) -> Callable[[AnyCallable], AnyCallable]:
+    """Validate value on instantiation.
 
-    def wrapper(func: "AnyCallable") -> "AnyCallable":
+    Same as `pydantic.validator` but works with models created with the
+    `dto` decorator.
+    """
+
+    def wrapper(func: AnyCallable) -> AnyCallable:
         dec = pydantic_validator(
             *fields,
             pre=pre,
