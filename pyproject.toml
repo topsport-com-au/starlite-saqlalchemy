@@ -90,6 +90,7 @@ testpaths = ["tests/unit"]
 [tool.pylint.main]
 disable = [
     "line-too-long",
+    "no-self-argument",
     "too-many-arguments",
 ]
 enable = "useless-suppression"

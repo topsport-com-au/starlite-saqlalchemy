@@ -1,12 +1,13 @@
 """Tests for the dto factory."""
 # pylint: disable=redefined-outer-name,too-few-public-methods,missing-class-docstring
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING, Any, ClassVar
 from uuid import UUID, uuid4
 
 import pytest
+from pydantic import BaseModel, constr, validator
 from sqlalchemy import func
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_column
 
 from starlite_saqlalchemy import dto, settings
 from tests.utils.domain import Author
@@ -167,3 +168,80 @@ class Test(orm.Base):
     assert all(isinstance(model.__annotations__[k], str) for k in ("hello", "related"))
     dto_model = dto.factory("TestDTO", module.Test, purpose=dto.Purpose.READ)
     assert all(not isinstance(dto_model.__annotations__[k], str) for k in ("hello", "related"))
+
+
+def test_dto_decorator() -> None:
+    """Test dto decorator.
+
+    Test ensures that fields defined on the decorated class aren't
+    overwritten by factory(), that fields not defined on the decorated
+    class are added to the DTO, and that validators work for fields that
+    are added both statically, and dynamically (with the
+    `check_fields=False` flag).
+    """
+
+    @dto.decorator(Author, dto.Purpose.WRITE)
+    class AuthorDTO(BaseModel):
+        name: constr(to_upper=True)  # pyright:ignore
+
+        @validator("name")
+        def validate_name(cls, val: str) -> str:
+            """We're shouting!"""
+            return f"{val}!"
+
+        @validator("dob", check_fields=False)
+        def validate_dob(cls, val: date) -> date:
+            """Off by one."""
+            val += timedelta(days=1)
+            return val
+
+    assert AuthorDTO.parse_obj({"name": "Bill Bryson", "dob": "1951-12-08"}).dict() == {
+        "name": "BILL BRYSON!",
+        "dob": date(1951, 12, 9),
+    }
+
+
+def test_dto_attrib_validator(base: type[DeclarativeBase]) -> None:
+    """Test arbitrary single arg callables as validators."""
+
+    validator_called = False
+
+    def validate_datetime(val: datetime) -> datetime:
+        nonlocal validator_called
+        validator_called = True
+        return val
+
+    class Model(base):
+        __tablename__ = "smth"
+        field: Mapped[datetime] = mapped_column(
+            info={settings.api.DTO_INFO_KEY: dto.Attrib(validators=[validate_datetime])}
+        )
+
+    dto_model = dto.factory("DTO", Model, purpose=dto.Purpose.WRITE)
+    dto_model.parse_obj({"id": 1, "field": datetime.min})
+    assert validator_called
+
+
+def test_dto_attrib_pydantic_type(base: type[DeclarativeBase]) -> None:
+    """Test declare pydantic type on `dto.Attrib`."""
+
+    class Model(base):
+        __tablename__ = "smth"
+        field: Mapped[str] = mapped_column(
+            info={settings.api.DTO_INFO_KEY: dto.Attrib(pydantic_type=constr(to_upper=True))}
+        )
+
+    dto_model = dto.factory("DTO", Model, purpose=dto.Purpose.WRITE)
+    assert dto_model.parse_obj({"id": 1, "field": "lower"}).dict() == {"id": 1, "field": "LOWER"}
+
+
+def test_dto_mapped_as_dataclass_model_type(base: type[DeclarativeBase]) -> None:
+    """Test declare pydantic type on `dto.Attrib`."""
+
+    class Model(MappedAsDataclass, base):
+        __tablename__ = "smth"
+        clz_var: ClassVar[str]
+        field: Mapped[str]
+
+    dto_model = dto.factory("DTO", Model, purpose=dto.Purpose.WRITE)
+    assert dto_model.__fields__.keys() == {"id", "field"}
