@@ -1,7 +1,7 @@
 """Example domain objects for testing."""
 from __future__ import annotations
 
-from datetime import date  # noqa: TC003
+from datetime import date
 
 from sqlalchemy.orm import Mapped
 

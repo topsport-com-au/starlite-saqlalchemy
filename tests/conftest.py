@@ -14,6 +14,8 @@ from structlog.testing import CapturingLogger
 
 import starlite_saqlalchemy
 from starlite_saqlalchemy import ConfigureApp, log
+from tests.utils.domain.authors import Author
+from tests.utils.domain.books import Book
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -44,8 +46,8 @@ def fx_capturing_logger(monkeypatch: MonkeyPatch) -> CapturingLogger:
     return cap_logger
 
 
-@pytest.fixture()
-def app() -> Starlite:
+@pytest.fixture(name="app")
+def fx_app() -> Starlite:
     """Always use this `app` fixture and never do `from app.main import app`
     inside a test module. We need to delay import of the `app.main` module
     until as late as possible to ensure we can mock everything necessary before
@@ -57,14 +59,10 @@ def app() -> Starlite:
     return Starlite(route_handlers=[], on_app_init=[ConfigureApp()], openapi_config=None)
 
 
-@pytest.fixture()
-def raw_authors() -> list[dict[str, Any]]:
-    """
+@pytest.fixture(name="raw_authors")
+def fx_raw_authors() -> list[dict[str, Any]]:
+    """Unstructured author representations."""
 
-    Returns:
-        Raw set of author data that can either be inserted into tables for integration tests, or
-        used to create `Author` instances for unit tests.
-    """
     return [
         {
             "id": UUID("97108ac1-ffcb-411d-8b1e-d9183399f63b"),
@@ -83,8 +81,35 @@ def raw_authors() -> list[dict[str, Any]]:
     ]
 
 
-@pytest.fixture()
-def create_module(tmp_path: Path, monkeypatch: MonkeyPatch) -> Callable[[str], ModuleType]:
+@pytest.fixture(name="authors")
+def fx_authors(raw_authors: list[dict[str, Any]]) -> list[Author]:
+    """Collection of parsed Author models."""
+    return [Author(**raw) for raw in raw_authors]
+
+
+@pytest.fixture(name="raw_books")
+def fx_raw_books() -> list[dict[str, Any]]:
+    """Unstructured book representations."""
+    return [
+        {
+            "id": UUID("f34545b9-663c-4fce-915d-dd1ae9cea42a"),
+            "title": "Murder on the Orient Express",
+            "author_id": UUID("97108ac1-ffcb-411d-8b1e-d9183399f63b"),
+            "created": datetime.min,
+            "updated": datetime.min,
+        },
+    ]
+
+
+@pytest.fixture(name="books")
+def fx_books(raw_books: list[dict[str, Any]], authors: list[Author]) -> list[Book]:
+    """Collection of parsed Book models."""
+    author_id_map = {author.id: author for author in authors}
+    return [Book(**raw, author=author_id_map[raw["author_id"]]) for raw in raw_books]
+
+
+@pytest.fixture(name="create_module")
+def fx_create_module(tmp_path: Path, monkeypatch: MonkeyPatch) -> Callable[[str], ModuleType]:
     """Utility fixture for dynamic module creation."""
 
     def wrapped(source: str) -> ModuleType:

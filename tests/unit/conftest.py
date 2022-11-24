@@ -1,7 +1,7 @@
 """Unit test specific config."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
 import pytest
@@ -12,12 +12,15 @@ from starlite.testing import TestClient
 
 from starlite_saqlalchemy import sqlalchemy_plugin, worker
 from starlite_saqlalchemy.testing import GenericMockRepository
+from tests.utils.domain.authors import Author
+from tests.utils.domain.authors import Service as AuthorService
+from tests.utils.domain.books import Book
+from tests.utils.domain.books import Service as BookService
 
-from ..utils import controllers, domain
+from ..utils import controllers
 
 if TYPE_CHECKING:
     from collections import abc
-    from uuid import UUID
 
     from starlite import Starlite
     from starlite.types import HTTPResponseBodyEvent, HTTPResponseStartEvent, HTTPScope
@@ -45,18 +48,62 @@ def _patch_worker() -> abc.Iterator:
 
 
 @pytest.fixture(autouse=True)
-def _author_repository(raw_authors: list[dict[str, Any]], monkeypatch: pytest.MonkeyPatch) -> None:
-    AuthorRepository = GenericMockRepository[domain.Author]
-    collection: dict[UUID, domain.Author] = {}
-    for raw_author in raw_authors:
-        author = domain.Author(**raw_author)
-        collection[getattr(author, AuthorRepository.id_attribute)] = author
-    monkeypatch.setattr(AuthorRepository, "collection", collection)
-    monkeypatch.setattr(domain.Service, "repository_type", AuthorRepository)
+def _clear_mock_repo_collections() -> None:
+    """Ensure all tests start with fresh collections."""
+    # pylint: disable=protected-access
+    GenericMockRepository._collections = {}  # type:ignore[misc]
 
 
-@pytest.fixture()
-def client(app: Starlite) -> abc.Iterator[TestClient]:
+@pytest.fixture(name="author_repository_type")
+def fx_author_repository_type(
+    authors: list[Author], monkeypatch: pytest.MonkeyPatch
+) -> type[GenericMockRepository[Author]]:
+    """Mock Author repository, pre-seeded with collection data."""
+
+    class AuthorRepository(GenericMockRepository[Author]):
+        """Mock Author repo."""
+
+        model_type = Author
+
+    AuthorRepository.seed_collection(authors)
+    monkeypatch.setattr(AuthorService, "repository_type", AuthorRepository)
+    return AuthorRepository
+
+
+@pytest.fixture(name="author_repository")
+def fx_author_repository(
+    author_repository_type: type[GenericMockRepository[Author]],
+) -> GenericMockRepository[Author]:
+    """Mock Author repository instance."""
+    return author_repository_type()
+
+
+@pytest.fixture(name="book_repository_type")
+def fx_book_repository_type(
+    books: list[Book], monkeypatch: pytest.MonkeyPatch
+) -> type[GenericMockRepository[Book]]:
+    """Mock Book repository, pre-seeded with collection data."""
+
+    class BookRepository(GenericMockRepository[Book]):
+        """Mock book repo."""
+
+        model_type = Book
+
+    BookRepository.seed_collection(books)
+    monkeypatch.setattr(BookService, "repository_type", BookRepository)
+    return BookRepository
+
+
+@pytest.fixture(name="book_repository")
+def fx_book_repository(
+    book_repository_type: type[GenericMockRepository[Book]],
+) -> GenericMockRepository[Book]:
+    """Mock Book repo instance."""
+    return book_repository_type()
+
+
+@pytest.fixture(name="client")
+def fx_client(app: Starlite) -> abc.Iterator[TestClient]:
     """Client instance attached to app.
 
     Args:
