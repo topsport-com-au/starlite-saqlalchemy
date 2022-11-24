@@ -3,7 +3,7 @@ import datetime
 from unittest.mock import MagicMock
 
 from starlite_saqlalchemy.db import orm
-from tests.utils.domain import Author, CreateDTO
+from tests.utils.domain.authors import Author, CreateDTO
 
 
 def test_sqla_touch_updated_timestamp() -> None:

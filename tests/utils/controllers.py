@@ -8,7 +8,7 @@ from starlite import Dependency, delete, get, post, put
 from starlite.status_codes import HTTP_200_OK
 
 from starlite_saqlalchemy.repository.types import FilterTypes
-from tests.utils.domain import Author, CreateDTO, ReadDTO, Service, UpdateDTO
+from tests.utils.domain.authors import Author, CreateDTO, ReadDTO, Service, UpdateDTO
 
 DETAIL_ROUTE = "/{author_id:uuid}"
 
