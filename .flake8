@@ -13,4 +13,4 @@ per-file-ignores =
     tests/*:SCS108,PT013
     tests/integration/test_tests.py:TC002,SCS108
     tests/unit/lib/test_dependencies.py:TC,SCS108
-    tests/utils/controllers.py:TC
+    tests/utils/*:TC
