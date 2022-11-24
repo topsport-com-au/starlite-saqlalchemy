@@ -190,6 +190,7 @@ jobs:
     name: SonarCloud
     runs-on: ubuntu-latest
     needs: coverage
+    if: github.event.pull_request.head.repo.fork == false
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
@@ -218,7 +219,6 @@ jobs:
       - mypy
       - pylint
       - pyright
-      - sonarcloud
       - tests
     runs-on: Ubuntu-latest
     steps:
