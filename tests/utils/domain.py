@@ -3,12 +3,13 @@ from __future__ import annotations
 
 from datetime import date  # noqa: TC003
 
+from pydantic import BaseModel
 from sqlalchemy.orm import Mapped
 
 from starlite_saqlalchemy import db, dto, repository, service
 
 
-class Author(db.orm.Base):  # pylint: disable=too-few-public-methods
+class Author(db.orm.Base):
     """The Author domain object."""
 
     name: Mapped[str]
@@ -27,15 +28,16 @@ class Service(service.Service[Author]):
     repository_type = Repository
 
 
-CreateDTO = dto.factory("AuthorCreateDTO", Author, purpose=dto.Purpose.WRITE, exclude={"id"})
-"""
-A pydantic model to validate `Author` creation data.
-"""
-ReadDTO = dto.factory("AuthorReadDTO", Author, purpose=dto.Purpose.READ)
+@dto.decorator(Author, dto.Purpose.WRITE)
+class CreateDTO(BaseModel):
+    """A pydantic model to validate `Author` creation data."""
+
+
+ReadDTO = dto.factory("AuthorReadDTO", Author, dto.Purpose.READ)
 """
 A pydantic model to serialize outbound `Author` representations.
 """
-UpdateDTO = dto.factory("AuthorUpdateDTO", Author, purpose=dto.Purpose.WRITE)
+UpdateDTO = dto.factory("AuthorUpdateDTO", Author, dto.Purpose.WRITE)
 """
 A pydantic model to validate and deserialize `Author` update data.
 """

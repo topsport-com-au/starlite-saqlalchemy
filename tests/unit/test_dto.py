@@ -1,5 +1,5 @@
 """Tests for the dto factory."""
-# pylint: disable=redefined-outer-name,too-few-public-methods,missing-class-docstring
+# pylint: disable=missing-class-docstring
 from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING, Any, ClassVar
 from uuid import UUID, uuid4
@@ -10,7 +10,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_column
 
 from starlite_saqlalchemy import dto, settings
-from tests.utils.domain import Author
+from tests.utils.domain import Author, CreateDTO
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -50,8 +50,8 @@ def test_dto_exclude() -> None:
     assert dto_type.__fields__.keys() == {"name", "dob", "created", "updated"}
 
 
-@pytest.fixture()
-def base() -> type[DeclarativeBase]:
+@pytest.fixture(name="base")
+def fx_base() -> type[DeclarativeBase]:
     """Declarative base for test models.
 
     Need a new base for every test, otherwise will get errors to do with
@@ -245,3 +245,11 @@ def test_dto_mapped_as_dataclass_model_type(base: type[DeclarativeBase]) -> None
 
     dto_model = dto.factory("DTO", Model, purpose=dto.Purpose.WRITE)
     assert dto_model.__fields__.keys() == {"id", "field"}
+
+
+def test_from_dto() -> None:
+    """Test conversion of a DTO instance to a model instance."""
+    data = CreateDTO.parse_obj({"name": "someone", "dob": "1982-03-22"})
+    author = data.to_mapped()
+    assert author.name == "someone"
+    assert author.dob == date(1982, 3, 22)

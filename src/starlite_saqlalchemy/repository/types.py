@@ -19,7 +19,7 @@ FilterTypes = BeforeAfter | CollectionFilter[Any] | LimitOffset
 T = TypeVar("T")
 
 
-class ModelProtocol(Protocol):  # pylint: disable=too-few-public-methods
+class ModelProtocol(Protocol):
     """Protocol for repository models."""
 
     @classmethod

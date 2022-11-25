@@ -91,6 +91,7 @@ testpaths = ["tests/unit"]
 disable = [
     "line-too-long",
     "no-self-argument",
+    "too-few-public-methods",
     "too-many-arguments",
 ]
 enable = "useless-suppression"

@@ -8,7 +8,7 @@ from starlite import Dependency, delete, get, post, put
 from starlite.status_codes import HTTP_200_OK
 
 from starlite_saqlalchemy.repository.types import FilterTypes
-from tests.utils.domain import Author, CreateDTO, ReadDTO, Service, UpdateDTO
+from tests.utils.domain import CreateDTO, ReadDTO, Service, UpdateDTO
 
 DETAIL_ROUTE = "/{author_id:uuid}"
 
@@ -30,7 +30,7 @@ async def get_authors(
 @post()
 async def create_author(data: CreateDTO, service: Service) -> ReadDTO:
     """Create an `Author`."""
-    return ReadDTO.from_orm(await service.create(Author.from_dto(data)))
+    return ReadDTO.from_orm(await service.create(data.to_mapped()))
 
 
 @get(DETAIL_ROUTE)
@@ -42,7 +42,7 @@ async def get_author(service: Service, author_id: UUID) -> ReadDTO:
 @put(DETAIL_ROUTE)
 async def update_author(data: UpdateDTO, service: Service, author_id: UUID) -> ReadDTO:
     """Update an author."""
-    return ReadDTO.from_orm(await service.update(author_id, Author.from_dto(data)))
+    return ReadDTO.from_orm(await service.update(author_id, data.to_mapped()))
 
 
 @delete(DETAIL_ROUTE, status_code=HTTP_200_OK)
