@@ -10,7 +10,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_column
 
 from starlite_saqlalchemy import dto, settings
-from tests.utils.domain import Author, CreateDTO
+from tests.utils.domain.authors import Author, CreateDTO
 
 if TYPE_CHECKING:
     from collections.abc import Callable
