@@ -40,18 +40,18 @@ ReadDTO = dto.factory("UserReadDTO", model=User, purpose=dto.Purpose.READ)
 WriteDTO = dto.factory("UserWriteDTO", model=User, purpose=dto.Purpose.WRITE)
 ```
 
-#### dto.Attrib
+#### dto.Field
 
-The `dto.Attrib` object is a container for configuring how the generated DTO object should reflect
+The `dto.Field` object is a container for configuring how the generated DTO object should reflect
 the SQLAlchemy model field.
 
 Define this in the SQLAlchemy `info` parameter to `mapped_column()`, for example,
-`mapped_column(info={"dto": dto.Attrib()})`.
+`mapped_column(info={"dto": dto.Field()})`.
 
-The DTO Attrib object has two values that can be set:
+The DTO Field object has two values that can be set:
 
-- `dto.Attrib.mark`: a value of the enum [`dto.Mark`](.. /reference/starlite_saqlalchemy/dto/#Mark).
-- `dto.Attrib.pydantic_field`: return value of the pydantic
+- `dto.Field.mark`: a value of the enum [`dto.Mark`](.. /reference/starlite_saqlalchemy/dto/#Mark).
+- `dto.Field.pydantic_field`: return value of the pydantic
   [`Field`](https://pydantic-docs.helpmanual.io/usage/schema/#field-customization) function that
   will be used to construct the pydantic model field for the model attribute.
 
@@ -73,9 +73,9 @@ from starlite_saqlalchemy import dto, orm
 
 class User(orm.Base):
     name: str
-    password_hash: str = mapped_column(info={"dto": dto.Attrib(mark=dto.Mark.SKIP)})
+    password_hash: str = mapped_column(info={"dto": dto.Field(mark=dto.Mark.SKIP)})
     updated_at: datetime = mapped_column(
-        info={"dto": dto.Attrib(mark=dto.Mark.READ_ONLY)}
+        info={"dto": dto.Field(mark=dto.Mark.READ_ONLY)}
     )
 
 
@@ -110,15 +110,15 @@ class Base(DeclarativeBase):
     id: Mapped[UUID] = mapped_column(
         default=uuid4,
         primary_key=True,
-        info={"dto": dto.Attrib(mark=dto.Mark.READ_ONLY)},
+        info={"dto": dto.Field(mark=dto.Mark.READ_ONLY)},
     )
     """Primary key column."""
     created: Mapped[datetime] = mapped_column(
-        default=datetime.now, info={"dto": dto.Attrib(mark=dto.Mark.READ_ONLY)}
+        default=datetime.now, info={"dto": dto.Field(mark=dto.Mark.READ_ONLY)}
     )
     """Date/time of instance creation."""
     updated: Mapped[datetime] = mapped_column(
-        default=datetime.now, info={"dto": dto.Attrib(mark=dto.Mark.READ_ONLY)}
+        default=datetime.now, info={"dto": dto.Field(mark=dto.Mark.READ_ONLY)}
     )
 ```
 

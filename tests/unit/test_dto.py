@@ -1,16 +1,16 @@
 """Tests for the dto factory."""
 # pylint: disable=missing-class-docstring
 from datetime import date, datetime, timedelta
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar
 from uuid import UUID, uuid4
 
 import pytest
-from pydantic import BaseModel, constr, validator
+from pydantic import constr, validator
 from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_column
 
 from starlite_saqlalchemy import dto, settings
-from tests.utils.domain.authors import Author, CreateDTO
+from tests.utils.domain.authors import Author, WriteDTO
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 def test_model_write_dto(raw_authors: list[dict[str, Any]]) -> None:
     """Create a model from DTO instance and check the values on the model."""
-    dto_type = dto.factory("AuthorDTO", Author, dto.Purpose.WRITE)
+    dto_type = dto.FromMapped[Annotated[Author, dto.config("write")]]
     assert dto_type.__fields__.keys() == {"name", "dob"}
     inst = dto_type(**raw_authors[0])
     model = Author(**inst.dict(exclude_unset=True))
@@ -31,7 +31,7 @@ def test_model_write_dto(raw_authors: list[dict[str, Any]]) -> None:
 
 def test_model_read_dto(raw_authors: list[dict[str, Any]]) -> None:
     """Create a model from DTO instance and check the values on the model."""
-    dto_type = dto.factory("AuthorDTO", Author, dto.Purpose.READ)
+    dto_type = dto.FromMapped[Annotated[Author, dto.config("read")]]
     assert dto_type.__fields__.keys() == {"name", "dob", "id", "created", "updated"}
     inst = dto_type(**raw_authors[1])
     model = Author(**inst.dict(exclude_unset=True))
@@ -46,7 +46,7 @@ def test_model_read_dto(raw_authors: list[dict[str, Any]]) -> None:
 
 def test_dto_exclude() -> None:
     """Test that names in `exclude` are not included in DTO."""
-    dto_type = dto.factory("AuthorDTO", Author, dto.Purpose.READ, exclude={"id"})
+    dto_type = dto.FromMapped[Annotated[Author, dto.config("read", {"id"})]]
     assert dto_type.__fields__.keys() == {"name", "dob", "created", "updated"}
 
 
@@ -77,7 +77,7 @@ def test_write_dto_for_model_field_scalar_default(
         __tablename__ = "smth"
         field: Mapped[int] = mapped_column(default=default)
 
-    dto_model = dto.factory("DTO", Model, purpose=purpose)
+    dto_model = dto.FromMapped[Annotated[Model, dto.config(purpose)]]
     assert dto_model.__fields__["field"].default == exp
 
 
@@ -88,8 +88,7 @@ def test_write_dto_for_model_field_factory_default(base: type[DeclarativeBase]) 
         __tablename__ = "smth"
         field: Mapped[UUID] = mapped_column(default=uuid4)
 
-    dto_model = dto.factory("DTO", Model, purpose=dto.Purpose.WRITE)
-
+    dto_model = dto.FromMapped[Annotated[Model, dto.config("write")]]
     assert dto_model.__fields__["field"].default_factory is not None
     assert isinstance(dto_model.__fields__["field"].default_factory(), UUID)
 
@@ -101,8 +100,7 @@ def test_read_dto_for_model_field_factory_default(base: type[DeclarativeBase]) -
         __tablename__ = "smth"
         field: Mapped[UUID] = mapped_column(default=uuid4)
 
-    dto_model = dto.factory("DTO", Model, purpose=dto.Purpose.READ)
-
+    dto_model = dto.FromMapped[Annotated[Model, dto.config("read")]]
     assert dto_model.__fields__["field"].default_factory is None
 
 
@@ -115,7 +113,10 @@ def test_read_dto_for_model_field_unsupported_default(base: type[DeclarativeBase
         field: Mapped[datetime] = mapped_column(default=func.now())
 
     with pytest.raises(ValueError):  # noqa: PT011
-        dto.factory("DTO", Model, purpose=dto.Purpose.WRITE)
+        # noinspection PyStatementEffect
+        dto.FromMapped[  # pylint: disable=expression-not-assigned
+            Annotated[Model, dto.config("write")]
+        ]
 
 
 @pytest.mark.parametrize("purpose", [dto.Purpose.WRITE, dto.Purpose.READ])
@@ -126,10 +127,10 @@ def test_dto_for_private_model_field(purpose: dto.Purpose, base: type[Declarativ
         __tablename__ = "smth"
         field: Mapped[datetime] = mapped_column(
             default=datetime.now(),
-            info={settings.api.DTO_INFO_KEY: dto.Attrib(mark=dto.Mark.SKIP)},
+            info={settings.api.DTO_INFO_KEY: dto.Field(mark=dto.Mark.SKIP)},
         )
 
-    dto_model = dto.factory("DTO", Model, purpose=purpose)
+    dto_model = dto.FromMapped[Annotated[Model, dto.config(purpose)]]
     assert "field" not in dto_model.__fields__
 
 
@@ -141,7 +142,7 @@ def test_dto_for_non_mapped_model_field(purpose: dto.Purpose, base: type[Declara
         __tablename__ = "smth"
         field: ClassVar[datetime]
 
-    dto_model = dto.factory("DTO", Model, purpose=purpose)
+    dto_model = dto.FromMapped[Annotated[Model, dto.config(purpose)]]
     assert "field" not in dto_model.__fields__
 
 
@@ -166,22 +167,21 @@ class Test(orm.Base):
     )
     model = module.Test
     assert all(isinstance(model.__annotations__[k], str) for k in ("hello", "related"))
-    dto_model = dto.factory("TestDTO", module.Test, purpose=dto.Purpose.READ)
+    dto_model = dto.FromMapped[Annotated[model, dto.config("read")]]
     assert all(not isinstance(dto_model.__annotations__[k], str) for k in ("hello", "related"))
 
 
-def test_dto_decorator() -> None:
-    """Test dto decorator.
+def test_subclassed_dto() -> None:
+    """Test dto subclass decoration.
 
-    Test ensures that fields defined on the decorated class aren't
-    overwritten by factory(), that fields not defined on the decorated
-    class are added to the DTO, and that validators work for fields that
-    are added both statically, and dynamically (with the
-    `check_fields=False` flag).
+    Test ensures that fields defined on the subclass overwrite those
+    generated by factory(), that fields not defined on the subclass are
+    added to the DTO, and that validators work for fields that are added
+    both statically, and dynamically (with the `check_fields=False`
+    flag).
     """
 
-    @dto.decorator(Author, dto.Purpose.WRITE)
-    class AuthorDTO(BaseModel):
+    class AuthorDTO(dto.FromMapped[Author]):
         name: constr(to_upper=True)  # pyright:ignore
 
         @validator("name")
@@ -214,42 +214,42 @@ def test_dto_attrib_validator(base: type[DeclarativeBase]) -> None:
     class Model(base):
         __tablename__ = "smth"
         field: Mapped[datetime] = mapped_column(
-            info={settings.api.DTO_INFO_KEY: dto.Attrib(validators=[validate_datetime])}
+            info={settings.api.DTO_INFO_KEY: dto.Field(validators=[validate_datetime])}
         )
 
-    dto_model = dto.factory("DTO", Model, purpose=dto.Purpose.WRITE)
+    dto_model = dto.FromMapped[Annotated[Model, dto.config("write")]]
     dto_model.parse_obj({"id": 1, "field": datetime.min})
     assert validator_called
 
 
 def test_dto_attrib_pydantic_type(base: type[DeclarativeBase]) -> None:
-    """Test declare pydantic type on `dto.Attrib`."""
+    """Test declare pydantic type on `dto.Field`."""
 
     class Model(base):
         __tablename__ = "smth"
         field: Mapped[str] = mapped_column(
-            info={settings.api.DTO_INFO_KEY: dto.Attrib(pydantic_type=constr(to_upper=True))}
+            info={settings.api.DTO_INFO_KEY: dto.Field(pydantic_type=constr(to_upper=True))}
         )
 
-    dto_model = dto.factory("DTO", Model, purpose=dto.Purpose.WRITE)
+    dto_model = dto.FromMapped[Annotated[Model, dto.config("write")]]
     assert dto_model.parse_obj({"id": 1, "field": "lower"}).dict() == {"id": 1, "field": "LOWER"}
 
 
 def test_dto_mapped_as_dataclass_model_type(base: type[DeclarativeBase]) -> None:
-    """Test declare pydantic type on `dto.Attrib`."""
+    """Test declare pydantic type on `dto.Field`."""
 
     class Model(MappedAsDataclass, base):
         __tablename__ = "smth"
         clz_var: ClassVar[str]
         field: Mapped[str]
 
-    dto_model = dto.factory("DTO", Model, purpose=dto.Purpose.WRITE)
+    dto_model = dto.FromMapped[Annotated[Model, dto.config("write")]]
     assert dto_model.__fields__.keys() == {"id", "field"}
 
 
 def test_from_dto() -> None:
     """Test conversion of a DTO instance to a model instance."""
-    data = CreateDTO.parse_obj({"name": "someone", "dob": "1982-03-22"})
+    data = WriteDTO.parse_obj({"name": "someone", "dob": "1982-03-22"})
     author = data.to_mapped()
     assert author.name == "someone"
     assert author.dob == date(1982, 3, 22)

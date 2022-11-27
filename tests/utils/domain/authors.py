@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 from datetime import date
+from typing import Annotated
 
-from pydantic import BaseModel
 from sqlalchemy.orm import Mapped
 
 from starlite_saqlalchemy import db, dto, repository, service
@@ -28,16 +28,8 @@ class Service(service.Service[Author]):
     repository_type = Repository
 
 
-@dto.decorator(Author, dto.Purpose.WRITE)
-class CreateDTO(BaseModel):
-    """A pydantic model to validate `Author` creation data."""
+ReadDTO = dto.FromMapped[Annotated[Author, dto.config("read")]]
+"""A pydantic model to serialize outbound `Author` representations."""
 
-
-ReadDTO = dto.factory("AuthorReadDTO", Author, dto.Purpose.READ)
-"""
-A pydantic model to serialize outbound `Author` representations.
-"""
-UpdateDTO = dto.factory("AuthorUpdateDTO", Author, dto.Purpose.WRITE)
-"""
-A pydantic model to validate and deserialize `Author` update data.
-"""
+WriteDTO = dto.FromMapped[Author]
+"""A pydantic model to validate and deserialize `Author` update data."""

@@ -85,14 +85,14 @@
 
 ## v0.3.0 (2022-11-07)
 ### Feature
-* **dto:** Dto.Attrib and dto.Mark. ([`ca47028`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ca47028f674b696493564d07379b589756433cc1))
+* **dto:** Dto.Field and dto.Mark. ([`ca47028`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ca47028f674b696493564d07379b589756433cc1))
 
 ### Fix
 * **log:** Fix dev config write to bytes logger. ([`2d8c69e`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/2d8c69ec93083d1d6dc42ebceb8e43b02cde9408))
 * Removes static files config. ([`bdf5ea5`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/bdf5ea56d4f04f6fa7b907492d305417e48be9f1))
 
 ### Breaking
-* dto.Attrib and dto.Mark. ([`ca47028`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ca47028f674b696493564d07379b589756433cc1))
+* dto.Field and dto.Mark. ([`ca47028`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ca47028f674b696493564d07379b589756433cc1))
 * removes static files config. ([`bdf5ea5`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/bdf5ea56d4f04f6fa7b907492d305417e48be9f1))
 
 ### Documentation
