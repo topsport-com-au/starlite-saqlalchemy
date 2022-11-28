@@ -2,6 +2,9 @@
 
 <!--next-version-placeholder-->
 
+## v0.14.0 (2022-11-28)
+
+
 ## v0.13.1 (2022-11-24)
 ### Fix
 * **testing:** Fix GenericMockRepository collections. ([#136](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/136)) ([`246c103`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/246c10305c8436f47142cd6208ba4bcf85017f17))
