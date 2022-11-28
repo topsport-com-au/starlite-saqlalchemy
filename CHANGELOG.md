@@ -3,7 +3,8 @@
 <!--next-version-placeholder-->
 
 ## v0.14.0 (2022-11-28)
-
+### Breaking
+* Overhaul of DTO pattern ([`e503447`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/e5034479b028ef791a4947b5df5a14cf248e935c))
 
 ## v0.13.1 (2022-11-24)
 ### Fix
