@@ -40,8 +40,6 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
 
         Args:
             item: The type that the class has been parametrized with.
-
-        Returns:
         """
         cls._collections.setdefault(item, {})
         return cls
@@ -169,9 +167,5 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
 
     @classmethod
     def clear_collection(cls) -> None:
-        """Empty the collection for repository type.
-
-        Args:
-            type_: type for which collection should be cleared.
-        """
+        """Empty the collection for repository type."""
         cls._collections[cls.model_type] = {}

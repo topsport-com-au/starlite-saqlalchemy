@@ -5,7 +5,7 @@ settings class, except `AppSettings`.
 """
 from __future__ import annotations
 
-# pylint: disable=too-few-public-methods,missing-class-docstring
+# pylint: disable=missing-class-docstring
 from typing import Literal
 
 from pydantic import AnyUrl, BaseSettings, PostgresDsn, parse_obj_as

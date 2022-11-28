@@ -1,6 +1,7 @@
 """Books domain definitions."""
 from __future__ import annotations
 
+from typing import Annotated
 from uuid import UUID
 
 from sqlalchemy import ForeignKey
@@ -17,7 +18,7 @@ class Book(db.orm.Base):  # pylint: disable=too-few-public-methods
     title: Mapped[str]
     author_id: Mapped[UUID] = mapped_column(ForeignKey("author.id"))
     author: Mapped[Author] = relationship(
-        lazy="joined", innerjoin=True, info={"dto": dto.Attrib(mark=dto.Mark.READ_ONLY)}
+        lazy="joined", innerjoin=True, info={"dto": dto.DTOField(mark=dto.Mark.READ_ONLY)}
     )
 
 
@@ -33,11 +34,11 @@ class Service(service.Service[Book]):
     repository_type = Repository
 
 
-ReadDTO = dto.factory("BookReadDTO", Book, purpose=dto.Purpose.READ)
+ReadDTO = dto.FromMapped[Annotated[Book, "read"]]
 """
 A pydantic model to serialize outbound `Book` representations.
 """
-WriteDTO = dto.factory("BookWriteDTO", Book, purpose=dto.Purpose.WRITE)
+WriteDTO = dto.FromMapped[Annotated[Book, "write"]]
 """
 A pydantic model to validate and deserialize `Book` creation/update data.
 """
