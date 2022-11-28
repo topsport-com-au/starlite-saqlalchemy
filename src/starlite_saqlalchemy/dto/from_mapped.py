@@ -8,7 +8,7 @@ should always be private, or read-only at the model declaration layer.
 """
 from __future__ import annotations
 
-from inspect import getmodule, isclass
+from inspect import getmodule
 from typing import (
     TYPE_CHECKING,
     Annotated,
@@ -28,17 +28,19 @@ from sqlalchemy.orm import DeclarativeBase, Mapped
 
 from starlite_saqlalchemy import settings
 
-from .types import Field, Mark, Purpose
+from .types import DTOField, Mark, Purpose
 from .utils import config
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Literal
 
     from pydantic.typing import AnyClassMethod
     from sqlalchemy import Column
     from sqlalchemy.orm import Mapper, RelationshipProperty
     from sqlalchemy.sql.base import ReadOnlyColumnCollection
     from sqlalchemy.util import ReadOnlyProperties
+
+    from .types import DTOConfig
 
 __all__ = ("FromMapped",)
 
@@ -57,7 +59,7 @@ class FromMapped(BaseModel, Generic[AnyDeclarative]):
         orm_mode = True
 
     def __class_getitem__(
-        cls, item: Annotated[type[AnyDeclarative], Purpose, set[str] | type[DeclarativeBase]]
+        cls, item: Annotated[type[AnyDeclarative], DTOConfig | Literal["read", "write"]]
     ) -> type[FromMapped[AnyDeclarative]]:
         """Decorate `cls` with result from `factory()`.
 
@@ -71,19 +73,31 @@ class FromMapped(BaseModel, Generic[AnyDeclarative]):
             from the SQLAlchemy model, respecting any declared configuration.
         """
         if get_origin(item) is Annotated:
-            model, dto_config = get_args(item)
-        elif issubclass(item, DeclarativeBase):
-            model, dto_config = item, config()
+            model, pos_arg, *_ = get_args(item)
+            if isinstance(pos_arg, str):
+                dto_config = config(pos_arg)  # type:ignore[arg-type]
+            else:
+                dto_config = pos_arg
         else:
             raise ValueError("Unexpected type annotation for `FromMapped`.")
-        new = cls._factory(
+        return cls._factory(
             cls.__name__,
             cast("type[AnyDeclarative]", model),
             dto_config.purpose,
             exclude=dto_config.exclude,
         )
-        new.__sqla_model__ = model
-        return new
+
+    # pylint: disable=arguments-differ
+    def __init_subclass__(cls, model: type[AnyDeclarative] | None = None, **kwargs: Any) -> None:
+        """Set `__sqla_model__` on type.
+
+        Args:
+            model: Model represented by the DTO
+            kwargs: Passed to `super().__init_subclass__()`
+        """
+        super().__init_subclass__(**kwargs)
+        if model is not None:
+            cls.__sqla_model__ = model
 
     def to_mapped(self) -> AnyDeclarative:
         """Create an instance of `self.__sqla_model__`
@@ -123,42 +137,55 @@ class FromMapped(BaseModel, Generic[AnyDeclarative]):
                 # class var, anything else??
                 continue
 
-            attrib = _get_dto_attrib(elem)
+            dto_field = _get_dto_field(elem)
 
-            if _should_exclude_field(purpose, elem, exclude, attrib):
+            if _should_exclude_field(purpose, elem, exclude, dto_field):
                 continue
 
-            if attrib.pydantic_type is not None:
-                type_hint = attrib.pydantic_type
+            if dto_field.pydantic_type is not None:
+                type_hint = dto_field.pydantic_type
 
-            for i, func in enumerate(attrib.validators or []):
+            for i, func in enumerate(dto_field.validators or []):
                 validators[f"_validates_{key}_{i}"] = validator(key, allow_reuse=True)(func)
 
-            if isclass(type_hint) and issubclass(type_hint, DeclarativeBase):
-                type_hint = cls._factory(
-                    f"{name}_{type_hint.__name__}", type_hint, purpose=purpose, exclude=set()
-                )
-
-            fields[key] = (type_hint, _construct_field_info(elem, purpose))
+            type_hint = cls._handle_relationships(type_hint, name, purpose)
+            fields[key] = (type_hint, _construct_field_info(elem, purpose, dto_field))
 
         return create_model(  # type:ignore[no-any-return,call-overload]
             name,
             __base__=cls,
             __module__=getattr(model, "__module__", __name__),
             __validators__=validators,
+            __cls_kwargs__={"model": model},
             **fields,
         )
 
+    @classmethod
+    def _handle_relationships(cls, type_hint: Any, name: str, purpose: Purpose) -> Any:
+        origin_type = get_origin(type_hint)
+        if origin_type is not None or issubclass(type_hint, DeclarativeBase):
+            if origin_type:
+                (type_hint,) = get_args(type_hint)
+            type_hint = cls._factory(
+                f"{name}_{type_hint.__name__}", type_hint, purpose=purpose, exclude=set()
+            )
+            if origin_type:
+                type_hint = origin_type[type_hint]
+        return type_hint  # noqa:R504
 
-def _construct_field_info(elem: Column | RelationshipProperty, purpose: Purpose) -> FieldInfo:
+
+def _construct_field_info(
+    elem: Column | RelationshipProperty, purpose: Purpose, dto_field: DTOField
+) -> FieldInfo:
+    if dto_field.pydantic_field is not None:
+        return dto_field.pydantic_field
+
     default = getattr(elem, "default", None)
     nullable = getattr(elem, "nullable", False)
     if purpose is Purpose.READ:
         return FieldInfo(...)
     if default is None:
-        if nullable:
-            return FieldInfo(default=None)
-        return FieldInfo(...)
+        return FieldInfo(default=None) if nullable else FieldInfo(...)
     if default.is_scalar:
         return FieldInfo(default=default.arg)
     if default.is_callable:
@@ -166,16 +193,16 @@ def _construct_field_info(elem: Column | RelationshipProperty, purpose: Purpose)
     raise ValueError("Unexpected default type")
 
 
-def _get_dto_attrib(elem: Column | RelationshipProperty) -> Field:
-    return elem.info.get(settings.api.DTO_INFO_KEY, Field())
+def _get_dto_field(elem: Column | RelationshipProperty) -> DTOField:
+    return elem.info.get(settings.api.DTO_INFO_KEY, DTOField())
 
 
 def _should_exclude_field(
-    purpose: Purpose, elem: Column | RelationshipProperty, exclude: set[str], dto_attrib: Field
+    purpose: Purpose, elem: Column | RelationshipProperty, exclude: set[str], dto_attrib: DTOField
 ) -> bool:
     if elem.key in exclude:
         return True
-    if dto_attrib.mark is Mark.SKIP:
+    if dto_attrib.mark is Mark.PRIVATE:
         return True
     if purpose is Purpose.WRITE and dto_attrib.mark is Mark.READ_ONLY:
         return True

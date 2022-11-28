@@ -134,7 +134,7 @@ class PluginConfig(BaseModel):
     do_set_debug: bool = True
     """
     Allow the plugin to set the starlite `debug` parameter. Parameter set to value of
-    [`AppConfig.debug`][starlite_saqlalchemy.settings.AppConfig.debug].
+    [`AppConfig.debug`][starlite_saqlalchemy.settings.AppSettings.DEBUG].
     """
     do_sqlalchemy_plugin: bool = True
     """

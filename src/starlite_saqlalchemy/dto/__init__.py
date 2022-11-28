@@ -1,10 +1,10 @@
 """Construct Pydantic models from SQLAlchemy ORM types."""
 from .from_mapped import FromMapped
-from .types import DTOConfig, Field, Mark, Purpose
+from .types import DTOConfig, DTOField, Mark, Purpose
 from .utils import config, field
 
 __all__ = (
-    "Field",
+    "DTOField",
     "DTOConfig",
     "FromMapped",
     "Mark",

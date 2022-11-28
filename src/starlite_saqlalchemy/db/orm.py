@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import Any, TypeVar
 from uuid import UUID, uuid4
 
 from sqlalchemy import MetaData
@@ -19,13 +19,10 @@ from sqlalchemy.orm import (
 
 from starlite_saqlalchemy import dto, settings
 
-if TYPE_CHECKING:
-    from pydantic import BaseModel
-
 BaseT = TypeVar("BaseT", bound="Base")
 
 DTO_KEY = settings.api.DTO_INFO_KEY
-"""The key we use to reference `dto.Field` in the SQLAlchemy info dict."""
+"""The key we use to reference `dto.DTOField` in the SQLAlchemy info dict."""
 
 convention = {
     "ix": "ix_%(column_0_label)s",
@@ -64,15 +61,15 @@ class Base(DeclarativeBase):
     )
 
     id: Mapped[UUID] = mapped_column(
-        default=uuid4, primary_key=True, info={DTO_KEY: dto.Field(mark=dto.Mark.READ_ONLY)}
+        default=uuid4, primary_key=True, info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)}
     )
     """Primary key column."""
     created: Mapped[datetime] = mapped_column(
-        default=datetime.now, info={DTO_KEY: dto.Field(mark=dto.Mark.READ_ONLY)}
+        default=datetime.now, info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)}
     )
     """Date/time of instance creation."""
     updated: Mapped[datetime] = mapped_column(
-        default=datetime.now, info={DTO_KEY: dto.Field(mark=dto.Mark.READ_ONLY)}
+        default=datetime.now, info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)}
     )
     """Date/time of instance update."""
 
@@ -81,15 +78,3 @@ class Base(DeclarativeBase):
     def __tablename__(cls) -> str:  # pylint: disable=no-self-argument
         """Infer table name from class name."""
         return cls.__name__.lower()
-
-    @classmethod
-    def from_dto(cls: type[BaseT], dto_instance: BaseModel) -> BaseT:
-        """Construct an instance of the SQLAlchemy model from the Pydantic DTO.
-
-        Args:
-            dto_instance: A pydantic model
-
-        Returns:
-            An instance of the SQLAlchemy model.
-        """
-        return cls(**dto_instance.dict(exclude_unset=True))

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 __all__ = (
     "AnyDeclarative",
     "DTOConfig",
-    "Field",
+    "DTOField",
     "Mark",
     "Purpose",
 )
@@ -36,7 +36,9 @@ class Mark(str, Enum):
     """
 
     READ_ONLY = "read-only"
-    SKIP = "skip"
+    """To mark a field that can be read, but not updated by clients."""
+    PRIVATE = "private"
+    """To mark a field that can neither be read or updated by clients."""
 
 
 class Purpose(str, Enum):
@@ -52,15 +54,17 @@ class Purpose(str, Enum):
     """
 
     READ = "read"
+    """To mark a DTO that is to be used to serialize data returned to clients."""
     WRITE = "write"
+    """To mark a DTO that is to deserialize and validate data provided by clients."""
 
 
 @dataclass
-class Field:
+class DTOField:
     """For configuring DTO behavior on SQLAlchemy model fields."""
 
     mark: Mark | None = None
-    """Mark the field as read only, or skip."""
+    """Mark the field as read-only, or private."""
     pydantic_type: Any | None = None
     """Override the field type on the pydantic model for this attribute."""
     pydantic_field: FieldInfo | None = None
@@ -73,5 +77,7 @@ class Field:
 class DTOConfig:
     """Control the generated DTO."""
 
-    purpose: Purpose = Purpose.WRITE
+    purpose: Purpose
+    """Configure the DTO for "read" or "write" operations."""
     exclude: set[str] = field(default_factory=set)
+    """Explicitly exclude fields from the generated DTO."""

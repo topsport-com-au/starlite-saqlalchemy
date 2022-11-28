@@ -1,13 +1,19 @@
 """Tests for the dto factory."""
-# pylint: disable=missing-class-docstring
+# pylint: disable=missing-class-docstring,invalid-name
 from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING, Annotated, Any, ClassVar
 from uuid import UUID, uuid4
 
 import pytest
-from pydantic import constr, validator
-from sqlalchemy import func
-from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_column
+from pydantic import Field, constr, validator
+from sqlalchemy import ForeignKey, func
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    MappedAsDataclass,
+    mapped_column,
+    relationship,
+)
 
 from starlite_saqlalchemy import dto, settings
 from tests.utils.domain.authors import Author, WriteDTO
@@ -121,13 +127,13 @@ def test_read_dto_for_model_field_unsupported_default(base: type[DeclarativeBase
 
 @pytest.mark.parametrize("purpose", [dto.Purpose.WRITE, dto.Purpose.READ])
 def test_dto_for_private_model_field(purpose: dto.Purpose, base: type[DeclarativeBase]) -> None:
-    """Ensure that fields markets as SKIP are excluded from DTO."""
+    """Ensure that fields markets as PRIVATE are excluded from DTO."""
 
     class Model(base):
         __tablename__ = "smth"
         field: Mapped[datetime] = mapped_column(
             default=datetime.now(),
-            info={settings.api.DTO_INFO_KEY: dto.Field(mark=dto.Mark.SKIP)},
+            info={settings.api.DTO_INFO_KEY: dto.DTOField(mark=dto.Mark.PRIVATE)},
         )
 
     dto_model = dto.FromMapped[Annotated[Model, dto.config(purpose)]]
@@ -181,7 +187,7 @@ def test_subclassed_dto() -> None:
     flag).
     """
 
-    class AuthorDTO(dto.FromMapped[Author]):
+    class AuthorDTO(dto.FromMapped[Annotated[Author, "write"]]):
         name: constr(to_upper=True)  # pyright:ignore
 
         @validator("name")
@@ -214,7 +220,7 @@ def test_dto_attrib_validator(base: type[DeclarativeBase]) -> None:
     class Model(base):
         __tablename__ = "smth"
         field: Mapped[datetime] = mapped_column(
-            info={settings.api.DTO_INFO_KEY: dto.Field(validators=[validate_datetime])}
+            info={settings.api.DTO_INFO_KEY: dto.DTOField(validators=[validate_datetime])}
         )
 
     dto_model = dto.FromMapped[Annotated[Model, dto.config("write")]]
@@ -223,12 +229,12 @@ def test_dto_attrib_validator(base: type[DeclarativeBase]) -> None:
 
 
 def test_dto_attrib_pydantic_type(base: type[DeclarativeBase]) -> None:
-    """Test declare pydantic type on `dto.Field`."""
+    """Test declare pydantic type on `dto.DTOField`."""
 
     class Model(base):
         __tablename__ = "smth"
         field: Mapped[str] = mapped_column(
-            info={settings.api.DTO_INFO_KEY: dto.Field(pydantic_type=constr(to_upper=True))}
+            info={settings.api.DTO_INFO_KEY: dto.DTOField(pydantic_type=constr(to_upper=True))}
         )
 
     dto_model = dto.FromMapped[Annotated[Model, dto.config("write")]]
@@ -236,7 +242,7 @@ def test_dto_attrib_pydantic_type(base: type[DeclarativeBase]) -> None:
 
 
 def test_dto_mapped_as_dataclass_model_type(base: type[DeclarativeBase]) -> None:
-    """Test declare pydantic type on `dto.Field`."""
+    """Test declare pydantic type on `dto.DTOField`."""
 
     class Model(MappedAsDataclass, base):
         __tablename__ = "smth"
@@ -253,3 +259,57 @@ def test_from_dto() -> None:
     author = data.to_mapped()
     assert author.name == "someone"
     assert author.dob == date(1982, 3, 22)
+
+
+def test_invalid_from_mapped_annotation() -> None:
+    """Test error raised if from mapped called without Annotated."""
+    with pytest.raises(ValueError):  # noqa:PT011
+        dto.FromMapped[Author]  # pylint: disable=pointless-statement
+
+
+def test_to_mapped_model_with_collection_relationship(base: type[DeclarativeBase]) -> None:
+    """Test building a DTO with collection relationship, and parsing data."""
+
+    class A(base):
+        __tablename__ = "a"
+        b_id: Mapped[int] = mapped_column(ForeignKey("b.id"))
+
+    class B(base):
+        __tablename__ = "b"
+
+        a: Mapped[list[A]] = relationship("A")
+
+    DTO = dto.FromMapped[Annotated[B, "write"]]
+    dto_instance = DTO.parse_obj({"id": 1, "a": [{"id": 2, "b_id": 1}, {"id": 3, "b_id": 1}]})
+    mapped_instance = dto_instance.to_mapped()
+    assert len(mapped_instance.a) == 2
+    assert all(isinstance(val, A) for val in mapped_instance.a)
+
+
+def test_to_mapped_model_with_scalar_relationship(base: type[DeclarativeBase]) -> None:
+    """Test building DTO with Scalar relationship, and parsing data."""
+
+    class A(base):
+        __tablename__ = "a"
+
+    class B(base):
+        __tablename__ = "b"
+        a_id: Mapped[int] = mapped_column(ForeignKey("a.id"), info=dto.field("private"))
+        a: Mapped[A] = relationship("A")
+
+    DTO = dto.FromMapped[Annotated[B, "write"]]
+    dto_instance = DTO.parse_obj({"id": 2, "a": {"id": 1}})
+    mapped_instance = dto_instance.to_mapped()
+    assert isinstance(mapped_instance.a, A)
+
+
+def test_dto_field_pydantic_field(base: type[DeclarativeBase]) -> None:
+    """Test specifying DTOField.pydantic_field."""
+
+    class A(base):
+        __tablename__ = "a"
+        val: Mapped[int] = mapped_column(info=dto.field(pydantic_field=Field(le=1)))
+
+    DTO = dto.FromMapped[Annotated[A, "write"]]
+    with pytest.raises(ValueError):  # noqa:PT011
+        DTO.parse_obj({"id": 1, "val": 2})

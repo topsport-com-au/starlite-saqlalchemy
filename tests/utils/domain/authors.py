@@ -28,8 +28,8 @@ class Service(service.Service[Author]):
     repository_type = Repository
 
 
-ReadDTO = dto.FromMapped[Annotated[Author, dto.config("read")]]
+ReadDTO = dto.FromMapped[Annotated[Author, "read"]]
 """A pydantic model to serialize outbound `Author` representations."""
 
-WriteDTO = dto.FromMapped[Author]
+WriteDTO = dto.FromMapped[Annotated[Author, "write"]]
 """A pydantic model to validate and deserialize `Author` update data."""

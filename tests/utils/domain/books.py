@@ -18,7 +18,7 @@ class Book(db.orm.Base):  # pylint: disable=too-few-public-methods
     title: Mapped[str]
     author_id: Mapped[UUID] = mapped_column(ForeignKey("author.id"))
     author: Mapped[Author] = relationship(
-        lazy="joined", innerjoin=True, info={"dto": dto.Field(mark=dto.Mark.READ_ONLY)}
+        lazy="joined", innerjoin=True, info={"dto": dto.DTOField(mark=dto.Mark.READ_ONLY)}
     )
 
 
@@ -34,11 +34,11 @@ class Service(service.Service[Book]):
     repository_type = Repository
 
 
-ReadDTO = dto.FromMapped[Annotated[Book, dto.config("read")]]
+ReadDTO = dto.FromMapped[Annotated[Book, "read"]]
 """
 A pydantic model to serialize outbound `Book` representations.
 """
-WriteDTO = dto.FromMapped[Book]
+WriteDTO = dto.FromMapped[Annotated[Book, "write"]]
 """
 A pydantic model to validate and deserialize `Book` creation/update data.
 """
