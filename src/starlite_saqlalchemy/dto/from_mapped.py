@@ -8,12 +8,14 @@ should always be private, or read-only at the model declaration layer.
 """
 from __future__ import annotations
 
-from inspect import getmodule
-from types import UnionType
+from collections import defaultdict
+from inspect import getmodule, isclass
+from types import ModuleType
 from typing import (
     TYPE_CHECKING,
     Annotated,
     ClassVar,
+    ForwardRef,
     Generic,
     TypeVar,
     Union,
@@ -26,7 +28,7 @@ from typing import (
 from pydantic import BaseModel, create_model, validator
 from pydantic.fields import FieldInfo
 from sqlalchemy import inspect
-from sqlalchemy.orm import DeclarativeBase, Mapped
+from sqlalchemy.orm import DeclarativeBase, Mapped, RelationshipProperty
 
 from starlite_saqlalchemy import settings
 
@@ -34,20 +36,263 @@ from .types import DTOField, Mark, Purpose
 from .utils import config
 
 if TYPE_CHECKING:
-    from typing import Any, Literal
+    from typing import Any, Generator, Literal, TypeAlias
 
     from pydantic.typing import AnyClassMethod
     from sqlalchemy import Column
-    from sqlalchemy.orm import Mapper, RelationshipProperty
+    from sqlalchemy.orm import Mapper, registry
     from sqlalchemy.sql.base import ReadOnlyColumnCollection
     from sqlalchemy.util import ReadOnlyProperties
 
     from .types import DTOConfig
 
+    Registry: TypeAlias = registry
+
+
 __all__ = ("FromMapped",)
 
-
 AnyDeclarative = TypeVar("AnyDeclarative", bound=DeclarativeBase)
+
+
+class DTOFactory:
+    def __init__(self, registry: Registry | None = None) -> None:
+        self._mapped_classes: dict[str, type[DeclarativeBase]] | None = None
+        self._registries: list[Registry] = []
+        if registry:
+            self._registries.append(registry)
+        self._model_modules: set[ModuleType] = set()
+
+    def _inspect_model(
+        self, model: type[DeclarativeBase]
+    ) -> tuple[ReadOnlyColumnCollection[str, Column], ReadOnlyProperties[RelationshipProperty]]:
+        mapper = cast("Mapper", inspect(model))
+        columns = mapper.columns
+        relationships = mapper.relationships
+        return columns, relationships
+
+    def _get_localns(self, model: type[DeclarativeBase]) -> dict[str, Any]:
+        localns: dict[str, Any] = self.mapped_classes
+        model_module = getmodule(model)
+        if model_module is not None:
+            self._model_modules.add(model_module)
+        for module in self._model_modules:
+            localns.update(vars(module))
+        return localns
+
+    def _should_exclude_field(
+        self,
+        purpose: Purpose,
+        elem: Column | RelationshipProperty,
+        exclude: set[str],
+        dto_attrib: DTOField,
+    ) -> bool:
+        if elem.key in exclude:
+            return True
+        if dto_attrib.mark is Mark.PRIVATE:
+            return True
+        if purpose is Purpose.WRITE and dto_attrib.mark is Mark.READ_ONLY:
+            return True
+        return False
+
+    def _is_model_ref(self, type_hint: Any) -> bool:
+        return (isclass(type_hint) and issubclass(type_hint, DeclarativeBase)) or isinstance(
+            type_hint, (ForwardRef, str)
+        )
+
+    def _type_hint_to_model(
+        self, type_hint: type[DeclarativeBase] | ForwardRef | str
+    ) -> type[DeclarativeBase] | None:
+        if isinstance(type_hint, ForwardRef):
+            return self.mapped_classes[type_hint.__forward_arg__]
+        if isinstance(type_hint, str):
+            return self.mapped_classes[type_hint]
+        if isclass(type_hint) and issubclass(type_hint, DeclarativeBase):
+            return type_hint
+        return None
+
+    def _relationship_to_model(self, relationship: RelationshipProperty) -> type[DeclarativeBase]:
+        return relationship.mapper.class_
+
+    @property
+    def mapped_classes(self) -> dict[str, type[DeclarativeBase]]:
+        if not self._registries:
+            from starlite_saqlalchemy.db.orm import Base
+
+            self.add_registry(Base.registry)
+        if self._mapped_classes is None:
+            self._mapped_classes = {}
+            for registry in self._registries:
+                self._mapped_classes.update(
+                    {m.class_.__name__: m.class_ for m in list(registry.mappers)}
+                )
+        return self._mapped_classes
+
+    def add_registry(self, registry: Registry) -> None:
+        self._registries.append(registry)
+
+    def clear_registries(self) -> None:
+        self._registries = []
+        self._mapped_classes = None
+
+    def get_dto_field(self, elem: Column | RelationshipProperty) -> DTOField:
+        return elem.info.get(settings.api.DTO_INFO_KEY, DTOField())
+
+    def iter_type_hints(
+        self, model: type[DeclarativeBase], purpose: Purpose, exclude: set[str]
+    ) -> Generator[tuple[str, Any, Column | RelationshipProperty], None, None]:
+        columns, relationships = self._inspect_model(model)
+
+        for key, type_hint in get_type_hints(model, localns=self._get_localns(model)).items():
+            if get_origin(type_hint) is Mapped:
+                (type_hint,) = get_args(type_hint)
+
+            elem: Column | RelationshipProperty
+            if key in columns:
+                elem = columns[key]
+            elif key in relationships:
+                elem = relationships[key]
+            else:
+                # class var, anything else??
+                continue
+
+            dto_field = self.get_dto_field(elem)
+
+            if self._should_exclude_field(purpose, elem, exclude, dto_field):
+                continue
+
+            yield key, type_hint, elem
+
+    def resolve_type(
+        self,
+        elem: Column | RelationshipProperty,
+        type_hint: Any,
+        name: str,
+        purpose: Purpose,
+        **kwargs: Any,
+    ) -> Any:
+        if model := self._type_hint_to_model(type_hint):
+            return self.factory(
+                name=f"{name}_{model.__name__}",
+                model=model,
+                purpose=purpose,
+                **kwargs,
+            )
+        if not get_origin(type_hint) and not get_args(type_hint):
+            return type_hint
+        if isinstance(elem, RelationshipProperty) and elem.uselist:
+            model = self._relationship_to_model(elem)
+            # Silent mypy on return list[dto], but annotation is not correct
+            dto: Any = self.factory(
+                name=f"{name}_{model.__name__}",
+                model=model,
+                purpose=purpose,
+                **kwargs,
+            )
+            return list[dto]
+
+    def factory(self, *args: Any, **kwargs: Any) -> type[FromMapped[AnyDeclarative]] | ForwardRef:
+        raise NotImplementedError
+
+
+class PydanticDTOFactory(DTOFactory):
+    def __init__(self, registry: registry | None = None) -> None:
+        super().__init__(registry)
+        self.dtos: dict[str, type[FromMapped]] = {}
+        self.dto_childs: dict[str, list[type[FromMapped]]] = defaultdict(list)
+
+    def _construct_field_info(
+        self, elem: Column | RelationshipProperty, purpose: Purpose, dto_field: DTOField
+    ) -> FieldInfo:
+        if dto_field.pydantic_field is not None:
+            return dto_field.pydantic_field
+
+        default = getattr(elem, "default", None)
+        nullable = getattr(elem, "nullable", False)
+        if purpose is Purpose.READ:
+            return FieldInfo(...)
+        if default is None:
+            if nullable:
+                return FieldInfo(default=None)
+            if isinstance(elem, RelationshipProperty):
+                if elem.uselist:
+                    return FieldInfo(default_factory=list)
+                return FieldInfo(default=None)
+            return FieldInfo(...)
+        if default.is_scalar:
+            return FieldInfo(default=default.arg)
+        if default.is_callable:
+            return FieldInfo(default_factory=lambda: default.arg({}))
+        raise ValueError("Unexpected default type")
+
+    def factory(
+        self,
+        name: str,
+        model: type[AnyDeclarative],
+        purpose: Purpose,
+        base: type[BaseModel],
+        exclude: set[str] | None = None,
+        parents: dict[type[AnyDeclarative], str] | None = None,
+        forward_refs: dict[type[AnyDeclarative], list[str]] | None = None,
+        root: str | None = None,
+    ) -> type[FromMapped[AnyDeclarative]] | ForwardRef:
+        if root is None:
+            root = name
+        if parents is None:
+            parents = {}
+        if forward_refs is None:
+            forward_refs = defaultdict(list)
+        if model in parents:
+            dto_name = f"{name}_{model.__name__}"
+            forward_refs[model].append(dto_name)
+            return ForwardRef(dto_name)
+
+        parents[model] = name
+        exclude = set() if exclude is None else exclude
+        fields: dict[str, tuple[Any, FieldInfo]] = {}
+        validators: dict[str, AnyClassMethod] = {}
+
+        for key, type_hint, elem in self.iter_type_hints(model, purpose, exclude):
+            dto_field = self.get_dto_field(elem)
+
+            if dto_field.pydantic_type is not None:
+                type_hint = dto_field.pydantic_type
+
+            for i, func in enumerate(dto_field.validators or []):
+                validators[f"_validates_{key}_{i}"] = validator(key, allow_reuse=True)(func)
+
+            type_hint = self.resolve_type(
+                elem,
+                type_hint,
+                name,
+                purpose,
+                parents=parents,
+                root=root,
+                forward_refs=forward_refs,
+                base=base,
+            )
+            fields[key] = (type_hint, self._construct_field_info(elem, purpose, dto_field))
+
+        dto = create_model(  # type:ignore[no-any-return,call-overload]
+            name,
+            __base__=base,
+            __module__=getattr(model, "__module__", __name__),
+            __validators__=validators,
+            __cls_kwargs__={"model": model},
+            **fields,
+        )
+        self.dtos[name] = dto
+
+        if name != root:
+            self.dto_childs[root].append(dto)
+
+        if model_forward_refs := forward_refs.get(model, None):
+            for forward_ref in model_forward_refs:
+                self.dtos[forward_ref] = dto
+
+        return cast("type[FromMapped[AnyDeclarative]]", dto)
+
+
+pydantic_dto_factory = PydanticDTOFactory()
 
 
 class FromMapped(BaseModel, Generic[AnyDeclarative]):
@@ -119,117 +364,24 @@ class FromMapped(BaseModel, Generic[AnyDeclarative]):
 
     @classmethod
     def _factory(
-        cls, name: str, model: type[DeclarativeBase], purpose: Purpose, exclude: set[str]
+        cls,
+        name: str,
+        model: type[DeclarativeBase],
+        purpose: Purpose,
+        exclude: set[str],
     ) -> type[FromMapped[AnyDeclarative]]:
-        exclude = set() if exclude is None else exclude
-
-        columns, relationships = _inspect_model(model)
-        fields: dict[str, tuple[Any, FieldInfo]] = {}
-        validators: dict[str, AnyClassMethod] = {}
-        for key, type_hint in get_type_hints(model, localns=_get_localns(model)).items():
-            if get_origin(type_hint) is Mapped:
-                (type_hint,) = get_args(type_hint)
-
-            elem: Column | RelationshipProperty
-            if key in columns:
-                elem = columns[key]
-            elif key in relationships:
-                elem = relationships[key]
-            else:
-                # class var, anything else??
-                continue
-
-            dto_field = _get_dto_field(elem)
-
-            if _should_exclude_field(purpose, elem, exclude, dto_field):
-                continue
-
-            if dto_field.pydantic_type is not None:
-                type_hint = dto_field.pydantic_type
-
-            for i, func in enumerate(dto_field.validators or []):
-                validators[f"_validates_{key}_{i}"] = validator(key, allow_reuse=True)(func)
-
-            type_hint = cls._handle_relationships(type_hint, name, purpose)
-            fields[key] = (type_hint, _construct_field_info(elem, purpose, dto_field))
-
-        return create_model(  # type:ignore[no-any-return,call-overload]
-            name,
-            __base__=cls,
-            __module__=getattr(model, "__module__", __name__),
-            __validators__=validators,
-            __cls_kwargs__={"model": model},
-            **fields,
+        dto = pydantic_dto_factory.factory(
+            name=name, model=model, purpose=purpose, exclude=exclude, base=cls
         )
+        return cast("type[FromMapped[AnyDeclarative]]", dto)
 
     @classmethod
-    def _handle_relationships(cls, type_hint: Any, name: str, purpose: Purpose) -> Any:
-        args = get_args(type_hint)
-        if not args and not issubclass(type_hint, DeclarativeBase):
-            return type_hint
-
-        any_decl = any(issubclass(a, DeclarativeBase) for a in args)
-        if args and not any_decl:
-            return type_hint
-
-        if args:
-            origin_type = get_origin(type_hint)
-            if origin_type is None:  # pragma: no cover
-                raise RuntimeError("Unexpected `None` origin type.")
-            origin_type = Union if origin_type is UnionType else origin_type
-            inner_types = tuple(cls._handle_relationships(a, name, purpose) for a in args)
-            return origin_type[inner_types]  # pyright:ignore
-
-        type_hint = cls._factory(
-            f"{name}_{type_hint.__name__}", type_hint, purpose=purpose, exclude=set()
-        )
-        return type_hint
-
-
-def _construct_field_info(
-    elem: Column | RelationshipProperty, purpose: Purpose, dto_field: DTOField
-) -> FieldInfo:
-    if dto_field.pydantic_field is not None:
-        return dto_field.pydantic_field
-
-    default = getattr(elem, "default", None)
-    nullable = getattr(elem, "nullable", False)
-    if purpose is Purpose.READ:
-        return FieldInfo(...)
-    if default is None:
-        return FieldInfo(default=None) if nullable else FieldInfo(...)
-    if default.is_scalar:
-        return FieldInfo(default=default.arg)
-    if default.is_callable:
-        return FieldInfo(default_factory=lambda: default.arg({}))
-    raise ValueError("Unexpected default type")
-
-
-def _get_dto_field(elem: Column | RelationshipProperty) -> DTOField:
-    return elem.info.get(settings.api.DTO_INFO_KEY, DTOField())
-
-
-def _should_exclude_field(
-    purpose: Purpose, elem: Column | RelationshipProperty, exclude: set[str], dto_attrib: DTOField
-) -> bool:
-    if elem.key in exclude:
-        return True
-    if dto_attrib.mark is Mark.PRIVATE:
-        return True
-    if purpose is Purpose.WRITE and dto_attrib.mark is Mark.READ_ONLY:
-        return True
-    return False
-
-
-def _inspect_model(
-    model: type[DeclarativeBase],
-) -> tuple[ReadOnlyColumnCollection[str, Column], ReadOnlyProperties[RelationshipProperty]]:
-    mapper = cast("Mapper", inspect(model))
-    columns = mapper.columns
-    relationships = mapper.relationships
-    return columns, relationships
-
-
-def _get_localns(model: type[DeclarativeBase]) -> dict[str, Any]:
-    model_module = getmodule(model)
-    return vars(model_module) if model_module is not None else {}
+    def update_forward_refs(cls, **localns: Any) -> None:
+        import pprint
+        pprint.pprint(pydantic_dto_factory.dtos)
+        namespace = {**pydantic_dto_factory.dtos, **localns}
+        if childs := pydantic_dto_factory.dto_childs.get(cls.__name__):
+            for child in childs:
+                child.update_forward_refs(**namespace)
+        else:
+            return super().update_forward_refs(**namespace)
