@@ -186,7 +186,7 @@ class DTOFactory:
             return dto
         return type_hint
 
-    def factory(self, *args: Any, **kwargs: Any) -> type[FromMapped[AnyDeclarative]] | ForwardRef:
+    def factory(self, *args: Any, **kwargs: Any) -> Any:
         raise NotImplementedError
 
 
@@ -291,6 +291,7 @@ class PydanticDTOFactory(DTOFactory):
             __cls_kwargs__={"model": model},
             **fields,
         )
+        dto = cast("type[FromMapped[AnyDeclarative]]", dto)
         self.dtos[name] = dto
 
         if name != root:
@@ -302,7 +303,7 @@ class PydanticDTOFactory(DTOFactory):
             for forward_ref in model_forward_refs:
                 self.dtos[forward_ref] = dto
 
-        return cast("type[FromMapped[AnyDeclarative]]", dto)
+        return dto
 
 
 pydantic_dto_factory = PydanticDTOFactory()
