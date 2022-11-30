@@ -19,11 +19,10 @@ async def test_repo_raises_conflict_if_add_with_id(
 
 def test_generic_mock_repository_parametrization() -> None:
     """Test that the mock repository handles multiple types."""
-    # pylint: disable=pointless-statement,protected-access
-    testing.GenericMockRepository[Author]
-    testing.GenericMockRepository[Book]
-    assert Author in testing.GenericMockRepository._collections  # type:ignore[misc]
-    assert Book in testing.GenericMockRepository._collections  # type:ignore[misc]
+    author_repo = testing.GenericMockRepository[Author]
+    book_repo = testing.GenericMockRepository[Book]
+    assert author_repo.model_type is Author  # type:ignore[misc]
+    assert book_repo.model_type is Book  # type:ignore[misc]
 
 
 def test_generic_mock_repository_seed_collection(
@@ -31,8 +30,7 @@ def test_generic_mock_repository_seed_collection(
 ) -> None:
     """Test seeding instances."""
     author_repository_type.seed_collection([Author(id="abc")])
-    # pylint: disable=protected-access
-    assert "abc" in author_repository_type._collections[Author]
+    assert "abc" in author_repository_type.collection
 
 
 def test_generic_mock_repository_clear_collection(
@@ -40,5 +38,4 @@ def test_generic_mock_repository_clear_collection(
 ) -> None:
     """Test clearing collection for type."""
     author_repository_type.clear_collection()
-    # pylint: disable=protected-access
-    assert not author_repository_type._collections[Author]
+    assert not author_repository_type.collection

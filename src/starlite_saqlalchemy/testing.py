@@ -27,12 +27,12 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
     Uses a `dict` for storage.
     """
 
-    _collections: MutableMapping[type[ModelT], MutableMapping[Hashable, ModelT]] = {}
+    collection: MutableMapping[Hashable, ModelT] = {}
+    model_type: type[ModelT]
 
     def __init__(self, id_factory: Callable[[], Any] = uuid4, **_: Any) -> None:
         super().__init__()
         self._id_factory = id_factory
-        self.collection = self._collections[self.model_type]
 
     @classmethod
     def __class_getitem__(cls: type[MockRepoT], item: type[ModelT]) -> type[MockRepoT]:
@@ -41,8 +41,9 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Args:
             item: The type that the class has been parametrized with.
         """
-        cls._collections.setdefault(item, {})
-        return cls
+        return type(  # pyright:ignore
+            f"{cls.__name__}[{item.__name__}]", (cls,), {"collection": {}, "model_type": item}
+        )
 
     def _find_or_raise_not_found(self, id_: Any) -> ModelT:
         return self.check_not_found(self.collection.get(id_))
@@ -161,11 +162,10 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Args:
             instances: the instances to be added to the collection.
         """
-        collection = cls._collections[cls.model_type]
         for instance in instances:
-            collection[cls.get_id_attribute_value(instance)] = instance
+            cls.collection[cls.get_id_attribute_value(instance)] = instance
 
     @classmethod
     def clear_collection(cls) -> None:
         """Empty the collection for repository type."""
-        cls._collections[cls.model_type] = {}
+        cls.collection = {}
