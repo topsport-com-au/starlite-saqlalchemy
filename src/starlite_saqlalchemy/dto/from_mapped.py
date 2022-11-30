@@ -283,7 +283,7 @@ class PydanticDTOFactory(DTOFactory):
             )
             fields[key] = (type_hint, self._construct_field_info(elem, purpose, dto_field))
 
-        dto = create_model(  # type:ignore[no-any-return,call-overload]
+        dto = create_model(  # type:ignore[call-overload]
             name,
             __base__=base,
             __module__=getattr(model, "__module__", __name__),
