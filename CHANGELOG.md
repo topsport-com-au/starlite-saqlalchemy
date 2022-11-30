@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.14.1 (2022-11-30)
+### Fix
+* Fix for usage of mock repo. ([`dddf1e2`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/dddf1e2e52defbb7632368c8442417fa26076e74))
+
+### Documentation
+* **changelog:** Add missing entry ([`e88a510`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/e88a5103c7107707a864a99e7eeef25a8a68daa8))
+
 ## v0.14.0 (2022-11-28)
 ### Breaking
 * Overhaul of DTO pattern ([`e503447`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/e5034479b028ef791a4947b5df5a14cf248e935c))
