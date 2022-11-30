@@ -194,7 +194,7 @@ class PydanticDTOFactory(DTOFactory):
     def __init__(self, registry: registry | None = None) -> None:
         super().__init__(registry)
         # List of all existing dtos, both declared and generated
-        self.dtos: dict[str, type[FromMapped[DeclarativeBase]]] = {}
+        self.dtos: dict[str, type[FromMapped]] = {}
         # Lis dto's children. Used to update forwardrefs of generated dtos
         self.dto_children: dict[str, list[type[FromMapped]]] = defaultdict(list)
         # Store dto names with fields typed as forwardref.
@@ -283,7 +283,7 @@ class PydanticDTOFactory(DTOFactory):
             )
             fields[key] = (type_hint, self._construct_field_info(elem, purpose, dto_field))
 
-        dto = create_model(  # type:ignore[call-overload]
+        dto = create_model(  # type: ignore[call-overload]
             name,
             __base__=base,
             __module__=getattr(model, "__module__", __name__),
@@ -303,7 +303,7 @@ class PydanticDTOFactory(DTOFactory):
             for forward_ref in model_forward_refs:
                 self.dtos[forward_ref] = dto
 
-        return dto
+        return dto  # type: ignore[no-any-return]
 
 
 pydantic_dto_factory = PydanticDTOFactory()
