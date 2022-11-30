@@ -47,27 +47,16 @@ def _patch_worker() -> abc.Iterator:
     monkeypatch.undo()
 
 
-@pytest.fixture(autouse=True)
-def _clear_mock_repo_collections() -> None:
-    """Ensure all tests start with fresh collections."""
-    # pylint: disable=protected-access
-    GenericMockRepository._collections = {}  # type:ignore[misc]
-
-
 @pytest.fixture(name="author_repository_type")
 def fx_author_repository_type(
     authors: list[Author], monkeypatch: pytest.MonkeyPatch
 ) -> type[GenericMockRepository[Author]]:
     """Mock Author repository, pre-seeded with collection data."""
 
-    class AuthorRepository(GenericMockRepository[Author]):
-        """Mock Author repo."""
-
-        model_type = Author
-
-    AuthorRepository.seed_collection(authors)
-    monkeypatch.setattr(AuthorService, "repository_type", AuthorRepository)
-    return AuthorRepository
+    repo = GenericMockRepository[Author]
+    repo.seed_collection(authors)
+    monkeypatch.setattr(AuthorService, "repository_type", repo)
+    return repo
 
 
 @pytest.fixture(name="author_repository")
