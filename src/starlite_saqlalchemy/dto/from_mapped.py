@@ -367,7 +367,7 @@ class PydanticDTOFactory(DTOFactory):
             )
         if elem.uselist:
             dto = list[dto]
-        elif self.is_type_hint_optional(type_hint):
+        if self.is_type_hint_optional(type_hint):
             return dto | None
         return dto
 
