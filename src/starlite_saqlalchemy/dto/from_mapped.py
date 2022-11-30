@@ -209,32 +209,29 @@ class PydanticDTOFactory(DTOFactory):
         default_factory = getattr(elem, "default_factory", _MISSING)
         default = getattr(elem, "default", _MISSING)
 
-
         if isinstance(elem, Column):
             if default not in (_MISSING, None):
                 if default.is_scalar:
-                    default = default.is_scalar
+                    default = default.arg
                 elif default.is_callable:
-                    default = lambda: default.arg({})
+                    default_factory = lambda: default.arg({})
+                else:
+                    raise ValueError("Unexpected default type")
         elif isinstance(elem, RelationshipProperty):
             if default is _MISSING and elem.uselist:
                 default_factory = list
-            elif default is _MISSING:
+            elif default is _MISSING and not elem.uselist:
                 default = None
-
-        print(elem, default, default_factory)
-        print(default is _MISSING, default_factory is _MISSING)
 
         if purpose is Purpose.READ:
             return FieldInfo(...)
-        match (default is _MISSING, default_factory is _MISSING):
-            case (True, True):
-                return FieldInfo(...)
-            case (False, True):
-                return FieldInfo(default=default)
-            case (True, False) | (False, False):
-                return FieldInfo(default_factory=default_factory)
-        raise ValueError("Unexpected default type")
+        else:
+            kwargs = {}
+            if default_factory is not _MISSING:
+                kwargs["default_factory"] = default_factory
+            elif default is not _MISSING and default_factory is _MISSING:
+                kwargs["default"] = default
+            return FieldInfo(**kwargs)
 
     def factory(
         self,
