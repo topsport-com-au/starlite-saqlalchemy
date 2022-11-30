@@ -291,9 +291,7 @@ class PydanticDTOFactory(DTOFactory):
                 if default.is_scalar:
                     default = default.arg
                 elif default.is_callable:
-                    default_factory = lambda: default.arg(
-                        {}
-                    )  # pylint: disable=unnecessary-lambda-assignment
+                    default_factory = lambda: default.arg({})  # pylint: disable=C3001
                 else:
                     raise ValueError("Unexpected default type")
         elif isinstance(elem, RelationshipProperty):
