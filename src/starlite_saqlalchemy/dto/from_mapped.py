@@ -243,7 +243,7 @@ class PydanticDTOFactory(DTOFactory):
         base: type[BaseModel],
         exclude: set[str] | None = None,
         parents: dict[type[AnyDeclarative], str] | None = None,
-        forward_refs: dict[type[AnyDeclarative], list[str]] | None = None,
+        forward_refs: defaultdict[type[DeclarativeBase], list[str]] | None = None,
         root: str | None = None,
     ) -> type[FromMapped[AnyDeclarative]] | ForwardRef:
         if root is None:
