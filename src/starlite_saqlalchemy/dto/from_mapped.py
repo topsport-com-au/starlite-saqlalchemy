@@ -61,8 +61,6 @@ class _MISSING:
     constructing pydantic FieldInfo.
     """
 
-    pass
-
 
 MISSING = _MISSING()
 
@@ -84,12 +82,28 @@ class DTOFactory:
     def _inspect_model(
         self, model: type[DeclarativeBase]
     ) -> tuple[ReadOnlyColumnCollection[str, Column], ReadOnlyProperties[RelationshipProperty]]:
+        """Inspect the given SQLAlchemy model.
+
+        Args:
+            model: The SQLAlchemy model to inspect
+
+        Return:
+            columns and relationships for the given model
+        """
         mapper = cast("Mapper", inspect(model))
         columns = mapper.columns
         relationships = mapper.relationships
         return columns, relationships
 
     def _get_localns(self, model: type[DeclarativeBase]) -> dict[str, Any]:
+        """Build namespace for resolving forward refs of the given model.
+
+        Args:
+            model: The SQLAlchemy model for which to build the namespace
+
+        Returns:
+            A dict suitable to pass to `get_type_hints` to resolve forward refs of the given model
+        """
         localns: dict[str, Any] = self.mapped_classes
         model_module = getmodule(model)
         if model_module is not None:
@@ -105,6 +119,7 @@ class DTOFactory:
         exclude: set[str],
         dto_attrib: DTOField,
     ) -> bool:
+        """Whether the model field should be excluded from the dto or not."""
         if elem.key in exclude:
             return True
         if dto_attrib.mark is Mark.PRIVATE:
@@ -115,10 +130,11 @@ class DTOFactory:
 
     @property
     def mapped_classes(self) -> dict[str, type[DeclarativeBase]]:
-        if not self._registries:
-            from starlite_saqlalchemy.db.orm import Base
+        """Get mapped classes across all added registries.
 
-            self.add_registry(Base.registry)
+        Returns:
+            A mapping of class name -> SQLAlchemy mapped class.
+        """
         if self._mapped_classes is None:
             self._mapped_classes = {}
             for reg in self._registries:
@@ -128,16 +144,48 @@ class DTOFactory:
         return self._mapped_classes
 
     def add_registry(self, reg: Registry) -> None:
+        """Add a registry from which mapped classes can be used to generate
+        dtos.
+
+        Args:
+            reg: The registry to add
+        """
         self._registries.append(reg)
 
-    def clear_registries(self) -> None:
+    def clear_mapped_classes(self) -> None:
+        """Clear mapping of known mapped classes and registry list.
+
+        After calling this method, the factory will not be able resolve
+        forward refs when generating dtos.
+        """
         self._registries = []
         self._mapped_classes = None
 
     def get_dto_field(self, elem: Column | RelationshipProperty) -> DTOField:
+        """Return the DTOField from the given Column or relationship.
+
+        Args:
+            elem: The models column or relationship from which to retrieve the DTOField.
+
+        Returns:
+            The DTOField associated with `elem`
+        """
         return elem.info.get(settings.api.DTO_INFO_KEY, DTOField())
 
     def is_type_hint_optional(self, type_hint: Any) -> bool:
+        """Whether the given type hint is considered as optional or not.
+
+        Returns:
+            `True` if arguments of the given type hint are optional
+
+        Three cases are considered:
+        ```
+            Optional[str]
+            Union[str, None]
+            str | None
+        ```
+        In any other form, the type hint will not be considered as optional
+        """
         origin = get_origin(type_hint)
         if origin is None:
             return False
@@ -151,6 +199,17 @@ class DTOFactory:
     def iter_type_hints(
         self, model: type[DeclarativeBase], purpose: Purpose, exclude: set[str]
     ) -> Generator[tuple[str, Any, Column | RelationshipProperty], None, None]:
+        """Iterate over type hints of columns and relationships for the given
+        model.
+
+        Args:
+            model: The model from which to retrieve type hints
+            purpose: DTO purpose
+            exclude: Set of field names that should be excluded from the DTO
+
+        Yields:
+            A tuple of (Attribute name, type hint, column/relationship)
+        """
         columns, relationships = self._inspect_model(model)
 
         for key, type_hint in get_type_hints(model, localns=self._get_localns(model)).items():
@@ -173,7 +232,19 @@ class DTOFactory:
 
             yield key, type_hint, elem
 
-    def factory(self, *args: Any, **kwargs: Any) -> Any:
+    def factory(
+        self, name: str, model: type[AnyDeclarative], purpose: Purpose, *args: Any, **kwargs: Any
+    ) -> Any:
+        """Build a Data transfer object (DTO) from an SQAlchemy model.
+
+        Args:
+            name: DTO name
+            model: SQLAlchemy model from which to generate the DTO
+            purpose: DTO purpose
+
+        Returns:
+            A DTO generated after the given model.
+        """
         raise NotImplementedError
 
 
@@ -195,6 +266,20 @@ class PydanticDTOFactory(DTOFactory):
         purpose: Purpose,
         dto_field: DTOField,
     ) -> FieldInfo:
+        """Build a `FieldInfo instance reflecting the given
+        column/relationship.`
+
+        Args:
+            elem: Column or relationship from which to generate the FieldInfo
+            purpose: DTO purpose
+            dto_field: DTOField
+
+        Raises:
+            ValueError: Raised when a column default value can't be used on a FieldInfo
+
+        Returns:
+            A `FieldInfo` instance
+        """
         if dto_field.pydantic_field is not None:
             return dto_field.pydantic_field
 
@@ -206,7 +291,9 @@ class PydanticDTOFactory(DTOFactory):
                 if default.is_scalar:
                     default = default.arg
                 elif default.is_callable:
-                    default_factory = lambda: default.arg({})
+                    default_factory = lambda: default.arg(
+                        {}
+                    )  # pylint: disable=unnecessary-lambda-assignment
                 else:
                     raise ValueError("Unexpected default type")
         elif isinstance(elem, RelationshipProperty):
@@ -225,13 +312,21 @@ class PydanticDTOFactory(DTOFactory):
         return FieldInfo(**kwargs)
 
     def _update_forward_refs(self, dto_name: str) -> None:
+        """Recursively update forward refs of the dto with the given class
+        name.
+
+        Any factory-generated DTO and referenced by the given parent will be updated too.
+
+        Args:
+            dto_name: Class name of the DTO to update.
+        """
         namespace = {**self.dtos}
         if children := self.dto_children.get(dto_name):
             for child in children:
                 child.update_forward_refs(**namespace)
             self.dto_children.pop(dto_name)
 
-    def resolve_type(
+    def _resolve_type(
         self,
         elem: Column | RelationshipProperty,
         type_hint: Any,
@@ -241,6 +336,20 @@ class PydanticDTOFactory(DTOFactory):
         forward_refs: defaultdict[type[DeclarativeBase], list[str]],
         **kwargs: Any,
     ) -> Any:
+        """Recursively resolve the type hint to a valid pydantic type.
+
+        Args:
+            elem: The column or relationship associated with the type hint
+            type_hint: Type hint to resolve
+            name: The name of the DTO that is being generated
+            purpose: DTO purpose
+            parents: Dependency chain of the current SQAlchemy model
+            forward_refs: Forward refs that have been found when generating the DTO
+
+        Returns:
+            unchanged `type_hint` if `elem` is not a relationship,
+            else a new type hint referencing a DTO generated after the relationship
+        """
         if not isinstance(elem, RelationshipProperty):
             return type_hint
         model = elem.mapper.class_
@@ -264,18 +373,30 @@ class PydanticDTOFactory(DTOFactory):
             return dto | None
         return dto
 
-    def factory(
+    def factory(  # pylint: disable=too-many-locals
         self,
         name: str,
         model: type[AnyDeclarative],
         purpose: Purpose,
-        base: type[BaseModel],
-        *_: Any,
+        *args: Any,
+        base: type[BaseModel] | None = None,
         exclude: set[str] | None = None,
         parents: list[type[AnyDeclarative]] | None = None,
         forward_refs: defaultdict[type[DeclarativeBase], list[str]] | None = None,
         **kwargs: Any,
     ) -> type[FromMapped[AnyDeclarative]]:
+        """Build a pydantic model from an SQAlchemy model.
+
+        Args:
+            name: DTO name
+            model: SQLAlchemy model from which to generate the DTO
+            purpose: DTO purpose
+            base: Class to use as base when generating the model
+            exclude: Set of field names that should be excluded from the DTO
+
+        Returns:
+            _description_
+        """
         if parents is None:
             parents = []
         if forward_refs is None:
@@ -295,7 +416,7 @@ class PydanticDTOFactory(DTOFactory):
             for i, func in enumerate(dto_field.validators or []):
                 validators[f"_validates_{key}_{i}"] = validator(key, allow_reuse=True)(func)
 
-            type_hint = self.resolve_type(
+            type_hint = self._resolve_type(
                 elem,
                 type_hint,
                 name,

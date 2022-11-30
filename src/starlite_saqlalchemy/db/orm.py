@@ -101,3 +101,7 @@ class AuditBase(AuditColumns, CommonColumns, DeclarativeBase):
     """Base for declarative models with audit columns."""
 
     registry = registry_
+
+
+
+dto.from_mapped.pydantic_dto_factory.add_registry(Base.registry)
