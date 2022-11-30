@@ -9,8 +9,8 @@ should always be private, or read-only at the model declaration layer.
 from __future__ import annotations
 
 from collections import defaultdict
-from inspect import getmodule, isclass
-from types import ModuleType
+from inspect import getmodule
+from types import ModuleType, UnionType
 from typing import (
     TYPE_CHECKING,
     Annotated,
@@ -23,11 +23,12 @@ from typing import (
     get_args,
     get_origin,
     get_type_hints,
+    Optional,
+    Union,
 )
-
 from pydantic import BaseModel, create_model, validator
 from pydantic.fields import FieldInfo
-from sqlalchemy import inspect
+from sqlalchemy import inspect, Column
 from sqlalchemy.orm import DeclarativeBase, Mapped, RelationshipProperty
 
 from starlite_saqlalchemy import settings
@@ -39,7 +40,6 @@ if TYPE_CHECKING:
     from typing import Any, Generator, Literal, TypeAlias
 
     from pydantic.typing import AnyClassMethod
-    from sqlalchemy import Column
     from sqlalchemy.orm import Mapper, registry
     from sqlalchemy.sql.base import ReadOnlyColumnCollection
     from sqlalchemy.util import ReadOnlyProperties
@@ -52,7 +52,7 @@ if TYPE_CHECKING:
 __all__ = ("FromMapped",)
 
 AnyDeclarative = TypeVar("AnyDeclarative", bound=DeclarativeBase)
-
+_MISSING = object()
 
 class DTOFactory:
     def __init__(self, registry: Registry | None = None) -> None:
@@ -94,25 +94,6 @@ class DTOFactory:
             return True
         return False
 
-    def _is_model_ref(self, type_hint: Any) -> bool:
-        return (isclass(type_hint) and issubclass(type_hint, DeclarativeBase)) or isinstance(
-            type_hint, (ForwardRef, str)
-        )
-
-    def _type_hint_to_model(
-        self, type_hint: type[DeclarativeBase] | ForwardRef | str
-    ) -> type[DeclarativeBase] | None:
-        if isinstance(type_hint, ForwardRef):
-            return self.mapped_classes[type_hint.__forward_arg__]
-        if isinstance(type_hint, str):
-            return self.mapped_classes[type_hint]
-        if isclass(type_hint) and issubclass(type_hint, DeclarativeBase):
-            return type_hint
-        return None
-
-    def _relationship_to_model(self, relationship: RelationshipProperty) -> type[DeclarativeBase]:
-        return relationship.mapper.class_
-
     @property
     def mapped_classes(self) -> dict[str, type[DeclarativeBase]]:
         if not self._registries:
@@ -136,6 +117,16 @@ class DTOFactory:
 
     def get_dto_field(self, elem: Column | RelationshipProperty) -> DTOField:
         return elem.info.get(settings.api.DTO_INFO_KEY, DTOField())
+
+    def is_type_hint_optional(self, type_hint: Any) -> bool:
+        origin = get_origin(type_hint)
+        if origin is None:
+            return False
+        if origin is Optional:
+            return True
+        if origin in (Union, UnionType):
+            args = get_args(type_hint)
+            return any(arg is type(None) for arg in args)
 
     def iter_type_hints(
         self, model: type[DeclarativeBase], purpose: Purpose, exclude: set[str]
@@ -170,25 +161,30 @@ class DTOFactory:
         purpose: Purpose,
         **kwargs: Any,
     ) -> Any:
-        if model := self._type_hint_to_model(type_hint):
-            return self.factory(
-                name=f"{name}_{model.__name__}",
-                model=model,
-                purpose=purpose,
-                **kwargs,
-            )
-        if not get_origin(type_hint) and not get_args(type_hint):
+        if isinstance(elem, RelationshipProperty):
+            model = elem.mapper.class_
+            if elem.uselist:
+                # Silent mypy on return list[dto], but annotation is not correct
+                dto: Any = self.factory(
+                    name=f"{name}_{model.__name__}",
+                    model=model,
+                    purpose=purpose,
+                    **kwargs,
+                )
+                dto_type = list[dto]
+            else:
+                dto_type: Any = self.factory(
+                    name=f"{name}_{model.__name__}",
+                    model=model,
+                    purpose=purpose,
+                    **kwargs,
+                )
+            if self.is_type_hint_optional(type_hint):
+                return dto_type | None
+            else:
+                return dto_type
+        else:
             return type_hint
-        if isinstance(elem, RelationshipProperty) and elem.uselist:
-            model = self._relationship_to_model(elem)
-            # Silent mypy on return list[dto], but annotation is not correct
-            dto: Any = self.factory(
-                name=f"{name}_{model.__name__}",
-                model=model,
-                purpose=purpose,
-                **kwargs,
-            )
-            return list[dto]
 
     def factory(self, *args: Any, **kwargs: Any) -> type[FromMapped[AnyDeclarative]] | ForwardRef:
         raise NotImplementedError
@@ -197,31 +193,47 @@ class DTOFactory:
 class PydanticDTOFactory(DTOFactory):
     def __init__(self, registry: registry | None = None) -> None:
         super().__init__(registry)
-        self.dtos: dict[str, type[FromMapped]] = {}
+        # List of all existing dtos, both declared and generated
+        self.dtos: dict[str, type[FromMapped[AnyDeclarative]]] = {}
+        # Lis dto's children. Used to update forwardrefs of generated dtos
         self.dto_childs: dict[str, list[type[FromMapped]]] = defaultdict(list)
+        # Store dto names with fields typed as forwardref.
+        self.not_ready: set[str] = set()
 
     def _construct_field_info(
-        self, elem: Column | RelationshipProperty, purpose: Purpose, dto_field: DTOField
+        self, elem: Column | RelationshipProperty, type_hint: Any, purpose: Purpose, dto_field: DTOField
     ) -> FieldInfo:
         if dto_field.pydantic_field is not None:
             return dto_field.pydantic_field
 
-        default = getattr(elem, "default", None)
-        nullable = getattr(elem, "nullable", False)
+        default_factory = getattr(elem, "default_factory", _MISSING)
+        default = getattr(elem, "default", _MISSING)
+
+
+        if isinstance(elem, Column):
+            if default not in (_MISSING, None):
+                if default.is_scalar:
+                    default = default.is_scalar
+                elif default.is_callable:
+                    default = lambda: default.arg({})
+        elif isinstance(elem, RelationshipProperty):
+            if default is _MISSING and elem.uselist:
+                default_factory = list
+            elif default is _MISSING:
+                default = None
+
+        print(elem, default, default_factory)
+        print(default is _MISSING, default_factory is _MISSING)
+
         if purpose is Purpose.READ:
             return FieldInfo(...)
-        if default is None:
-            if nullable:
-                return FieldInfo(default=None)
-            if isinstance(elem, RelationshipProperty):
-                if elem.uselist:
-                    return FieldInfo(default_factory=list)
-                return FieldInfo(default=None)
-            return FieldInfo(...)
-        if default.is_scalar:
-            return FieldInfo(default=default.arg)
-        if default.is_callable:
-            return FieldInfo(default_factory=lambda: default.arg({}))
+        match (default is _MISSING, default_factory is _MISSING):
+            case (True, True):
+                return FieldInfo(...)
+            case (False, True):
+                return FieldInfo(default=default)
+            case (True, False) | (False, False):
+                return FieldInfo(default_factory=default_factory)
         raise ValueError("Unexpected default type")
 
     def factory(
@@ -270,7 +282,7 @@ class PydanticDTOFactory(DTOFactory):
                 forward_refs=forward_refs,
                 base=base,
             )
-            fields[key] = (type_hint, self._construct_field_info(elem, purpose, dto_field))
+            fields[key] = (type_hint, self._construct_field_info(elem, type_hint, purpose, dto_field))
 
         dto = create_model(  # type:ignore[no-any-return,call-overload]
             name,
@@ -284,6 +296,8 @@ class PydanticDTOFactory(DTOFactory):
 
         if name != root:
             self.dto_childs[root].append(dto)
+        elif forward_refs:
+            self.not_ready.add(dto.__name__)
 
         if model_forward_refs := forward_refs.get(model, None):
             for forward_ref in model_forward_refs:
@@ -373,15 +387,17 @@ class FromMapped(BaseModel, Generic[AnyDeclarative]):
         dto = pydantic_dto_factory.factory(
             name=name, model=model, purpose=purpose, exclude=exclude, base=cls
         )
+        if dto.__name__ in pydantic_dto_factory.not_ready:
+            pydantic_dto_factory.not_ready.remove(dto.__name__)
+            dto.update_forward_refs()
         return cast("type[FromMapped[AnyDeclarative]]", dto)
 
     @classmethod
     def update_forward_refs(cls, **localns: Any) -> None:
-        import pprint
-        pprint.pprint(pydantic_dto_factory.dtos)
         namespace = {**pydantic_dto_factory.dtos, **localns}
         if childs := pydantic_dto_factory.dto_childs.get(cls.__name__):
             for child in childs:
                 child.update_forward_refs(**namespace)
+            pydantic_dto_factory.dto_childs.pop(cls.__name__)
         else:
             return super().update_forward_refs(**namespace)
