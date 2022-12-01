@@ -207,7 +207,7 @@ jobs:
         # https://community.sonarsource.com/t/sonar-on-github-actions-with-python-coverage-source-issue/36057
         run: sed -i "s/home\/runner\/work\/starlite-saqlalchemy\/starlite-saqlalchemy/github\/workspace/g" coverage.xml
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@156db6fef3e168e4972abb76de0b32bbce8ec77a # @v1.7
+        uses: SonarSource/sonarcloud-github-action@cb201f3b2d7a38231a8c042dfea4539c8bea180b # @v1.8
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
