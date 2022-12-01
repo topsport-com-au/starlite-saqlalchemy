@@ -368,7 +368,7 @@ class PydanticDTOFactory(DTOFactory):
         if elem.uselist:
             dto = list[dto]
         if self.is_type_hint_optional(type_hint):
-            return dto | None
+            return Optional[dto]
         return dto
 
     def factory(  # pylint: disable=too-many-locals
