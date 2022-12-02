@@ -9,12 +9,14 @@ should always be private, or read-only at the model declaration layer.
 from __future__ import annotations
 
 from inspect import getmodule
+from types import UnionType
 from typing import (
     TYPE_CHECKING,
     Annotated,
     ClassVar,
     Generic,
     TypeVar,
+    Union,
     cast,
     get_args,
     get_origin,
@@ -162,16 +164,26 @@ class FromMapped(BaseModel, Generic[AnyDeclarative]):
 
     @classmethod
     def _handle_relationships(cls, type_hint: Any, name: str, purpose: Purpose) -> Any:
-        origin_type = get_origin(type_hint)
-        if origin_type is not None or issubclass(type_hint, DeclarativeBase):
-            if origin_type:
-                (type_hint,) = get_args(type_hint)
-            type_hint = cls._factory(
-                f"{name}_{type_hint.__name__}", type_hint, purpose=purpose, exclude=set()
-            )
-            if origin_type:
-                type_hint = origin_type[type_hint]
-        return type_hint  # noqa:R504
+        args = get_args(type_hint)
+        if not args and not issubclass(type_hint, DeclarativeBase):
+            return type_hint
+
+        any_decl = any(issubclass(a, DeclarativeBase) for a in args)
+        if args and not any_decl:
+            return type_hint
+
+        if args:
+            origin_type = get_origin(type_hint)
+            if origin_type is None:  # pragma: no cover
+                raise RuntimeError("Unexpected `None` origin type.")
+            origin_type = Union if origin_type is UnionType else origin_type
+            inner_types = tuple(cls._handle_relationships(a, name, purpose) for a in args)
+            return origin_type[inner_types]  # pyright:ignore
+
+        type_hint = cls._factory(
+            f"{name}_{type_hint.__name__}", type_hint, purpose=purpose, exclude=set()
+        )
+        return type_hint
 
 
 def _construct_field_info(

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Annotated, Any, ClassVar
 from uuid import UUID, uuid4
 
 import pytest
-from pydantic import Field, constr, validator
+from pydantic import BaseModel, Field, constr, validator
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -313,3 +313,37 @@ def test_dto_field_pydantic_field(base: type[DeclarativeBase]) -> None:
     DTO = dto.FromMapped[Annotated[A, "write"]]
     with pytest.raises(ValueError):  # noqa:PT011
         DTO.parse_obj({"id": 1, "val": 2})
+
+
+def test_dto_mapped_union(base: type[DeclarativeBase]) -> None:
+    """Test where a column type declared as e.g., `Mapped[str | None]`."""
+
+    class A(base):
+        __tablename__ = "a"
+        val: Mapped[str | None]
+
+    DTO = dto.FromMapped[Annotated[A, "write"]]
+    field = DTO.__fields__["val"]
+    assert field.allow_none is True
+    assert field.default is None
+    assert field.type_ is str
+
+
+def test_dto_mapped_union_relationship(base: type[DeclarativeBase]) -> None:
+    """Test where a related type declared as e.g., `Mapped[A | None]`."""
+
+    class A(base):
+        __tablename__ = "a"
+        val: Mapped[str | None]
+
+    class B(base):
+        __tablename__ = "b"
+        a_id: Mapped[int | None] = mapped_column(ForeignKey("a.id"), info=dto.field("private"))
+        a: Mapped[A | None] = relationship(A)
+
+    DTO = dto.FromMapped[Annotated[B, "write"]]
+    field = DTO.__fields__["a"]
+    assert field.allow_none is True
+    assert field.default is None
+    assert issubclass(field.type_, BaseModel)
+    assert "val" in field.type_.__fields__
