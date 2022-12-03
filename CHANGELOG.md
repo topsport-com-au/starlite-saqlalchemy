@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.14.2 (2022-12-03)
+### Fix
+* **dto:** Fix UnionType parsing as relationship. ([`4b93d17`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/4b93d17e732849179bb1c2d014d8177a93a3dbfc))
+
 ## v0.14.1 (2022-11-30)
 ### Fix
 * Fix for usage of mock repo. ([`dddf1e2`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/dddf1e2e52defbb7632368c8442417fa26076e74))
