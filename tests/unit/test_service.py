@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any
 from unittest.mock import AsyncMock
 from uuid import uuid4
 
-import orjson
 import pytest
 
 from starlite_saqlalchemy import db, service, worker
@@ -95,17 +94,9 @@ async def test_make_service_callback(
         {},
         service_type_id="tests.utils.domain.authors.Service",
         service_method_name="receive_callback",
-        raw_obj=orjson.loads(orjson.dumps(raw_authors[0], default=str)),
+        raw_obj=raw_authors[0],
     )
-    recv_cb_mock.assert_called_once_with(
-        raw_obj={
-            "id": "97108ac1-ffcb-411d-8b1e-d9183399f63b",
-            "name": "Agatha Christie",
-            "dob": "1890-09-15",
-            "created": "0001-01-01T00:00:00",
-            "updated": "0001-01-01T00:00:00",
-        },
-    )
+    recv_cb_mock.assert_called_once_with(raw_obj=raw_authors[0])
 
 
 async def test_make_service_callback_raises_runtime_error(
@@ -117,7 +108,7 @@ async def test_make_service_callback_raises_runtime_error(
             {},
             service_type_id="tests.utils.domain.LSKDFJ",
             service_method_name="receive_callback",
-            raw_obj=orjson.loads(orjson.dumps(raw_authors[0], default=str)),
+            raw_obj=raw_authors[0],
         )
 
 

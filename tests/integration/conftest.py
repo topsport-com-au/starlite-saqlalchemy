@@ -28,6 +28,8 @@ if TYPE_CHECKING:
     from pytest_docker.plugin import Services  # type:ignore[import]
     from starlite import Starlite
 
+    from tests.utils.domain.authors import Author
+
 
 here = Path(__file__).parent
 
@@ -165,9 +167,7 @@ async def engine(docker_ip: str) -> AsyncEngine:
 
 
 @pytest.fixture(autouse=True)
-async def _seed_db(
-    engine: AsyncEngine, raw_authors: list[dict[str, Any]]
-) -> abc.AsyncIterator[None]:
+async def _seed_db(engine: AsyncEngine, authors: list[Author]) -> abc.AsyncIterator[None]:
     """Populate test database with.
 
     Args:
@@ -179,7 +179,7 @@ async def _seed_db(
     async with engine.begin() as conn:
         await conn.run_sync(metadata.create_all)
     async with engine.begin() as conn:
-        await conn.execute(author_table.insert(), raw_authors)
+        await conn.execute(author_table.insert(), [vars(item) for item in authors])
     yield
     async with engine.begin() as conn:
         await conn.run_sync(metadata.drop_all)
