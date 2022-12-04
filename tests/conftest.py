@@ -3,9 +3,8 @@ from __future__ import annotations
 
 import importlib
 import sys
-from datetime import date, datetime
 from typing import TYPE_CHECKING, TypeVar
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 from starlite import Starlite
@@ -14,8 +13,7 @@ from structlog.testing import CapturingLogger
 
 import starlite_saqlalchemy
 from starlite_saqlalchemy import ConfigureApp, log
-from tests.utils.domain.authors import Author
-from tests.utils.domain.books import Book
+from tests.utils.domain import authors, books
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -65,47 +63,47 @@ def fx_raw_authors() -> list[dict[str, Any]]:
 
     return [
         {
-            "id": UUID("97108ac1-ffcb-411d-8b1e-d9183399f63b"),
+            "id": "97108ac1-ffcb-411d-8b1e-d9183399f63b",
             "name": "Agatha Christie",
-            "dob": date(1890, 9, 15),
-            "created": datetime.min,
-            "updated": datetime.min,
+            "dob": "1890-09-15",
+            "created": "0001-01-01T00:00:00",
+            "updated": "0001-01-01T00:00:00",
         },
         {
-            "id": UUID("5ef29f3c-3560-4d15-ba6b-a2e5c721e4d2"),
+            "id": "5ef29f3c-3560-4d15-ba6b-a2e5c721e4d2",
             "name": "Leo Tolstoy",
-            "dob": date(1828, 9, 9),
-            "created": datetime.min,
-            "updated": datetime.min,
+            "dob": "1828-09-09",
+            "created": "0001-01-01T00:00:00",
+            "updated": "0001-01-01T00:00:00",
         },
     ]
 
 
 @pytest.fixture(name="authors")
-def fx_authors(raw_authors: list[dict[str, Any]]) -> list[Author]:
+def fx_authors(raw_authors: list[dict[str, Any]]) -> list[authors.Author]:
     """Collection of parsed Author models."""
-    return [Author(**raw) for raw in raw_authors]
+    return [authors.ReadDTO(**raw).to_mapped() for raw in raw_authors]
 
 
 @pytest.fixture(name="raw_books")
-def fx_raw_books() -> list[dict[str, Any]]:
+def fx_raw_books(raw_authors: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Unstructured book representations."""
     return [
         {
-            "id": UUID("f34545b9-663c-4fce-915d-dd1ae9cea42a"),
+            "id": "f34545b9-663c-4fce-915d-dd1ae9cea42a",
             "title": "Murder on the Orient Express",
-            "author_id": UUID("97108ac1-ffcb-411d-8b1e-d9183399f63b"),
-            "created": datetime.min,
-            "updated": datetime.min,
+            "author_id": "97108ac1-ffcb-411d-8b1e-d9183399f63b",
+            "author": raw_authors[0],
+            "created": "0001-01-01T00:00:00",
+            "updated": "0001-01-01T00:00:00",
         },
     ]
 
 
 @pytest.fixture(name="books")
-def fx_books(raw_books: list[dict[str, Any]], authors: list[Author]) -> list[Book]:
+def fx_books(raw_books: list[dict[str, Any]]) -> list[books.Book]:
     """Collection of parsed Book models."""
-    author_id_map = {author.id: author for author in authors}
-    return [Book(**raw, author=author_id_map[raw["author_id"]]) for raw in raw_books]
+    return [books.ReadDTO(**raw).to_mapped() for raw in raw_books]
 
 
 @pytest.fixture(name="create_module")
