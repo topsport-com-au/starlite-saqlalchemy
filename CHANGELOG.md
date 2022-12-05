@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.15.0 (2022-12-05)
+### Feature
+* **testing:** ControllerTest utility. ([#152](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/152)) ([`4cc707b`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/4cc707bf25b4493b0477df173040f0fa4454fe1c))
+
 ## v0.14.2 (2022-12-03)
 ### Fix
 * **dto:** Fix UnionType parsing as relationship. ([`4b93d17`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/4b93d17e732849179bb1c2d014d8177a93a3dbfc))
