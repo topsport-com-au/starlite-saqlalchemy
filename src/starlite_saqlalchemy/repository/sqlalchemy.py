@@ -206,6 +206,16 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             self.session.expunge(instance)
             return instance
 
+    def filter_collection_by_kwargs(self, **kwargs: Any) -> None:
+        """Filter the collection by kwargs.
+
+        Args:
+            **kwargs: key/value pairs such that objects remaining in the collection after filtering
+                have the property that their attribute named `key` has value equal to `value`.
+        """
+        with wrap_sqlalchemy_exception():
+            self._select.filter_by(**kwargs)
+
     @classmethod
     async def check_health(cls, session: AsyncSession) -> bool:
         """Perform a health check on the database.
