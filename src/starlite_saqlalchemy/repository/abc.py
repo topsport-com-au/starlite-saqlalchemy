@@ -112,6 +112,20 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
             RepositoryNotFoundException: If no instance found with same identifier as `data`.
         """
 
+    @abstractmethod
+    def filter_collection_by_kwargs(self, **kwargs: Any) -> None:
+        """Filter the collection by kwargs.
+
+        Has `AND` semantics where multiple kwargs name/value pairs are provided.
+
+        Args:
+            **kwargs: key/value pairs such that objects remaining in the collection after filtering
+                have the property that their attribute named `key` has value equal to `value`.
+
+        Raises:
+            RepositoryException: if a named attribute doesn't exist on `self.model_type`.
+        """
+
     @staticmethod
     def check_not_found(item_or_none: T | None) -> T:
         """Raise `RepositoryNotFoundException` if `item_or_none` is `None`.

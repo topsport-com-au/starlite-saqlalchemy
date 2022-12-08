@@ -9,7 +9,10 @@ import pytest
 from starlite.status_codes import HTTP_200_OK, HTTP_404_NOT_FOUND
 
 from starlite_saqlalchemy import testing
-from starlite_saqlalchemy.repository.exceptions import RepositoryConflictException
+from starlite_saqlalchemy.repository.exceptions import (
+    RepositoryConflictException,
+    RepositoryException,
+)
 from tests.utils.domain.authors import Author
 from tests.utils.domain.authors import Service as AuthorService
 from tests.utils.domain.books import Book
@@ -52,6 +55,33 @@ def test_generic_mock_repository_clear_collection(
     """Test clearing collection for type."""
     author_repository_type.clear_collection()
     assert not author_repository_type.collection
+
+
+def test_generic_mock_repository_filter_collection_by_kwargs(
+    author_repository: testing.GenericMockRepository[Author],
+) -> None:
+    """Test filtering the repository collection by kwargs."""
+    author_repository.filter_collection_by_kwargs(name="Leo Tolstoy")
+    assert len(author_repository.collection) == 1
+    assert list(author_repository.collection.values())[0].name == "Leo Tolstoy"
+
+
+def test_generic_mock_repository_filter_collection_by_kwargs_and_semantics(
+    author_repository: testing.GenericMockRepository[Author],
+) -> None:
+    """Test that filtering by kwargs has `AND` semantics when multiple kwargs,
+    not `OR`."""
+    author_repository.filter_collection_by_kwargs(name="Agatha Christie", dob="1828-09-09")
+    assert len(author_repository.collection) == 0
+
+
+def test_generic_mock_repository_raises_repository_exception_if_named_attribute_doesnt_exist(
+    author_repository: testing.GenericMockRepository[Author],
+) -> None:
+    """Test that a repo exception is raised if a named attribute doesn't
+    exist."""
+    with pytest.raises(RepositoryException):
+        author_repository.filter_collection_by_kwargs(cricket="ball")
 
 
 @pytest.fixture(name="mock_response")

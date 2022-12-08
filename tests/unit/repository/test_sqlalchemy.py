@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, call
 
 import pytest
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, InvalidRequestError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from starlite_saqlalchemy.repository.exceptions import (
@@ -229,3 +229,21 @@ def test__filter_on_datetime_field(
     field_mock.__gt__ = field_mock.__lt__ = lambda self, other: True
     mock_repo.model_type.updated = field_mock
     mock_repo._filter_on_datetime_field("updated", before, after)
+
+
+def test_filter_collection_by_kwargs(mock_repo: SQLAlchemyRepository) -> None:
+    """Test `filter_by()` called with kwargs."""
+    mock_repo.filter_collection_by_kwargs(a=1, b=2)
+    mock_repo._select.filter_by.assert_called_once_with(a=1, b=2)
+
+
+def test_filter_collection_by_kwargs_raises_repository_exception_for_attribute_error(
+    mock_repo: SQLAlchemyRepository,
+) -> None:
+    """Test that we raise a repository exception if an attribute name is
+    incorrect."""
+    mock_repo._select.filter_by = MagicMock(  # type:ignore[assignment]
+        side_effect=InvalidRequestError,
+    )
+    with pytest.raises(RepositoryException):
+        mock_repo.filter_collection_by_kwargs(a=1)

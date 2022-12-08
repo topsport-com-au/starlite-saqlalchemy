@@ -13,7 +13,10 @@ from starlite.status_codes import HTTP_200_OK, HTTP_201_CREATED
 
 from starlite_saqlalchemy.db import orm
 from starlite_saqlalchemy.repository.abc import AbstractRepository
-from starlite_saqlalchemy.repository.exceptions import RepositoryConflictException
+from starlite_saqlalchemy.repository.exceptions import (
+    RepositoryConflictException,
+    RepositoryException,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Hashable, Iterable, MutableMapping, Sequence
@@ -161,6 +164,22 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         if id_ in self.collection:
             return await self.update(data)
         return await self.add(data, allow_id=True)
+
+    def filter_collection_by_kwargs(self, **kwargs: Any) -> None:
+        """Filter the collection by kwargs.
+
+        Args:
+            **kwargs: key/value pairs such that objects remaining in the collection after filtering
+                have the property that their attribute named `key` has value equal to `value`.
+        """
+        new_collection: dict[Hashable, ModelT] = {}
+        for item in self.collection.values():
+            try:
+                if all(getattr(item, name) == value for name, value in kwargs.items()):
+                    new_collection[item.id] = item
+            except AttributeError as orig:
+                raise RepositoryException from orig
+        self.collection = new_collection
 
     @classmethod
     def seed_collection(cls, instances: Iterable[ModelT]) -> None:
