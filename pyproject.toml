@@ -31,7 +31,7 @@ profile = "black"
 
 [tool.poetry]
 name = "starlite-saqlalchemy"
-version = "0.15.0"
+version = "0.16.0"
 description = "Starlite config plugin with SAQ and SQLAlchemy boilerplate"
 license = "MIT"
 authors = ["Peter Schutt <peter.github@proton.me>"]
