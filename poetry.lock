@@ -188,6 +188,14 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "msgspec"
+version = "0.10.1"
+description = "A fast and friendly JSON/MessagePack library, with optional schema validation"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[[package]]
 name = "multidict"
 version = "6.0.3"
 description = "multidict implementation"
@@ -405,7 +413,7 @@ sqlcipher = ["sqlcipher3-binary"]
 
 [[package]]
 name = "starlite"
-version = "1.44.0"
+version = "1.45.0"
 description = "Performant, light and flexible ASGI API Framework"
 category = "main"
 optional = false
@@ -414,8 +422,8 @@ python-versions = ">=3.8,<4.0"
 [package.dependencies]
 anyio = ">=3"
 httpx = ">=0.22"
+msgspec = ">=0.10.1"
 multidict = ">=6.0.2"
-orjson = "*"
 pydantic = "*"
 pydantic-factories = "*"
 pydantic-openapi-schema = "*"
@@ -696,6 +704,37 @@ httpx = [
 idna = [
     {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
     {file = "idna-3.4.tar.gz", hash = "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"},
+]
+msgspec = [
+    {file = "msgspec-0.10.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:c5d0db7a52a5b41337b57f82c55aeb0e9ddeb5d568e2e059009fbc1b60b4ac99"},
+    {file = "msgspec-0.10.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:72d4056fbb75cd6a51da86f6ca9d39bd67163b6d04c9fe0f3e331d814f651512"},
+    {file = "msgspec-0.10.1-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:aee4810f8411a285675d6bced87ed5fd59a58792cf223f0591a3c911b3aa4fd6"},
+    {file = "msgspec-0.10.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:aa5c15d8d5c36a1a47dc85df5b74fe8f1a6c97c57de7cc065bceeb53d0468f10"},
+    {file = "msgspec-0.10.1-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:970b1b8d4fb3a474b5b003b48c181b385c23bb263f0906cda731a6f12070b9b2"},
+    {file = "msgspec-0.10.1-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:636f6a0480a05f5be2b184f826bbbc15a90cf5e22b78a204408fa3ad92d6c96f"},
+    {file = "msgspec-0.10.1-cp310-cp310-win_amd64.whl", hash = "sha256:750c1374b8129f5793cfea5fef069b6be69ee6f3e6e4b1a202e1b16e1d126dd4"},
+    {file = "msgspec-0.10.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:a732a442ff7c943f9341191a89ce8938f27e96d53ace87502c5dcf6c4614bc8a"},
+    {file = "msgspec-0.10.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:22920e23e57b1db92171aa52a785e47a04f5a21a84cf92caf7ad78c9200ddd06"},
+    {file = "msgspec-0.10.1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a4cb25d51cb9708a324c8b53daf6ca2d91fcfd7c51c3441fdfb6b36562a8624e"},
+    {file = "msgspec-0.10.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4c1f6cd279ef1e4fb78844924f28676a78bb64da4da01c320740c5a65d3b2b91"},
+    {file = "msgspec-0.10.1-cp311-cp311-musllinux_1_1_aarch64.whl", hash = "sha256:8d327f518db0aa24b28624fed1a8ae4b02fede568e57055f70afd93b82b96f15"},
+    {file = "msgspec-0.10.1-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:79c79fbc37dde6d2a2e73160ee3ba6d3d03041395ee6748e4feff2f13766a1c5"},
+    {file = "msgspec-0.10.1-cp311-cp311-win_amd64.whl", hash = "sha256:930b2f676075a864ae7bb4cdfb7b6deeb575d19fe668a09854c026bda80c710d"},
+    {file = "msgspec-0.10.1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:99b7e5ef0c0f0e5134d57f3e5b5eb4513b479cc1e32a3191377f6d9ed957c20d"},
+    {file = "msgspec-0.10.1-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:ad77924223829bc4b7b2373999b8553bf2701e566d1e7c47d8c5646a399525fc"},
+    {file = "msgspec-0.10.1-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:b4de6b43ae27c3ba5176b5f58c6d3f2d51217b57678de3c4faafc25dae49dba7"},
+    {file = "msgspec-0.10.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:bf134628bf5968c479d158e49d88a09a5302a56d9934ce2cc98f9d17ad306ad6"},
+    {file = "msgspec-0.10.1-cp38-cp38-musllinux_1_1_aarch64.whl", hash = "sha256:33d09e754baaa4062bdc82c4638d81675e06dd00bbf971f28d8684be87924943"},
+    {file = "msgspec-0.10.1-cp38-cp38-musllinux_1_1_x86_64.whl", hash = "sha256:34d149c24fb926e3b138bf69bdbec517e9c49356412ccd03642e4a10f67e2f05"},
+    {file = "msgspec-0.10.1-cp38-cp38-win_amd64.whl", hash = "sha256:4ad2bcd58a235303a37271851d4933c8e99068d1c5c102409ccf096918fe8a3b"},
+    {file = "msgspec-0.10.1-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:3cdf4eb3b81e20672fa55d7a8dcadac6ec175fcabef1f7f5670fbe1ebe5e0cc0"},
+    {file = "msgspec-0.10.1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:67c64bc237f656a7f2990aa38339bdc72314ab0c480bb267e1fd1d7a5a09a147"},
+    {file = "msgspec-0.10.1-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5401253669343f1e6325e88165d51b4a32a8727718fc0f34ed7583f2022ed64a"},
+    {file = "msgspec-0.10.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:96576b8ec6e52efa5dd835a229c1ddffd0557746b814e83c04b679c3de6bb7d3"},
+    {file = "msgspec-0.10.1-cp39-cp39-musllinux_1_1_aarch64.whl", hash = "sha256:2eeaf8dea776eb0cecd28f83e9029ecc754bc7cf37de6b43a628d5f8fc1c921e"},
+    {file = "msgspec-0.10.1-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:970407e05ac9c59e90791befa23decd4ef4cc4b3b6b7bb1a6797ba5d3f64625d"},
+    {file = "msgspec-0.10.1-cp39-cp39-win_amd64.whl", hash = "sha256:e6244009afdf5083ccfcf6038de8fb4a1d94254e4716b402d478e0275f431e8f"},
+    {file = "msgspec-0.10.1.tar.gz", hash = "sha256:770c29c5bf227f1c5e3bd0f82ecea313b74772763997c2a5d0ff1375c7e4e1db"},
 ]
 multidict = [
     {file = "multidict-6.0.3-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:73009ea04205966d47e16d98686ac5c438af23a1bb30b48a2c5da3423ec9ce37"},
@@ -983,8 +1022,8 @@ sqlalchemy = [
     {file = "SQLAlchemy-2.0.0b4.tar.gz", hash = "sha256:3192d9af656d0fc1b07351f0ac13a84bb679f40f918234e54cbcc36af11766fe"},
 ]
 starlite = [
-    {file = "starlite-1.44.0-py3-none-any.whl", hash = "sha256:2a9a32733e38382942709e84955a137841ecd339953a4224928d7da4cbb8297a"},
-    {file = "starlite-1.44.0.tar.gz", hash = "sha256:eee794f06024255843ef7a589081da3e184843c5569781fac7c1c5e20a3c33a1"},
+    {file = "starlite-1.45.0-py3-none-any.whl", hash = "sha256:a01065f4117c4551a482fa6e4805d029fd591a0ed5044bcf0885c9285b882111"},
+    {file = "starlite-1.45.0.tar.gz", hash = "sha256:af180cebcc40549effefee791b926f04f5c19b50facf2d54ae84e51a77aa9fc2"},
 ]
 structlog = [
     {file = "structlog-22.3.0-py3-none-any.whl", hash = "sha256:b403f344f902b220648fa9f286a23c0cc5439a5844d271fec40562dbadbc70ad"},
