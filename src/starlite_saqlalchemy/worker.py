@@ -2,10 +2,9 @@
 from __future__ import annotations
 
 import asyncio
-from functools import partial
 from typing import TYPE_CHECKING, Any
 
-import orjson
+import msgspec
 import saq
 
 from starlite_saqlalchemy import redis, settings
@@ -37,8 +36,8 @@ class Queue(saq.Queue):
             **kwargs: Passed through to `saq.Queue.__init__()`
         """
         kwargs.setdefault("name", settings.app.slug)
-        kwargs.setdefault("dump", partial(orjson.dumps, default=str))
-        kwargs.setdefault("load", orjson.loads)
+        kwargs.setdefault("dump", msgspec.json.encode)
+        kwargs.setdefault("load", msgspec.json.decode)
         super().__init__(*args, **kwargs)
 
 
