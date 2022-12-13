@@ -6,7 +6,7 @@ import logging
 import sys
 from typing import TYPE_CHECKING
 
-import orjson
+import msgspec
 import structlog
 from starlite.config.logging import LoggingConfig
 
@@ -43,7 +43,7 @@ else:  # pragma: no cover
     default_processors.extend(
         [
             structlog.processors.dict_tracebacks,
-            structlog.processors.JSONRenderer(serializer=orjson.dumps),
+            structlog.processors.JSONRenderer(serializer=msgspec.json.encode),
         ]
     )
 
