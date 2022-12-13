@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.0 (2022-12-13)
+### Feature
+* Follow starlite into msgspec. ([#165](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/165)) ([`2104626`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/2104626ff9016ba97675c0489d62f5106f1a9757))
+
+### Breaking
+* follow starlite into msgspec. ([#165](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/165)) ([`2104626`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/2104626ff9016ba97675c0489d62f5106f1a9757))
+
 ## v0.16.0 (2022-12-08)
 ### Feature
 * **repo:** Abstract method `filter_collection_by_kwargs()` ([#159](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/159)) ([`15bf7a8`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/15bf7a814da21e105fc26b98a876f68fa0c998b4))
