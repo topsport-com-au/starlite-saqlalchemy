@@ -42,7 +42,7 @@ async def test_logging(app: "Starlite", cap_logger: CapturingLogger) -> None:
                 "response": {
                     "status_code": 200,
                     "cookies": {},
-                    "headers": {"content-type": "application/json", "content-length": "144"},
+                    "headers": {"content-type": "application/json", "content-length": "151"},
                     "body": ANY,
                 },
                 "request": {
