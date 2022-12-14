@@ -5,13 +5,13 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-import msgspec
 import structlog
 from starlite.config.logging import LoggingConfig
 
 from starlite_saqlalchemy import settings
 
 from . import controller, worker
+from .msgspec_renderer import msgspec_json_renderer
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -27,6 +27,7 @@ __all__ = (
     "worker",
 )
 
+
 default_processors = [
     structlog.contextvars.merge_contextvars,
     controller.drop_health_logs,
@@ -34,17 +35,12 @@ default_processors = [
     structlog.processors.TimeStamper(fmt="iso", utc=True),
 ]
 
-if settings.app.ENVIRONMENT == "local":
+if settings.app.ENVIRONMENT == "local":  # pragma: no cover
     LoggerFactory: Any = structlog.WriteLoggerFactory
     default_processors.extend([structlog.dev.ConsoleRenderer()])
-else:  # pragma: no cover
+else:
     LoggerFactory = structlog.BytesLoggerFactory
-    default_processors.extend(
-        [
-            structlog.processors.dict_tracebacks,
-            structlog.processors.JSONRenderer(serializer=msgspec.json.encode),
-        ]
-    )
+    default_processors.extend([structlog.processors.dict_tracebacks, msgspec_json_renderer])
 
 
 def configure(processors: Sequence[Processor]) -> None:
