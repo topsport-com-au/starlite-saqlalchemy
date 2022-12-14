@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v0.18.0 (2022-12-14)
+### Feature
+* "local" environment ([`2a439e7`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/2a439e7b723276831deb66ea068537cddeb43619))
+
+### Fix
+* Msgspec json log rendering ([`818539d`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/818539d19cd60b54fe136ee7efd4f8f462cc7ff5))
+
+### Breaking
+* "local" environment ([`2a439e7`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/2a439e7b723276831deb66ea068537cddeb43619))
+
 ## v0.17.0 (2022-12-13)
 ### Feature
 * Follow starlite into msgspec. ([#165](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/165)) ([`2104626`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/2104626ff9016ba97675c0489d62f5106f1a9757))
