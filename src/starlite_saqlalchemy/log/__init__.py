@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import sys
 from typing import TYPE_CHECKING
 
 import msgspec
@@ -35,7 +34,7 @@ default_processors = [
     structlog.processors.TimeStamper(fmt="iso", utc=True),
 ]
 
-if sys.stderr.isatty() or "pytest" in sys.modules:  # pragma: no cover
+if settings.app.ENVIRONMENT == "local":
     LoggerFactory: Any = structlog.WriteLoggerFactory
     default_processors.extend([structlog.dev.ConsoleRenderer()])
 else:  # pragma: no cover
