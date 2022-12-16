@@ -2,6 +2,9 @@
 
 <!--next-version-placeholder-->
 
+## v0.19.0 (2022-12-16)
+
+
 ## v0.18.0 (2022-12-14)
 ### Feature
 * "local" environment ([`2a439e7`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/2a439e7b723276831deb66ea068537cddeb43619))
