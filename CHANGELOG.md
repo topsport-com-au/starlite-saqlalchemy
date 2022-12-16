@@ -3,7 +3,11 @@
 <!--next-version-placeholder-->
 
 ## v0.19.0 (2022-12-16)
+### Feature
+* Adds `service.RepositoryService` type. ([`598fc51`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/598fc519e3edc39475e6485ce65fcffeeceaebce)
 
+### Breaking
+* Adds `service.RepositoryService` type. ([`598fc51`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/598fc519e3edc39475e6485ce65fcffeeceaebce)
 
 ## v0.18.0 (2022-12-14)
 ### Feature
