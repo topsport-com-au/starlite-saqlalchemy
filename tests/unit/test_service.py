@@ -124,3 +124,9 @@ async def test_enqueue_service_callback(monkeypatch: "MonkeyPatch") -> None:
         service_method_name="receive_callback",
         raw_obj={"a": "b"},
     )
+
+
+async def test_service_new_context_manager() -> None:
+    """Simple test of `Service.new()` context manager behavior."""
+    async with service.Service[domain.authors.Author].new() as service_obj:
+        assert isinstance(service_obj, service.Service)

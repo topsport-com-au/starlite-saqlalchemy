@@ -24,6 +24,7 @@ skip_covered = true
 exclude_lines = [
     'if TYPE_CHECKING:',
     'pragma: no cover',
+    'raise NotImplementedError',
 ]
 
 [tool.isort]

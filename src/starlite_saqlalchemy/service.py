@@ -5,6 +5,7 @@ SQLAlchemy model.
 """
 from __future__ import annotations
 
+import contextlib
 import inspect
 import logging
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
@@ -14,6 +15,8 @@ from starlite_saqlalchemy.repository.types import ModelT
 from starlite_saqlalchemy.worker import queue
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
     from saq.types import Context
 
     from starlite_saqlalchemy.repository.abc import AbstractRepository
@@ -22,7 +25,9 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+T = TypeVar("T")
 ServiceT = TypeVar("ServiceT", bound="Service")
+RepoServiceT = TypeVar("RepoServiceT", bound="RepositoryService")
 
 service_object_identity_map: dict[str, type[Service]] = {}
 
@@ -35,19 +40,10 @@ class UnauthorizedException(ServiceException):
     """A user tried to do something they shouldn't have."""
 
 
-class Service(Generic[ModelT]):
+class Service(Generic[T]):
     """Generic Service object."""
 
     __id__: ClassVar[str]
-    repository_type: type[AbstractRepository[ModelT]]
-
-    def __init__(self, **repo_kwargs: Any) -> None:
-        """Configure the service object.
-
-        Args:
-            **repo_kwargs: passed as keyword args to repo instantiation.
-        """
-        self.repository = self.repository_type(**repo_kwargs)
 
     def __init_subclass__(cls, *_: Any, **__: Any) -> None:
         """Map the service object to a unique identifier.
@@ -60,6 +56,116 @@ class Service(Generic[ModelT]):
         """
         cls.__id__ = f"{cls.__module__}.{cls.__name__}"
         service_object_identity_map[cls.__id__] = cls
+
+    async def create(self, data: T) -> T:
+        """Create an instance of `T`.
+
+        Args:
+            data: Representation to be created.
+
+        Returns:
+            Representation of created instance.
+        """
+        raise NotImplementedError
+
+    async def list(self, **kwargs: Any) -> list[T]:
+        """Return view of the collection of `T`.
+
+        Args:
+            **kwargs: Keyword arguments for filtering.
+
+        Returns:
+            The list of instances retrieved from the repository.
+        """
+        raise NotImplementedError
+
+    async def update(self, id_: Any, data: T) -> T:
+        """Update existing instance of `T` with `data`.
+
+        Args:
+            id_: Identifier of item to be updated.
+            data: Representation to be updated.
+
+        Returns:
+            Updated representation.
+        """
+        raise NotImplementedError
+
+    async def upsert(self, id_: Any, data: T) -> T:
+        """Create or update an instance of `T` with `data`.
+
+        Args:
+            id_: Identifier of the object for upsert.
+            data: Representation for upsert.
+
+        Returns:
+            Updated or created representation.
+        """
+        raise NotImplementedError
+
+    async def get(self, id_: Any) -> T:
+        """Retrieve a representation of `T` with that is identified by `id_`
+
+        Args:
+            id_: Identifier of instance to be retrieved.
+
+        Returns:
+            Representation of instance with identifier `id_`.
+        """
+        raise NotImplementedError
+
+    async def delete(self, id_: Any) -> T:
+        """Delete `T` that is identified by `id_`.
+
+        Args:
+            id_: Identifier of instance to be deleted.
+
+        Returns:
+            Representation of the deleted instance.
+        """
+        raise NotImplementedError
+
+    async def enqueue_background_task(self, method_name: str, **kwargs: Any) -> None:
+        """Enqueue an async callback for the operation and data.
+
+        Args:
+            method_name: Method on the service object that should be called by the async worker.
+            **kwargs: Arguments to be passed to the method when called. Must be JSON serializable.
+        """
+        module = inspect.getmodule(self)
+        if module is None:  # pragma: no cover
+            logger.warning("Callback not enqueued, no module resolved for %s", self)
+            return
+        await queue.enqueue(
+            make_service_callback.__qualname__,
+            service_type_id=self.__id__,
+            service_method_name=method_name,
+            **kwargs,
+        )
+
+    @classmethod
+    @contextlib.asynccontextmanager
+    async def new(cls: type[ServiceT]) -> AsyncIterator[ServiceT]:
+        """Context manager that returns instance of service object.
+
+        Returns:
+            The service object instance.
+        """
+        yield cls()
+
+
+class RepositoryService(Service[ModelT], Generic[ModelT]):
+    """Service object that operates on a repository object."""
+
+    repository_type: type[AbstractRepository[ModelT]]
+
+    def __init__(self, **repo_kwargs: Any) -> None:
+        """Configure the service object.
+
+        Args:
+            **repo_kwargs: passed as keyword args to repo instantiation.
+        """
+        self.repository = self.repository_type(**repo_kwargs)
 
     async def create(self, data: ModelT) -> ModelT:
         """Wrap repository instance creation.
@@ -132,23 +238,18 @@ class Service(Generic[ModelT]):
         """
         return await self.repository.delete(id_)
 
-    async def enqueue_background_task(self, method_name: str, **kwargs: Any) -> None:
-        """Enqueue an async callback for the operation and data.
+    @classmethod
+    @contextlib.asynccontextmanager
+    async def new(cls: type[RepoServiceT]) -> AsyncIterator[RepoServiceT]:
+        """Context manager that returns instance of service object.
 
-        Args:
-            method_name: Method on the service object that should be called by the async worker.
-            **kwargs: Arguments to be passed to the method when called. Must be JSON serializable.
+        Handles construction of the database session.
+
+        Returns:
+            The service object instance.
         """
-        module = inspect.getmodule(self)
-        if module is None:  # pragma: no cover
-            logger.warning("Callback not enqueued, no module resolved for %s", self)
-            return
-        await queue.enqueue(
-            make_service_callback.__qualname__,
-            service_type_id=self.__id__,
-            service_method_name=method_name,
-            **kwargs,
-        )
+        async with async_session_factory() as session:
+            yield cls(session=session)
 
 
 async def make_service_callback(
@@ -167,7 +268,6 @@ async def make_service_callback(
         **kwargs: Unpacked into the service method call as keyword arguments.
     """
     service_type = service_object_identity_map[service_type_id]
-    async with async_session_factory() as session:
-        service_object: Service = service_type(session=session)
-    method = getattr(service_object, service_method_name)
-    await method(**kwargs)
+    async with service_type.new() as service_object:
+        method = getattr(service_object, service_method_name)
+        await method(**kwargs)
