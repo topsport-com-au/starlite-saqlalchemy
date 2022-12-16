@@ -1,0 +1,1547 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+    
+    
+      
+        <title>Logging - starlite-saqlalchemy</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.975780f9.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="None" data-md-color-accent="None">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#logging" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="starlite-saqlalchemy" class="md-header__button md-logo" aria-label="starlite-saqlalchemy" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            starlite-saqlalchemy
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Logging
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/topsport-com-au/starlite-saqlalchemy" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href=".." class="md-tabs__link">
+      starlite-saqlalchemy
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../config/" class="md-tabs__link md-tabs__link--active">
+        Usage
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../reference/starlite_saqlalchemy/" class="md-tabs__link">
+        Reference
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="starlite-saqlalchemy" class="md-nav__button md-logo" aria-label="starlite-saqlalchemy" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    starlite-saqlalchemy
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/topsport-com-au/starlite-saqlalchemy" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        starlite-saqlalchemy
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Usage
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Usage" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Usage
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/" class="md-nav__link">
+        Configuration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dto/" class="md-nav__link">
+        DTOs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../async_worker/" class="md-nav__link">
+        Async Worker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Logging
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Logging
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#adding-data-to-the-log" class="md-nav__link">
+    Adding data to the log
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#controller-logging" class="md-nav__link">
+    Controller Logging
+  </a>
+  
+    <nav class="md-nav" aria-label="Controller Logging">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#middleware" class="md-nav__link">
+    Middleware
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#before-send-hook-handler" class="md-nav__link">
+    Before Send Hook Handler
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#controlling-log-content" class="md-nav__link">
+    Controlling Log Content
+  </a>
+  
+    <nav class="md-nav" aria-label="Controlling Log Content">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#log_exclude_paths" class="md-nav__link">
+    LOG_EXCLUDE_PATHS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#log_obfuscate_cookies-log_obfuscate_headers" class="md-nav__link">
+    LOG_OBFUSCATE_COOKIES &amp; LOG_OBFUSCATE_HEADERS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#log_request_fields-log_response_fields" class="md-nav__link">
+    LOG_REQUEST_FIELDS &amp; LOG_RESPONSE_FIELDS
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-log-config" class="md-nav__link">
+    Other Log Config
+  </a>
+  
+    <nav class="md-nav" aria-label="Other Log Config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#log_http_event-log_worker_event" class="md-nav__link">
+    LOG_HTTP_EVENT &amp; LOG_WORKER_EVENT
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#log_level" class="md-nav__link">
+    LOG_LEVEL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#more-goodies" class="md-nav__link">
+    More Goodies
+  </a>
+  
+    <nav class="md-nav" aria-label="More Goodies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#automatic-dropping-of-health-check-logs" class="md-nav__link">
+    Automatic dropping of health check logs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#standard-library-logging-config" class="md-nav__link">
+    Standard library logging config
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-specific-processor-chain" class="md-nav__link">
+    Environment specific processor chain
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worker-logging" class="md-nav__link">
+    Worker Logging
+  </a>
+  
+    <nav class="md-nav" aria-label="Worker Logging">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workerbefore_process" class="md-nav__link">
+    Worker.before_process
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workerafter_process" class="md-nav__link">
+    Worker.after_process
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#saq-logs" class="md-nav__link">
+    SAQ Logs
+  </a>
+  
+    <nav class="md-nav" aria-label="SAQ Logs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workerpy" class="md-nav__link">
+    worker.py
+  </a>
+  
+    <nav class="md-nav" aria-label="worker.py">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#class-worker" class="md-nav__link">
+    class Worker
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#def-async_check_health" class="md-nav__link">
+    def async_check_health()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" checked>
+      
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../reference/starlite_saqlalchemy/">starlite_saqlalchemy</a>
+          
+            <label for="__nav_3_1">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="starlite_saqlalchemy" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          starlite_saqlalchemy
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/cache/" class="md-nav__link">
+        cache
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/compression/" class="md-nav__link">
+        compression
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3_1_3" type="checkbox" id="__nav_3_1_3" checked>
+      
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../reference/starlite_saqlalchemy/db/">db</a>
+          
+            <label for="__nav_3_1_3">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="db" data-md-level="3">
+        <label class="md-nav__title" for="__nav_3_1_3">
+          <span class="md-nav__icon md-icon"></span>
+          db
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/db/orm/" class="md-nav__link">
+        orm
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/dependencies/" class="md-nav__link">
+        dependencies
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3_1_5" type="checkbox" id="__nav_3_1_5" checked>
+      
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../reference/starlite_saqlalchemy/dto/">dto</a>
+          
+            <label for="__nav_3_1_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="dto" data-md-level="3">
+        <label class="md-nav__title" for="__nav_3_1_5">
+          <span class="md-nav__icon md-icon"></span>
+          dto
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/dto/from_mapped/" class="md-nav__link">
+        from_mapped
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/dto/types/" class="md-nav__link">
+        types
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/dto/utils/" class="md-nav__link">
+        utils
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/endpoint_decorator/" class="md-nav__link">
+        endpoint_decorator
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/exceptions/" class="md-nav__link">
+        exceptions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/health/" class="md-nav__link">
+        health
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/http/" class="md-nav__link">
+        http
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/init_plugin/" class="md-nav__link">
+        init_plugin
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3_1_11" type="checkbox" id="__nav_3_1_11" checked>
+      
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../reference/starlite_saqlalchemy/log/">log</a>
+          
+            <label for="__nav_3_1_11">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="log" data-md-level="3">
+        <label class="md-nav__title" for="__nav_3_1_11">
+          <span class="md-nav__icon md-icon"></span>
+          log
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/log/controller/" class="md-nav__link">
+        controller
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/log/msgspec_renderer/" class="md-nav__link">
+        msgspec_renderer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/log/worker/" class="md-nav__link">
+        worker
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/openapi/" class="md-nav__link">
+        openapi
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/redis/" class="md-nav__link">
+        redis
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3_1_14" type="checkbox" id="__nav_3_1_14" checked>
+      
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../reference/starlite_saqlalchemy/repository/">repository</a>
+          
+            <label for="__nav_3_1_14">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="repository" data-md-level="3">
+        <label class="md-nav__title" for="__nav_3_1_14">
+          <span class="md-nav__icon md-icon"></span>
+          repository
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/repository/abc/" class="md-nav__link">
+        abc
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/repository/exceptions/" class="md-nav__link">
+        exceptions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/repository/filters/" class="md-nav__link">
+        filters
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/repository/sqlalchemy/" class="md-nav__link">
+        sqlalchemy
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/repository/types/" class="md-nav__link">
+        types
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/scripts/" class="md-nav__link">
+        scripts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/sentry/" class="md-nav__link">
+        sentry
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/serializer/" class="md-nav__link">
+        serializer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/service/" class="md-nav__link">
+        service
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/settings/" class="md-nav__link">
+        settings
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/sqlalchemy_plugin/" class="md-nav__link">
+        sqlalchemy_plugin
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/testing/" class="md-nav__link">
+        testing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/starlite_saqlalchemy/worker/" class="md-nav__link">
+        worker
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/topsport-com-au/starlite-saqlalchemy/edit/master/docs/logging.md" title="Edit this page" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+<h1 id="logging">Logging<a class="headerlink" href="#logging" title="Permanent link">&para;</a></h1>
+<p><code>starlite-saqlalchemy</code> has structured logging baked-in, built around facilitating the
+<a href="https://brandur.org/canonical-log-lines">Canonical Log Lines</a> pattern (which is basically, a
+single log line per request or async worker invocation).</p>
+<p>The pattern is built upon the excellent <a href="https://github.com/hynek/structlog"><code>structlog</code></a> library,
+and is configured to be as efficient as possible while not blocking the event loop (it runs the
+logging in a processor thread).</p>
+<h2 id="adding-data-to-the-log">Adding data to the log<a class="headerlink" href="#adding-data-to-the-log" title="Permanent link">&para;</a></h2>
+<p>To bind a key/value pair to the log object <em>anywhere</em> within the application, use
+<code>structlog.contextvars.bind_contextvars</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">structlog.contextvars</span> <span class="kn">import</span> <span class="n">bind_contextvars</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">def</span> <span class="nf">do_something</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">...</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">bind_contextvars</span><span class="p">(</span><span class="n">i_did</span><span class="o">=</span><span class="s2">&quot;something&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>Whether you call that in the context of handling an HTTP request, or during an async worker
+invocation, it doesn't matter, that key/value pair will be included in the log representing that
+invocation.</p>
+<h2 id="controller-logging">Controller Logging<a class="headerlink" href="#controller-logging" title="Permanent link">&para;</a></h2>
+<h3 id="middleware">Middleware<a class="headerlink" href="#middleware" title="Permanent link">&para;</a></h3>
+<p>The configuration adds a very light-weight middleware that simply clears the context-local storage
+for each request.</p>
+<h3 id="before-send-hook-handler">Before Send Hook Handler<a class="headerlink" href="#before-send-hook-handler" title="Permanent link">&para;</a></h3>
+<p>We add a handler to Starlite's
+<a href="https://starlite-api.github.io/starlite/usage/0-the-starlite-app/5-application-hooks/#before-send"><code>before_send</code></a>
+hook. That allows us to do two things:</p>
+<ol>
+<li>We inspect the outbound messages looking for a
+   <a href="https://asgi.readthedocs.io/en/latest/specs/www.html#response-start-send-event">Response Start</a>
+   event. When that is located, we stash the message into the connection scope state, for later use.
+   We also use this event to determine the severity of the eventual log message. If the status code
+   is in the 500s we log at ERROR, otherwise INFO.</li>
+<li>We inspect the outbound messages looking for a
+   <a href="https://asgi.readthedocs.io/en/latest/specs/www.html#response-body-send-event">Response Body</a>
+   event. This event has a property called <code>more_body</code>, for streaming responses this flag indicates
+   whether there is another <code>Response Body</code> message to come. If <code>more_body</code> is <code>True</code> we do nothing,
+   but once we receive the final <code>Response Body</code> message of the request we use it to construct the
+   response log, and finally emit the log message at the predetermined severity level.</li>
+</ol>
+<h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h3>
+<p>Here's an example of a log emitted with the default configuration (I've applied the formatting for
+the purposes of this documentation, the logger emits un-formatted json):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HTTP&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="nt">&quot;body&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">            </span><span class="nt">&quot;dob&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1890-9-15&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TEST UPDATE&quot;</span><span class="w"></span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">        </span><span class="p">},</span><span class="w"></span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">        </span><span class="nt">&quot;content_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">            </span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">            </span><span class="p">{}</span><span class="w"></span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">        </span><span class="p">],</span><span class="w"></span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">        </span><span class="nt">&quot;cookies&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w"></span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">        </span><span class="nt">&quot;headers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">            </span><span class="nt">&quot;accept&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;*/*&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">            </span><span class="nt">&quot;accept-encoding&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gzip, deflate&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">            </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;keep-alive&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">            </span><span class="nt">&quot;content-length&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;43&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">            </span><span class="nt">&quot;content-type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">            </span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;testserver&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">            </span><span class="nt">&quot;user-agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python-httpx/0.23.0&quot;</span><span class="w"></span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">        </span><span class="p">},</span><span class="w"></span>
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">        </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PUT&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">        </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/authors/97108ac1-ffcb-411d-8b1e-d9183399f63b&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">        </span><span class="nt">&quot;path_params&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="w">            </span><span class="nt">&quot;author_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;97108ac1-ffcb-411d-8b1e-d9183399f63b&quot;</span><span class="w"></span>
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="w">        </span><span class="p">},</span><span class="w"></span>
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="w">        </span><span class="nt">&quot;query&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="w">    </span><span class="p">},</span><span class="w"></span>
+<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="w">    </span><span class="nt">&quot;response&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="w">        </span><span class="nt">&quot;body&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;b&#39;{\&quot;id\&quot;:\&quot;97108ac1-ffcb-411d-8b1e-d9183399f63b\&quot;,\&quot;created\&quot;:\&quot;0001-01-01T00:00:00\&quot;,\&quot;updated\&quot;:\&quot;2022-11-04T14:15:16\&quot;,\&quot;name\&quot;:\&quot;TEST UPDATE\&quot;,\&quot;dob\&quot;:\&quot;1890-09-15\&quot;}&#39;&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="w">        </span><span class="nt">&quot;cookies&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w"></span>
+<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a><span class="w">        </span><span class="nt">&quot;headers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a><span class="w">            </span><span class="nt">&quot;content-length&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;149&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a><span class="w">            </span><span class="nt">&quot;content-type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application/json&quot;</span><span class="w"></span>
+<a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a><span class="w">        </span><span class="p">},</span><span class="w"></span>
+<a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a><span class="w">        </span><span class="nt">&quot;status_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="w"></span>
+<a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a><span class="w">    </span><span class="p">},</span><span class="w"></span>
+<a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2022-11-04T04:15:16.766464Z&quot;</span><span class="w"></span>
+<a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<h3 id="controlling-log-content">Controlling Log Content<a class="headerlink" href="#controlling-log-content" title="Permanent link">&para;</a></h3>
+<p>As you can see, we are including a lot of data in our logs that may include sensitive values, such
+as <a href="https://en.wikipedia.org/wiki/Personal_data">PII</a> and secrets.</p>
+<p>Thankfully, we have mechanisms to ensure that this type of data is excluded from our logs!</p>
+<p>Our
+<a href="../reference/starlite_saqlalchemy/settings/#starlite_saqlalchemy.settings.LogSettings">LogSettings</a>
+object provides a host of options that allow you to customize log output. This exposes the following
+environment variables:</p>
+<h4 id="log_exclude_paths"><code>LOG_EXCLUDE_PATHS</code><a class="headerlink" href="#log_exclude_paths" title="Permanent link">&para;</a></h4>
+<p>This is a <a href="https://docs.python.org/3/library/re.html">regular expression</a> that is matched against
+the path of the request before logging. If the path matches the regex, the route is not logged.</p>
+<p>For example, the value <code>^/a</code> will exclude any path that begins with <code>/a</code>, such as <code>/apath</code> and
+<code>/a/path</code>.</p>
+<p>Explicit paths can be excluded by using the "start" (<code>^</code>) and "end" (<code>$</code>) symbols, for example
+<code>^/never-log$</code> will exclude the path <code>/never-log</code> but will not exclude <code>/never-log/just/joking</code>.</p>
+<p>Multiple regexes can be concatenated with the "or" symbol (<code>|</code>).</p>
+<h4 id="log_obfuscate_cookies-log_obfuscate_headers">LOG_OBFUSCATE_COOKIES &amp; LOG_OBFUSCATE_HEADERS<a class="headerlink" href="#log_obfuscate_cookies-log_obfuscate_headers" title="Permanent link">&para;</a></h4>
+<p>These two environment variables allow you to specify header and cookie names, whose value will be
+obfuscated in the logs.</p>
+<p>This leverages functionality that is provided via Starlite's
+<a href="https://starlite-api.github.io/starlite/reference/utils/4-extractor-utils/">Extraction Utils</a>.</p>
+<p>Simply provide the exact name of the cookies and headers that should be obfuscated.</p>
+<p>As environment variables are parsed by pydantic, collections such as these should be JSON strings
+(per <a href="https://pydantic-docs.helpmanual.io/usage/settings/#parsing-environment-variable-values">their documentation</a>)
+. For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>LOG_OBFUSCATE_HEADERS=&#39;[&quot;Authorization&quot;, &quot;X-API-KEY&quot;]&#39;`
+</code></pre></div>
+<h4 id="log_request_fields-log_response_fields">LOG_REQUEST_FIELDS &amp; LOG_RESPONSE_FIELDS<a class="headerlink" href="#log_request_fields-log_response_fields" title="Permanent link">&para;</a></h4>
+<p>These specify the fields from the
+<a href="https://asgi.readthedocs.io/en/latest/specs/www.html#http-connection-scope">ASGI Connection Scope</a>
+and response messages that are included in logs.</p>
+<p>As environment variables are parsed by pydantic, collections such as these should be JSON strings
+(per <a href="https://pydantic-docs.helpmanual.io/usage/settings/#parsing-environment-variable-values">their documentation</a>)
+. For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>REQUEST_FIELDS=&#39;[&quot;path&quot;, &quot;method&quot;, &quot;content_type&quot;, &quot;headers&quot;, &quot;cookies&quot;, &quot;query&quot;, &quot;path_params&quot;, &quot;body&quot;]&#39;
+</code></pre></div>
+<p>The above is the default configuration for this setting, so if you are happy with that you don't
+need to do anything. However, lets say you never want to log the request body, you could define
+this in your environment and simply exclude <code>"body"</code> from that collection:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>REQUEST_FIELDS=&#39;[&quot;path&quot;, &quot;method&quot;, &quot;content_type&quot;, &quot;headers&quot;, &quot;cookies&quot;, &quot;query&quot;, &quot;path_params&quot;]&#39;
+</code></pre></div>
+<h2 id="other-log-config">Other Log Config<a class="headerlink" href="#other-log-config" title="Permanent link">&para;</a></h2>
+<p>There are some other logging configurations that you can control via environment</p>
+<h3 id="log_http_event-log_worker_event">LOG_HTTP_EVENT &amp; LOG_WORKER_EVENT<a class="headerlink" href="#log_http_event-log_worker_event" title="Permanent link">&para;</a></h3>
+<p>These define the value of the "event" key in the emitted log object.</p>
+<p>By default, <code>LOG_HTTP_EVENT</code> is <code>"HTTP"</code> and <code>LOG_WORKER_EVENT</code> is <code>"Worker"</code>.</p>
+<p>E.g., a log emitted by the HTTP handlers will be <code>{"event": "HTTP", ...}</code> and one emitted by the
+worker will be <code>{"event": "Worker", ...}</code>.</p>
+<h3 id="log_level">LOG_LEVEL<a class="headerlink" href="#log_level" title="Permanent link">&para;</a></h3>
+<p>Set this according to the standard library logging levels. Any message emitted at a level that is
+below this one will be silently (and efficiently, thanks to <code>structlog</code>) dropped.</p>
+<p>For example, setting <code>LOG_LEVEL=WARNING</code> in your environment would mean that no <code>INFO</code> level logs
+would ever be emitted by the application.</p>
+<h2 id="more-goodies">More Goodies<a class="headerlink" href="#more-goodies" title="Permanent link">&para;</a></h2>
+<h3 id="automatic-dropping-of-health-check-logs">Automatic dropping of health check logs<a class="headerlink" href="#automatic-dropping-of-health-check-logs" title="Permanent link">&para;</a></h3>
+<p>Successful health check logs are dropped early in the processor chain. This prevents your logs
+getting clogged up with "white noise" and all the associated data storage and ingestion costs that
+go along with it.</p>
+<p>Of course, if you health checks fail, there's nothing worse than those logs getting dropped too, so
+any response from the health check handler not within the success status range is logged.</p>
+<h3 id="standard-library-logging-config">Standard library logging config<a class="headerlink" href="#standard-library-logging-config" title="Permanent link">&para;</a></h3>
+<p>We configure the standard library logger with a queue listener and handler and route any logs from
+our dependencies through that, so they won't block the event loop.</p>
+<h3 id="environment-specific-processor-chain">Environment specific processor chain<a class="headerlink" href="#environment-specific-processor-chain" title="Permanent link">&para;</a></h3>
+<p>We inspect <code>stdout</code> destination to determine if it is writing to a terminal and modify the processor
+chain so that you get pretty log output when developing locally!</p>
+<h2 id="worker-logging">Worker Logging<a class="headerlink" href="#worker-logging" title="Permanent link">&para;</a></h2>
+<h3 id="workerbefore_process">Worker.before_process<a class="headerlink" href="#workerbefore_process" title="Permanent link">&para;</a></h3>
+<p>If logging configuration is enabled, we use this SAQ <code>Worker</code> hook to clear the structlog
+contextvars for the job.</p>
+<h3 id="workerafter_process">Worker.after_process<a class="headerlink" href="#workerafter_process" title="Permanent link">&para;</a></h3>
+<p>If logging configuration is enabled, we use this SAQ <code>Worker</code> hook to extract the configured <code>Job</code>
+attributes and inject them into the log, and emit the log event. The attributes that are logged for
+each <code>Job</code> can be configured in
+<a href="../reference/starlite_saqlalchemy/settings/#starlite_saqlalchemy.settings.
+LogSettings.JOB_FIELDS"><code>LogSettings</code></a>.</p>
+<p>If the <code>Job.error</code> attribute is truthy, we log at <code>ERROR</code> severity, otherwise log at <code>INFO</code>.</p>
+<h2 id="saq-logs">SAQ Logs<a class="headerlink" href="#saq-logs" title="Permanent link">&para;</a></h2>
+<p>SAQ emits logs via standard library logging, we restrict these to level of <code>WARNING</code> or higher, and
+handle them using the asyncio-friendly <code>queue_handler</code> that is provided to us by Starlite.</p>
+<p>That means, you might see the following logs emitted from the SAQ logger:</p>
+<h3 id="workerpy">worker.py<a class="headerlink" href="#workerpy" title="Permanent link">&para;</a></h3>
+<h4 id="class-worker"><code>class Worker</code><a class="headerlink" href="#class-worker" title="Permanent link">&para;</a></h4>
+<ul>
+<li>upkeep(): l181 - EXCEPTION - on failed upkeep task</li>
+<li>process(): l253 - EXCEPTION - on job error</li>
+<li>process(): l270 - EXCEPTION - on after process hook failure</li>
+</ul>
+<h4 id="def-async_check_health"><code>def async_check_health()</code><a class="headerlink" href="#def-async_check_health" title="Permanent link">&para;</a></h4>
+<ul>
+<li>l343 - WARNING - on health check failure</li>
+</ul>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../async_worker/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Async Worker" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Async Worker
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../reference/starlite_saqlalchemy/" class="md-footer__link md-footer__link--next" aria-label="Next: starlite_saqlalchemy" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              starlite_saqlalchemy
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "navigation.expand", "toc.integrate", "search.suggest", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      
+    
+    
+  </body>
+</html>
