@@ -28,7 +28,7 @@ class Repository(SQLAlchemyRepository[Author]):
     model_type = Author
 
 
-class Service(service.Service[Author]):
+class Service(service.RepositoryService[Author]):
     """Author service object."""
 
     repository_type = Repository
