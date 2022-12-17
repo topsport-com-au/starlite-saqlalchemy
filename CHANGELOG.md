@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.20.0 (2022-12-17)
+### Feature
+* Enable toggling of db/cache checks in run-app script. ([#173](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/173)) ([`16b6380`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/16b63803799670bca8ef4f89a945b6c9a1bbe3b5))
+
+### Documentation
+* Update CHANGELOG.md ([`c73da31`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/c73da3188b5b6467e96d10add4bee50f9a6ef012))
+
 ## v0.19.0 (2022-12-16)
 ### Feature
 * Adds `service.RepositoryService` type. ([`598fc51`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/598fc519e3edc39475e6485ce65fcffeeceaebce)
