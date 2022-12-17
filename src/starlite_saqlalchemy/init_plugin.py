@@ -29,12 +29,14 @@ The `PluginConfig` has switches to disable every aspect of the plugin behavior.
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypeVar
+from collections.abc import Callable, Sequence  # noqa: TC003
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from pydantic import BaseModel
 from starlite.app import DEFAULT_CACHE_CONFIG, DEFAULT_OPENAPI_CONFIG
 from starlite.plugins.sql_alchemy import SQLAlchemyPlugin
 from starlite.response import Response
+from structlog.types import Processor  # noqa: TC002
 
 from starlite_saqlalchemy import (
     cache,
@@ -56,11 +58,7 @@ from starlite_saqlalchemy.service import ServiceException, make_service_callback
 from starlite_saqlalchemy.worker import create_worker_instance
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
-    from typing import Any
-
     from starlite.config.app import AppConfig
-    from structlog.types import Processor
 
 T = TypeVar("T")
 
