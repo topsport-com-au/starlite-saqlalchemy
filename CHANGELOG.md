@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.20.1 (2022-12-17)
+### Fix
+* Ensures PluginConfig doesn't carry forward refs downstream. ([#176](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/176)) ([`b37c262`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/b37c26204bc18eeaff67d626d5089738fae1abf7))
+
 ## v0.20.0 (2022-12-17)
 ### Feature
 * Enable toggling of db/cache checks in run-app script. ([#173](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/173)) ([`16b6380`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/16b63803799670bca8ef4f89a945b6c9a1bbe3b5))
