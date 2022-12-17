@@ -1,6 +1,7 @@
 """Application startup script."""
 # pragma: no cover
 # pylint: disable=broad-except
+import argparse
 import asyncio
 
 import uvicorn
@@ -42,6 +43,12 @@ async def _redis_ready() -> None:
 
 def run_app() -> None:
     """Run the application."""
+    parser = argparse.ArgumentParser(description="Run the application")
+    parser.add_argument("--no-db", action="store_const", const=False, default=True, dest="check_db")
+    parser.add_argument(
+        "--no-cache", action="store_const", const=False, default=True, dest="check_cache"
+    )
+    args = parser.parse_args()
     uvicorn_config = uvicorn.Config(
         app=settings.server.APP_LOC,
         factory=settings.server.APP_LOC_IS_FACTORY,
@@ -54,6 +61,8 @@ def run_app() -> None:
     )
     server = uvicorn.Server(config=uvicorn_config)
     with asyncio.Runner() as runner:
-        runner.run(_db_ready())
-        runner.run(_redis_ready())
+        if args.check_db:
+            runner.run(_db_ready())
+        if args.check_cache:
+            runner.run(_redis_ready())
         runner.run(server.serve())
