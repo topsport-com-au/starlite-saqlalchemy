@@ -38,13 +38,16 @@ engine = create_async_engine(
     pool_timeout=settings.db.POOL_TIMEOUT,
     poolclass=NullPool if settings.db.POOL_DISABLE else None,
 )
-"""Configure via [DatabaseSettings][starlite_saqlalchemy.settings.DatabaseSettings]. Overrides
-default JSON serializer to use `msgspec`. See
+"""Configure via
+[DatabaseSettings][starlite_saqlalchemy.settings.DatabaseSettings]. Overrides
+default JSON serializer to use `msgspec`. See.
+
 [`create_async_engine()`][sqlalchemy.ext.asyncio.create_async_engine] for detailed instructions.
 """
 async_session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(engine)
-"""
-Database session factory. See [`async_sessionmaker()`][sqlalchemy.ext.asyncio.async_sessionmaker].
+"""Database session factory.
+
+See [`async_sessionmaker()`][sqlalchemy.ext.asyncio.async_sessionmaker].
 """
 
 

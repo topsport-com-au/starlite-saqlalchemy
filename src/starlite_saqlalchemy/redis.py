@@ -8,7 +8,7 @@ from starlite_saqlalchemy import settings
 __all__ = ["client"]
 
 client: Redis[bytes] = Redis.from_url(settings.redis.URL)
-"""
-Async [`Redis`][redis.Redis] instance, configure via
+"""Async [`Redis`][redis.Redis] instance, configure via.
+
 [CacheSettings][starlite_saqlalchemy.settings.RedisSettings].
 """

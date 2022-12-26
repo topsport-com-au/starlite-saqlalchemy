@@ -54,8 +54,8 @@ class Worker(saq.Worker):
 
 
 queue = Queue(redis.client)
-"""
-[Queue][starlite_saqlalchemy.worker.Queue] instance instantiated with
+"""[Queue][starlite_saqlalchemy.worker.Queue] instance instantiated with.
+
 [redis][starlite_saqlalchemy.redis.client] instance.
 """
 

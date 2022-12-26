@@ -81,7 +81,10 @@ class LogSettings(BaseSettings):
     INCLUDE_COMPRESSED_BODY: bool = False
     """Include 'body' of compressed responses in log output."""
     LEVEL: int = 20
-    """Stdlib log levels. Only emit logs at this level, or higher."""
+    """Stdlib log levels.
+
+    Only emit logs at this level, or higher.
+    """
     OBFUSCATE_COOKIES: set[str] = {"session"}
     """Request cookie keys to obfuscate."""
     OBFUSCATE_HEADERS: set[str] = {"Authorization", "X-API-KEY"}
@@ -98,9 +101,9 @@ class LogSettings(BaseSettings):
         "result",
         "error",
     ]
-    """Attributes of the SAQ [`Job`](https://github.com/tobymao/saq/blob/master/saq/job.py)
-    to be logged.
-    """
+    """Attributes of the SAQ
+    [`Job`](https://github.com/tobymao/saq/blob/master/saq/job.py) to be
+    logged."""
     REQUEST_FIELDS: list[RequestExtractorField] = [
         "path",
         "method",
@@ -111,14 +114,16 @@ class LogSettings(BaseSettings):
         "path_params",
         "body",
     ]
-    """Attributes of the [Request][starlite.connection.request.Request] to be logged."""
+    """Attributes of the [Request][starlite.connection.request.Request] to be
+    logged."""
     RESPONSE_FIELDS: list[ResponseExtractorField] = [
         "status_code",
         "cookies",
         "headers",
         "body",
     ]
-    """Attributes of the [Response][starlite.response.Response] to be logged."""
+    """Attributes of the [Response][starlite.response.Response] to be
+    logged."""
     WORKER_EVENT: str = "Worker"
     """Log event name for logs from SAQ worker."""
     SAQ_LEVEL: int = 30
@@ -164,7 +169,8 @@ class DatabaseSettings(BaseSettings):
     ECHO_POOL: bool | Literal["debug"] = False
     """Enable SQLAlchemy connection pool logs."""
     POOL_DISABLE: bool = False
-    """Disable SQLAlchemy pooling, same as setting pool to
+    """Disable SQLAlchemy pooling, same as setting pool to.
+
     [`NullPool`][sqlalchemy.pool.NullPool].
     """
     POOL_MAX_OVERFLOW: int = 10
@@ -201,7 +207,10 @@ class SentrySettings(BaseSettings):
         env_prefix = "SENTRY_"
 
     DSN: str = ""
-    """The sentry DSN. Set as empty string to disable sentry reporting."""
+    """The sentry DSN.
+
+    Set as empty string to disable sentry reporting.
+    """
     TRACES_SAMPLE_RATE: float = 0.0001
     """% of requests traced by sentry, `0.0` means none, `1.0` means all."""
 
