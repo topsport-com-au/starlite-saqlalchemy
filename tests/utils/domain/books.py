@@ -35,10 +35,6 @@ class Service(service.RepositoryService[Book]):
 
 
 ReadDTO = dto.FromMapped[Annotated[Book, "read"]]
-"""
-A pydantic model to serialize outbound `Book` representations.
-"""
+"""A pydantic model to serialize outbound `Book` representations."""
 WriteDTO = dto.FromMapped[Annotated[Book, "write"]]
-"""
-A pydantic model to validate and deserialize `Book` creation/update data.
-"""
+"""A pydantic model to validate and deserialize `Book` creation/update data."""

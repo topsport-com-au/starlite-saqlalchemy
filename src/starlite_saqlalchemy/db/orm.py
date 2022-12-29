@@ -31,9 +31,7 @@ convention = {
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
     "pk": "pk_%(table_name)s",
 }
-"""
-Templates for automated constraint name generation.
-"""
+"""Templates for automated constraint name generation."""
 
 
 @listens_for(Session, "before_flush")
