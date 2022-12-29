@@ -94,6 +94,7 @@ config = LoggingConfig(
 )
 """Pre-configured log config for application deps.
 
-While we use structlog for internal app logging, we still want to ensure that logs emitted by any
-of our dependencies are handled in a non-blocking manner.
+While we use structlog for internal app logging, we still want to ensure
+that logs emitted by any of our dependencies are handled in a non-
+blocking manner.
 """

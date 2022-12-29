@@ -54,9 +54,11 @@ class Purpose(str, Enum):
     """
 
     READ = "read"
-    """To mark a DTO that is to be used to serialize data returned to clients."""
+    """To mark a DTO that is to be used to serialize data returned to
+    clients."""
     WRITE = "write"
-    """To mark a DTO that is to deserialize and validate data provided by clients."""
+    """To mark a DTO that is to deserialize and validate data provided by
+    clients."""
 
 
 @dataclass
@@ -70,7 +72,8 @@ class DTOField:
     pydantic_field: FieldInfo | None = None
     """If provided, used for the pydantic model for this attribute."""
     validators: Iterable[Callable[[Any], Any]] | None = None
-    """Single argument callables that are defined on the DTO as validators for the field."""
+    """Single argument callables that are defined on the DTO as validators for
+    the field."""
 
 
 @dataclass
