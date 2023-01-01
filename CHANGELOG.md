@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.21.0 (2023-01-01)
+### Feature
+* Support new starlite type encoders pattern ([`34aea07`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/34aea0748979c3236668cee1fe19b3aa32f5ee3e))
+
+### Breaking
+* support new starlite type encoders pattern ([`34aea07`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/34aea0748979c3236668cee1fe19b3aa32f5ee3e))
+
 ## v0.20.1 (2022-12-17)
 ### Fix
 * Ensures PluginConfig doesn't carry forward refs downstream. ([#176](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/176)) ([`b37c262`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/b37c26204bc18eeaff67d626d5089738fae1abf7))
