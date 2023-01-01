@@ -35,7 +35,6 @@ from typing import TYPE_CHECKING, Any, TypeVar
 from pydantic import BaseModel
 from starlite.app import DEFAULT_CACHE_CONFIG, DEFAULT_OPENAPI_CONFIG
 from starlite.plugins.sql_alchemy import SQLAlchemyPlugin
-from starlite.response import Response
 from structlog.types import Processor  # noqa: TC002
 
 from starlite_saqlalchemy import (
@@ -53,12 +52,13 @@ from starlite_saqlalchemy import (
 )
 from starlite_saqlalchemy.health import health_check
 from starlite_saqlalchemy.repository.exceptions import RepositoryException
-from starlite_saqlalchemy.serializer import default_serializer
 from starlite_saqlalchemy.service import ServiceException, make_service_callback
+from starlite_saqlalchemy.type_encoders import type_encoders_map
 from starlite_saqlalchemy.worker import create_worker_instance
 
 if TYPE_CHECKING:
     from starlite.config.app import AppConfig
+    from starlite.types import TypeEncodersMap
 
 T = TypeVar("T")
 
@@ -125,12 +125,6 @@ class PluginConfig(BaseModel):
     Set the OpenAPI config object to
     [`AppConfig.openapi_config`][starlite.config.app.AppConfig.openapi_config].
     """
-    do_response_class: bool = True
-    """Configure custom response class.
-
-    Set the custom response class to
-    [`AppConfig.response_class`][starlite.config.app.AppConfig.response_class].
-    """
     do_sentry: bool = True
     """Configure sentry.
 
@@ -149,6 +143,9 @@ class PluginConfig(BaseModel):
     Set the SQLAlchemy plugin on the application. Adds the plugin to
     [`AppConfig.plugins`][starlite.config.app.AppConfig.plugins].
     """
+    do_type_encoders: bool = True
+    """Configure custom type encoders on the app."""
+
     do_worker: bool = True
     """Configure the async worker on the application.
 
@@ -157,20 +154,12 @@ class PluginConfig(BaseModel):
     [`AppConfig.on_shutdown`][starlite.config.app.AppConfig.on_shutdown] that manage the lifecycle
     of the `SAQ` worker.
     """
-    serializer: Callable[[Any], Any] = default_serializer
-    """Configure custom serializer.
-
-    The serializer callable that is used by the custom
-    [`Response`][starlite.response.Response] class that is created. If
-    [`AppConfig.response_class`][starlite.config.app.AppConfig.response_class]
-    is not `None`, this is ignored. If
-    [`PluginConfig.do_response_class`][starlite_saqlalchemy.init_plugin.PluginConfig.do_response_class]
-    is `False`, this is ignored.
-    """
     # the addition of the health check filter processor makes mypy think `log.default_processors` is
     # list[object].. seems typed correctly to me :/
     log_processors: Sequence[Processor] = log.default_processors  # type:ignore[assignment]
     """Chain of structlog log processors."""
+    type_encoders: TypeEncodersMap = type_encoders_map
+    """Map of type to serializer callable."""
 
 
 class ConfigureApp:
@@ -205,9 +194,9 @@ class ConfigureApp:
         self.configure_health_check(app_config)
         self.configure_logging(app_config)
         self.configure_openapi(app_config)
-        self.configure_response_class(app_config)
         self.configure_sentry(app_config)
         self.configure_sqlalchemy_plugin(app_config)
+        self.configure_type_encoders(app_config)
         self.configure_worker(app_config)
 
         app_config.on_shutdown.extend([http.Client.close, redis.client.close])
@@ -321,20 +310,6 @@ class ConfigureApp:
         if self.config.do_openapi and app_config.openapi_config == DEFAULT_OPENAPI_CONFIG:
             app_config.openapi_config = openapi.config
 
-    def configure_response_class(self, app_config: AppConfig) -> None:
-        """Add the custom response class.
-
-        No-op if the [`AppConfig.response_class`][starlite.config.app.AppConfig.response_class]
-        is not `None`.
-
-        Args:
-            app_config: The Starlite application config object.
-        """
-        if self.config.do_response_class and app_config.response_class is None:
-            app_config.response_class = type(
-                "Response", (Response,), {"serializer": staticmethod(self.config.serializer)}
-            )
-
     def configure_sentry(self, app_config: AppConfig) -> None:
         """Add handler to configure Sentry integration.
 
@@ -355,6 +330,15 @@ class ConfigureApp:
         """
         if self.config.do_sqlalchemy_plugin:
             app_config.plugins.append(SQLAlchemyPlugin(config=sqlalchemy_plugin.config))
+
+    def configure_type_encoders(self, app_config: AppConfig) -> None:
+        """Set mapping of type encoders on the application config.
+
+        Args:
+            app_config: The Starlite application config object.
+        """
+        if self.config.do_type_encoders:
+            app_config.type_encoders = self.config.type_encoders
 
     def configure_worker(self, app_config: AppConfig) -> None:
         """Configure the `SAQ` async worker.
