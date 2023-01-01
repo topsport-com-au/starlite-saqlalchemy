@@ -29,10 +29,10 @@ def test_config_switches() -> None:
         do_health_check=False,
         do_logging=False,
         do_openapi=False,
-        do_response_class=False,
         do_sentry=False,
         do_set_debug=False,
         do_sqlalchemy_plugin=False,
+        do_type_encoders=False,
         do_worker=False,
     )
     app = Starlite(
