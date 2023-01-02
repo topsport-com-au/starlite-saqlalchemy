@@ -199,7 +199,7 @@ class ConfigureApp:
         self.configure_type_encoders(app_config)
         self.configure_worker(app_config)
 
-        app_config.on_shutdown.extend([http.Client.close, redis.client.close])
+        app_config.on_shutdown.extend([http.on_shutdown, redis.client.close])
         return app_config
 
     def configure_after_exception(self, app_config: AppConfig) -> None:
