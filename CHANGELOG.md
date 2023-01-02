@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.22.1 (2023-01-02)
+### Fix
+* **docs:** Update starlite objects.inv url ([#201](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/201)) ([`bcdc251`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/bcdc2511c320c28972485cb7feb828abf3417ecb))
+
 ## v0.22.0 (2023-01-02)
 ### Feature
 * New http client pattern. ([#200](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/200)) ([`5538f83`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5538f83123d30c80a7121f18ba1f6f8885fc731b))
