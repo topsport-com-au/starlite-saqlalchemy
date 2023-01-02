@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.22.0 (2023-01-02)
+### Feature
+* New http client pattern. ([#200](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/200)) ([`5538f83`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5538f83123d30c80a7121f18ba1f6f8885fc731b))
+
+### Breaking
+* new http client pattern. ([#200](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/200)) ([`5538f83`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5538f83123d30c80a7121f18ba1f6f8885fc731b))
+
 ## v0.21.0 (2023-01-01)
 ### Feature
 * Support new starlite type encoders pattern ([`34aea07`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/34aea0748979c3236668cee1fe19b3aa32f5ee3e))
