@@ -241,6 +241,20 @@ class ServerSettings(BaseSettings):
     """Directories to watch for reloading."""
 
 
+class HTTPClientSettings(BaseSettings):
+    """HTTP Client configurations."""
+
+    class Config:
+        case_sensitive = True
+        env_file = ".env"
+        env_prefix = "HTTP_"
+
+    BACKOFF_MAX: float = 60
+    BACKOFF_MIN: float = 0
+    EXPONENTIAL_BACKOFF_BASE: float = 2
+    EXPONENTIAL_BACKOFF_MULTIPLIER: float = 1
+
+
 # `.parse_obj()` thing is a workaround for pyright and pydantic interplay, see:
 # https://github.com/pydantic/pydantic/issues/3753#issuecomment-1087417884
 api = APISettings.parse_obj({})
@@ -249,6 +263,8 @@ app = AppSettings.parse_obj({})
 """App settings."""
 db = DatabaseSettings.parse_obj({})
 """Database settings."""
+http = HTTPClientSettings.parse_obj({})
+"""HTTP Client Settings."""
 log = LogSettings.parse_obj({})
 """Log settings."""
 openapi = OpenAPISettings.parse_obj({})

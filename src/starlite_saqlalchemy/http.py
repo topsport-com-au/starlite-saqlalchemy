@@ -4,6 +4,15 @@ from __future__ import annotations
 from typing import Any
 
 import httpx
+import tenacity
+
+from . import settings
+
+clients = set[httpx.AsyncClient]()
+"""For bookkeeping of clients.
+
+We close them on app shutdown.
+"""
 
 
 class ClientException(Exception):
@@ -11,73 +20,163 @@ class ClientException(Exception):
 
 
 class Client:
-    """Base class for HTTP clients.
+    """A simple HTTP client class with retrying and exponential backoff.
 
-    ```python
-    client = Client()
-    response = await client.request("GET", "/some/resource")
-    assert response.status_code == 200
-    ```
+    This class uses the `tenacity` library to retry failed HTTP httpx
+    with exponential backoff and jitter. It also uses a `httpx.Session`
+    instance to manage HTTP connections and cookies.
     """
 
-    _client = httpx.AsyncClient()
+    def __init__(self, base_url: str, headers: dict[str, str] | None = None) -> None:
+        """
+        Args:
+            base_url: e.g., http://localhost
+            headers: Headers that are applied to every request
+        """
+        self.base_url = base_url
+        self.client = httpx.AsyncClient(base_url=base_url)
+        clients.add(self.client)
+        self.client.headers.update({"Content-Type": "application/json"})
+        if headers is not None:
+            self.client.headers.update(headers)
 
-    async def request(self, *args: Any, **kwargs: Any) -> httpx.Response:
-        """Make a HTTP request.
+    @tenacity.retry(
+        wait=tenacity.wait_random_exponential(  # type:ignore[attr-defined]
+            multiplier=settings.http.EXPONENTIAL_BACKOFF_MULTIPLIER,
+            exp_base=settings.http.EXPONENTIAL_BACKOFF_BASE,
+            min=settings.http.BACKOFF_MIN,
+            max=settings.http.BACKOFF_MAX,
+        ),
+        retry=tenacity.retry_if_exception_type(httpx.TransportError),  # type:ignore[attr-defined]
+    )
+    async def request(
+        self,
+        method: str,
+        path: str,
+        params: dict[str, Any] | None = None,
+        content: bytes | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> httpx.Response:
+        """Make an HTTP request with retrying and exponential backoff.
 
-        Passes `*args`, `**kwargs` straight through to `httpx.AsyncClient.request`, we call
-        `raise_for_status()` on the response and wrap any `HTTPX` error in a `ClientException`.
+        This method uses the `httpx` library to make an HTTP request and
+        the `tenacity` library to retry the request if it fails. It uses
+        exponential backoff with jitter to wait between retries.
 
         Args:
-            *args: Unpacked into `httpx.AsyncClient.request()`.
-            **kwargs: Unpacked into `httpx.AsyncClient.request()`.
+            method: The HTTP method (e.g. "GET", "POST")
+            path: The URL path (e.g. "/users/123")
+            params: Query parameters (optional)
+            content: Data to send in the request body (optional)
+            headers: HTTP headers to send with the request (optional)
 
         Returns:
-            Return value of `httpx.AsyncClient.request()` after calling
-            `httpx.Response.raise_for_status()`
+            The `httpx.Response` object.
 
         Raises:
-            ClientException: Wraps any `httpx.HTTPError` arising from the request or response status
-                check.
+            httpx.RequestException: If the request fails and cannot be retried.
         """
         try:
-            req = await self._client.request(*args, **kwargs)
-            req.raise_for_status()
+            response = await self.client.request(
+                method, path, params=params, content=content, headers=headers
+            )
+            response.raise_for_status()
         except httpx.HTTPError as exc:
-            url = exc.request.url
-            raise ClientException(f"Client Error for '{url}'") from exc
-        return req
+            raise ClientException from exc
+        return response
 
-    def json(self, response: httpx.Response) -> Any:
-        """Parse response as JSON.
+    async def get(
+        self,
+        path: str,
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> httpx.Response:
+        """Make an HTTP GET request with retrying and exponential backoff.
 
-        Abstracts deserializing to allow for optional unwrapping of server response, e.g.,
-        `{"data": []}`.
-
-        Args:
-            response: Response object, we call `.json()` on it.
-
-        Returns:
-            The result of `httpx.Response.json()` after passing through `self.unwrap_json()`.
-        """
-        return self.unwrap_json(response.json())
-
-    @staticmethod
-    def unwrap_json(data: Any) -> Any:
-        """Receive parsed JSON.
-
-        Override this method for pre-processing response data, for example unwrapping enveloped
-        data.
+        This method is a convenience wrapper around the `request` method that
+        sends an HTTP GET request.
 
         Args:
-            data: Value returned from `response.json()`.
+            path: The URL path (e.g. "/users/123")
+            params: Query parameters (optional)
+            headers: HTTP headers to send with the request (optional)
 
         Returns:
-            Pre-processed data, default is pass-through/no-op.
-        """
-        return data
+            The `httpx.Response` object.
 
-    @classmethod
-    async def close(cls) -> None:
-        """Close underlying client transport and proxies."""
-        await cls._client.aclose()
+        Raises:
+            httpx.RequestException: If the request fails and cannot be retried.
+        """
+        return await self.request("GET", path, params=params, headers=headers)
+
+    async def post(
+        self,
+        path: str,
+        content: bytes | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> httpx.Response:
+        """Make an HTTP POST request with retrying and exponential backoff.
+
+        This method is a convenience wrapper around the `request` method that
+        sends an HTTP POST request.
+
+        Args:
+            path: The URL path (e.g. "/users/123")
+            content: Data to send in the request body (optional)
+            headers: HTTP headers to send with the request (optional)
+
+        Returns:
+            The `httpx.Response` object.
+
+        Raises:
+            httpx.RequestException: If the request fails and cannot be retried.
+        """
+        return await self.request("POST", path, content=content, headers=headers)
+
+    async def put(
+        self,
+        path: str,
+        content: bytes | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> httpx.Response:
+        """Make an HTTP PUT request with retrying and exponential backoff.
+
+        This method is a convenience wrapper around the `request` method that
+        sends an HTTP PUT request.
+
+        Args:
+            path: The URL path (e.g. "/users/123")
+            content: Data to send in the request body (optional)
+            headers: HTTP headers to send with the request (optional)
+
+        Returns:
+            The `httpx.Response` object.
+
+        Raises:
+            httpx.RequestException: If the request fails and cannot be retried.
+        """
+        return await self.request("PUT", path, content=content, headers=headers)
+
+    async def delete(self, path: str, headers: dict[str, str] | None = None) -> httpx.Response:
+        """Make an HTTP DELETE request with retrying and exponential backoff.
+
+        This method is a convenience wrapper around the `request` method that
+        sends an HTTP DELETE request.
+
+        Args:
+            path: The URL path (e.g. "/users/123")
+            headers: HTTP headers to send with the request (optional)
+
+        Returns:
+            The `httpx.Response` object.
+
+        Raises:
+            httpx.RequestException: If the request fails and cannot be retried.
+        """
+        return await self.request("DELETE", path, headers=headers)
+
+
+async def on_shutdown() -> None:
+    """Close any clients that have been created."""
+    for client in clients:
+        await client.aclose()
