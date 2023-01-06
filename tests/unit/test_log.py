@@ -9,8 +9,13 @@ from unittest.mock import ANY, AsyncMock, MagicMock
 
 import pytest
 import structlog
+from starlite import get, post
 from starlite.constants import SCOPE_STATE_RESPONSE_COMPRESSED
-from starlite.status_codes import HTTP_200_OK, HTTP_500_INTERNAL_SERVER_ERROR
+from starlite.status_codes import (
+    HTTP_200_OK,
+    HTTP_400_BAD_REQUEST,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+)
 from starlite.testing import RequestFactory
 from starlite.utils.scope import set_starlite_scope_state
 from structlog import DropEvent
@@ -23,6 +28,7 @@ if TYPE_CHECKING:
     from pytest import MonkeyPatch
     from saq.job import Job
     from starlite import Starlite, State
+    from starlite.testing import TestClient
     from starlite.types.asgi_types import (
         HTTPResponseBodyEvent,
         HTTPResponseStartEvent,
@@ -288,9 +294,9 @@ async def test_before_send_handler_extract_request_data(
         "content_type": ("application/json", {}),
         "headers": {"content-length": "10", "content-type": "application/json"},
         "cookies": {},
-        "query": {},
+        "query": b"",
         "path_params": {},
-        "body": {"a": "b"},
+        "body": b'{"a": "b"}',
     }
 
 
@@ -369,3 +375,44 @@ async def test_after_process_logs_at_error(job: Job, cap_logger: CapturingLogger
             },
         )
     ] == cap_logger.calls
+
+
+async def test_exception_in_before_send_handler(
+    client: TestClient[Starlite], cap_logger: CapturingLogger, monkeypatch: MonkeyPatch
+) -> None:
+    """Test we handle errors originating from trying to log a request in the
+    before-send handler."""
+
+    @get(media_type="text/plain")
+    def test_handler() -> str:
+        return "Hello"
+
+    monkeypatch.setattr(
+        log.controller.BeforeSendHandler, "log_response", AsyncMock(side_effect=RuntimeError)
+    )
+    client.app.register(test_handler)
+    resp = client.get("/")
+    assert resp.text == "Hello"
+    assert len(cap_logger.calls) == 1
+    call = cap_logger.calls[0]
+    assert call.method_name == "error"
+    assert call.kwargs["event"] == "Error in logging before-send handler!"
+    assert call.kwargs["exception"]
+
+
+@pytest.mark.xfail(reason="starlite is returning 500 for invalid payloads as of v1.48.1")
+async def test_log_request_with_invalid_json_payload(client: TestClient[Starlite]) -> None:
+    """Test logs emitted with invalid client payload.
+
+    The request will fail with a 400 due to the data not being
+    parseable, so we need to make sure that the logging doesn't also
+    fail due to attempting to parse the invalid payload.
+    """
+
+    @post()
+    def test_handler(data: dict[str, Any]) -> dict[str, Any]:
+        return data
+
+    client.app.register(test_handler)
+    resp = client.post("/", content=b'{"a": "b",}', headers={"content-type": "application/json"})
+    assert resp.status_code == HTTP_400_BAD_REQUEST

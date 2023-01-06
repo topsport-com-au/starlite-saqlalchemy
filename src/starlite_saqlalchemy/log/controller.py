@@ -108,8 +108,8 @@ class BeforeSendHandler:
             extract_scheme="scheme" in settings.log.REQUEST_FIELDS,
             obfuscate_cookies=settings.log.OBFUSCATE_COOKIES,
             obfuscate_headers=settings.log.OBFUSCATE_HEADERS,
-            parse_body=True,
-            parse_query=True,
+            parse_body=False,
+            parse_query=False,
         )
         self.response_extractor = ResponseDataExtractor(
             extract_body="body" in settings.log.RESPONSE_FIELDS,
@@ -138,11 +138,16 @@ class BeforeSendHandler:
         # ignore intermediate content of streaming responses for now.
         elif message["type"] == HTTP_RESPONSE_BODY and message["more_body"] is False:
             scope["state"][HTTP_RESPONSE_BODY] = message
-            if self.do_log_request:
-                await self.log_request(scope)
-            if self.do_log_response:
-                await self.log_response(scope)
-            await LOGGER.alog(scope["state"]["log_level"], settings.log.HTTP_EVENT)
+            try:
+                if self.do_log_request:
+                    await self.log_request(scope)
+                if self.do_log_response:
+                    await self.log_response(scope)
+                await LOGGER.alog(scope["state"]["log_level"], settings.log.HTTP_EVENT)
+            except Exception as exc:  # pylint: disable=broad-except
+                # just in-case something in the context causes the error
+                structlog.contextvars.clear_contextvars()
+                await LOGGER.aerror("Error in logging before-send handler!", exc_info=exc)
 
     async def log_request(self, scope: "Scope") -> None:
         """Handle extracting the request data and logging the message.
