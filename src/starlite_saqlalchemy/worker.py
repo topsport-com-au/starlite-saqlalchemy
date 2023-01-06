@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import asyncio
+from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import msgspec
 import saq
+from starlite.utils.serialization import default_serializer
 
-from starlite_saqlalchemy import redis, settings
+from starlite_saqlalchemy import redis, settings, type_encoders
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable, Collection
@@ -19,6 +21,10 @@ __all__ = [
     "create_worker_instance",
     "queue",
 ]
+
+encoder = msgspec.json.Encoder(
+    enc_hook=partial(default_serializer, type_encoders=type_encoders.type_encoders_map)
+)
 
 
 class Queue(saq.Queue):
@@ -36,7 +42,7 @@ class Queue(saq.Queue):
             **kwargs: Passed through to `saq.Queue.__init__()`
         """
         kwargs.setdefault("name", settings.app.slug)
-        kwargs.setdefault("dump", msgspec.json.encode)
+        kwargs.setdefault("dump", encoder.encode)
         kwargs.setdefault("load", msgspec.json.decode)
         super().__init__(*args, **kwargs)
 
