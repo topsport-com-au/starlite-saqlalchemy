@@ -33,14 +33,6 @@ RepoServiceT = TypeVar("RepoServiceT", bound="RepositoryService")
 service_object_identity_map: dict[str, type[Service]] = {}
 
 
-class ServiceException(Exception):
-    """Base class for `Service` related exceptions."""
-
-
-class UnauthorizedException(ServiceException):
-    """A user tried to do something they shouldn't have."""
-
-
 class Service(Generic[T]):
     """Generic Service object."""
 

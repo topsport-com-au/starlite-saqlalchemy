@@ -9,10 +9,7 @@ import pytest
 from starlite.status_codes import HTTP_200_OK, HTTP_404_NOT_FOUND
 
 from starlite_saqlalchemy import testing
-from starlite_saqlalchemy.repository.exceptions import (
-    RepositoryConflictException,
-    RepositoryException,
-)
+from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyError
 from tests.utils.domain.authors import Author
 from tests.utils.domain.authors import Service as AuthorService
 from tests.utils.domain.books import Book
@@ -29,7 +26,7 @@ async def test_repo_raises_conflict_if_add_with_id(
     author_repository: testing.GenericMockRepository[Author],
 ) -> None:
     """Test mock repo raises conflict if add identified entity."""
-    with pytest.raises(RepositoryConflictException):
+    with pytest.raises(ConflictError):
         await author_repository.add(authors[0])
 
 
@@ -80,7 +77,7 @@ def test_generic_mock_repository_raises_repository_exception_if_named_attribute_
 ) -> None:
     """Test that a repo exception is raised if a named attribute doesn't
     exist."""
-    with pytest.raises(RepositoryException):
+    with pytest.raises(StarliteSaqlalchemyError):
         author_repository.filter_collection_by_kwargs(cricket="ball")
 
 

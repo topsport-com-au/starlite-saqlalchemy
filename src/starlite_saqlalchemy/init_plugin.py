@@ -51,8 +51,7 @@ from starlite_saqlalchemy import (
     sqlalchemy_plugin,
 )
 from starlite_saqlalchemy.health import health_check
-from starlite_saqlalchemy.repository.exceptions import RepositoryException
-from starlite_saqlalchemy.service import ServiceException, make_service_callback
+from starlite_saqlalchemy.service import make_service_callback
 from starlite_saqlalchemy.type_encoders import type_encoders_map
 from starlite_saqlalchemy.worker import create_worker_instance
 
@@ -250,7 +249,7 @@ class ConfigureApp:
             app_config.compression_config = compression.config
 
     def configure_debug(self, app_config: AppConfig) -> None:
-        """Set Starlite's `debug` parameter.
+        """Set the Starlite `debug` parameter.
 
         Args:
             app_config: The Starlite application config object.
@@ -271,10 +270,8 @@ class ConfigureApp:
             return
 
         app_config.exception_handlers.setdefault(
-            RepositoryException, exceptions.repository_exception_to_http_response
-        )
-        app_config.exception_handlers.setdefault(
-            ServiceException, exceptions.service_exception_to_http_response
+            exceptions.StarliteSaqlalchemyError,
+            exceptions.starlite_saqlalchemy_exception_to_http_response,
         )
 
     def configure_health_check(self, app_config: AppConfig) -> None:

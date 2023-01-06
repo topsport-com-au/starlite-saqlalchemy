@@ -12,11 +12,8 @@ from uuid import uuid4
 from starlite.status_codes import HTTP_200_OK, HTTP_201_CREATED
 
 from starlite_saqlalchemy.db import orm
+from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyError
 from starlite_saqlalchemy.repository.abc import AbstractRepository
-from starlite_saqlalchemy.repository.exceptions import (
-    RepositoryConflictException,
-    RepositoryException,
-)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Hashable, Iterable, MutableMapping, Sequence
@@ -69,7 +66,7 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
             The added instance.
         """
         if allow_id is False and self.get_id_attribute_value(data) is not None:
-            raise RepositoryConflictException("`add()` received identified item.")
+            raise ConflictError("`add()` received identified item.")
         now = datetime.now()
         data.updated = data.created = now
         if allow_id is False:
@@ -178,7 +175,7 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
                 if all(getattr(item, name) == value for name, value in kwargs.items()):
                     new_collection[item.id] = item
             except AttributeError as orig:
-                raise RepositoryException from orig
+                raise StarliteSaqlalchemyError from orig
         self.collection = new_collection
 
     @classmethod
