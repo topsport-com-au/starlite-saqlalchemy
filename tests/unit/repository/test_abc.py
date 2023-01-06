@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from starlite_saqlalchemy.repository.exceptions import RepositoryNotFoundException
+from starlite_saqlalchemy.exceptions import NotFoundError
 from starlite_saqlalchemy.testing import GenericMockRepository
 
 if TYPE_CHECKING:
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 def test_repository_check_not_found_raises() -> None:
     """Test `check_not_found()` raises if `None`."""
-    with pytest.raises(RepositoryNotFoundException):
+    with pytest.raises(NotFoundError):
         GenericMockRepository.check_not_found(None)
 
 
