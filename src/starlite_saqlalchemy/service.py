@@ -1,7 +1,8 @@
 """A generic service object implementation.
 
-Service object is generic on the domain model type, which should be a
-SQLAlchemy model.
+Service object is generic on the domain model type.
+
+RepositoryService object is generic on the domain model type which should be a SQLAlchemy model.
 """
 from __future__ import annotations
 
