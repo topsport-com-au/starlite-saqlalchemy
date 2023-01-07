@@ -2,6 +2,22 @@
 
 <!--next-version-placeholder-->
 
+## v0.23.0 (2023-01-07)
+### Feature
+* **exceptions:** Centralizes exceptions ([`69c6cdb`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/69c6cdba87982276f290e18c9b13a087ee00e45a))
+* **worker:** Natively serialize pydantic and pgproto.UUID types. ([`9cb59ee`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/9cb59ee238d08c2c918263323c87d0d707d857d4))
+
+### Fix
+* **server:** Fix uvicorn reloading. ([`5e639ea`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5e639eacef5286fca555bb3112853f42370d1c42))
+* **log:** Default uvicorn log level INFO ([`edd499b`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/edd499b3b5e707095135e9317662b25e9068f239))
+* **logging:** Catch logging errors ([`d6c0f7e`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/d6c0f7e224ba85d2ca0fe1410e690d543d01fe95))
+
+### Breaking
+* centralizes exceptions ([`69c6cdb`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/69c6cdba87982276f290e18c9b13a087ee00e45a))
+
+### Documentation
+* **service:** Fix stale module docstring. ([`0805244`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/0805244a9de45cd7111814c58841f1aa34c6a6ce))
+
 ## v0.22.1 (2023-01-02)
 ### Fix
 * **docs:** Update starlite objects.inv url ([#201](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/201)) ([`bcdc251`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/bcdc2511c320c28972485cb7feb828abf3417ecb))
