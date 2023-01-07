@@ -12,7 +12,7 @@ import logging
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 
 from starlite_saqlalchemy.db import async_session_factory
-from starlite_saqlalchemy.repository.types import ModelT
+from starlite_saqlalchemy.repository.sqlalchemy import ModelT
 from starlite_saqlalchemy.worker import queue
 
 if TYPE_CHECKING:
