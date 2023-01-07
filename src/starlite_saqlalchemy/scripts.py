@@ -49,7 +49,12 @@ def run_app() -> None:
         "--no-cache", action="store_const", const=False, default=True, dest="check_cache"
     )
     args = parser.parse_args()
-    uvicorn_config = uvicorn.Config(
+    with asyncio.Runner() as runner:
+        if args.check_db:
+            runner.run(_db_ready())
+        if args.check_cache:
+            runner.run(_redis_ready())
+    uvicorn.run(
         app=settings.server.APP_LOC,
         factory=settings.server.APP_LOC_IS_FACTORY,
         host=settings.server.HOST,
@@ -59,10 +64,3 @@ def run_app() -> None:
         reload_dirs=settings.server.RELOAD_DIRS,
         timeout_keep_alive=settings.server.KEEPALIVE,
     )
-    server = uvicorn.Server(config=uvicorn_config)
-    with asyncio.Runner() as runner:
-        if args.check_db:
-            runner.run(_db_ready())
-        if args.check_cache:
-            runner.run(_redis_ready())
-        runner.run(server.serve())
