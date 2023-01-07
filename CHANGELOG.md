@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.23.2 (2023-01-07)
+### Fix
+* **logging:** Reading empty body when extracting request data ([#207](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/207)) ([`5400e44`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5400e443cc01877a9859d67f199fb1d988446944))
+
 ## v0.23.1 (2023-01-07)
 ### Fix
 * **docs:** Fix starlite objects.inv url ([`b6b43a2`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/b6b43a2ae326ce27594442c208001651bb7180c2))
