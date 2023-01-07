@@ -31,6 +31,7 @@ LOGGER = structlog.get_logger()
 
 HTTP_RESPONSE_START: Literal["http.response.start"] = "http.response.start"
 HTTP_RESPONSE_BODY: Literal["http.response.body"] = "http.response.body"
+REQUEST_BODY_FIELD: Literal["body"] = "body"
 
 
 def drop_health_logs(_: WrappedLogger, __: str, event_dict: EventDict) -> EventDict:
@@ -190,7 +191,14 @@ class BeforeSendHandler:
             if value is missing:  # pragma: no cover
                 continue
             if isawaitable(value):
-                value = await value
+                # Starlite raises a RuntimeError when trying to read an empty request body.
+                # This can happen when a previous exception has been raised before
+                # calling the route handler (e.g: in a middleware).
+                try:
+                    value = await value
+                except RuntimeError:
+                    if key != REQUEST_BODY_FIELD:
+                        raise
             data[key] = value
         return data
 
