@@ -57,7 +57,7 @@ plugins:
           - https://docs.python.org/3/objects.inv
           - https://docs.sqlalchemy.org/en/20/objects.inv
           - https://redis-py.readthedocs.io/en/stable/objects.inv
-          - https://starlite-api.github.io/starlite/main/objects.inv
+          - https://starlite-api.github.io/starlite/dev/objects.inv
           options:
             docstring_style: google
             docstring_options:
