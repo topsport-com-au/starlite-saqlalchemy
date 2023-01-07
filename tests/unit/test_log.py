@@ -416,7 +416,7 @@ async def test_exception_in_before_send_handler_read_empty_body(
     def test_handler() -> str:
         return "Hello"
 
-    request = Request(http_scope, receive=empty_receive)
+    request: Request = Request(http_scope, receive=empty_receive)
     await before_send_handler.extract_request_data(request)
 
     client.app.register(test_handler)
