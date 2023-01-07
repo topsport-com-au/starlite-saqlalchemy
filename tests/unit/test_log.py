@@ -426,6 +426,7 @@ async def test_exception_in_before_send_handler_read_empty_body(
     call = cap_logger.calls[0]
     assert call.method_name == "info"
     assert call.kwargs["event"] == "HTTP"
+    assert call.kwargs["request"]["body"] is None
     assert "exception" not in call.kwargs
 
 

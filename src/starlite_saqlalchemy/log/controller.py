@@ -198,6 +198,7 @@ class BeforeSendHandler:
                 except RuntimeError:
                     if key != REQUEST_BODY_FIELD:
                         raise
+                    value = None
             data[key] = value
         return data
 
