@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.23.1 (2023-01-07)
+### Fix
+* **docs:** Fix starlite objects.inv url ([`b6b43a2`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/b6b43a2ae326ce27594442c208001651bb7180c2))
+
 ## v0.23.0 (2023-01-07)
 ### Feature
 * **exceptions:** Centralizes exceptions ([`69c6cdb`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/69c6cdba87982276f290e18c9b13a087ee00e45a))
