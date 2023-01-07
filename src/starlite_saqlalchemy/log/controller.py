@@ -191,9 +191,8 @@ class BeforeSendHandler:
             if value is missing:  # pragma: no cover
                 continue
             if isawaitable(value):
-                # Starlite raises a RuntimeError when trying to read an empty request body.
-                # This can happen when a previous exception has been raised before
-                # calling the route handler (e.g: in a middleware).
+                # Prevent Starlite from raising a RuntimeError
+                # when trying to read an empty request body.
                 try:
                     value = await value
                 except RuntimeError:
