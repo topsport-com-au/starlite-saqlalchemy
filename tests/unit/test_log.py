@@ -9,7 +9,8 @@ from unittest.mock import ANY, AsyncMock, MagicMock
 
 import pytest
 import structlog
-from starlite import get, post
+from starlite import Request, get, post
+from starlite.connection.base import empty_receive
 from starlite.constants import SCOPE_STATE_RESPONSE_COMPRESSED
 from starlite.status_codes import (
     HTTP_200_OK,
@@ -378,7 +379,9 @@ async def test_after_process_logs_at_error(job: Job, cap_logger: CapturingLogger
 
 
 async def test_exception_in_before_send_handler(
-    client: TestClient[Starlite], cap_logger: CapturingLogger, monkeypatch: MonkeyPatch
+    client: TestClient[Starlite],
+    cap_logger: CapturingLogger,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Test we handle errors originating from trying to log a request in the
     before-send handler."""
@@ -398,6 +401,33 @@ async def test_exception_in_before_send_handler(
     assert call.method_name == "error"
     assert call.kwargs["event"] == "Error in logging before-send handler!"
     assert call.kwargs["exception"]
+
+
+async def test_exception_in_before_send_handler_read_empty_body(
+    client: TestClient[Starlite],
+    cap_logger: CapturingLogger,
+    before_send_handler: log.controller.BeforeSendHandler,
+    http_scope: HTTPScope,
+) -> None:
+    """Test we handle errors originating from trying to log a request in the
+    before-send handler."""
+
+    @post(media_type="text/plain")
+    def test_handler() -> str:
+        return "Hello"
+
+    request: Request = Request(http_scope, receive=empty_receive)
+    await before_send_handler.extract_request_data(request)
+
+    client.app.register(test_handler)
+    resp = client.post("/")
+    assert resp.text == "Hello"
+    assert len(cap_logger.calls) == 1
+    call = cap_logger.calls[0]
+    assert call.method_name == "info"
+    assert call.kwargs["event"] == "HTTP"
+    assert call.kwargs["request"]["body"] is None
+    assert "exception" not in call.kwargs
 
 
 @pytest.mark.xfail(reason="starlite is returning 500 for invalid payloads as of v1.48.1")
