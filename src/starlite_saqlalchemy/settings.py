@@ -134,7 +134,7 @@ class LogSettings(BaseSettings):
     """Level to log SAQ logs."""
     UVICORN_ACCESS_LEVEL: int = 30
     """Level to log uvicorn access logs."""
-    UVICORN_ERROR_LEVEL: int = 30
+    UVICORN_ERROR_LEVEL: int = 20
     """Level to log uvicorn error logs."""
 
 
