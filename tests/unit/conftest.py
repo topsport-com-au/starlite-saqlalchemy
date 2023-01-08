@@ -4,7 +4,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-from saq.job import Job
 from starlite.datastructures import State
 from starlite.enums import ScopeType
 
@@ -113,9 +112,3 @@ def http_scope(app: Starlite) -> HTTPScope:
 def state() -> State:
     """Starlite application state datastructure."""
     return State()
-
-
-@pytest.fixture()
-def job() -> Job:
-    """SAQ Job instance."""
-    return Job(function="whatever", kwargs={"a": "b"})

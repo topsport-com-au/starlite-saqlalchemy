@@ -30,6 +30,7 @@ The `PluginConfig` has switches to disable every aspect of the plugin behavior.
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence  # noqa: TC003
+from importlib import import_module
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from pydantic import BaseModel
@@ -39,7 +40,6 @@ from starlite.types import TypeEncodersMap  # noqa: TC002
 from structlog.types import Processor  # noqa: TC002
 
 from starlite_saqlalchemy import (
-    cache,
     compression,
     dependencies,
     exceptions,
@@ -47,13 +47,11 @@ from starlite_saqlalchemy import (
     lifespan,
     log,
     openapi,
-    redis,
-    sentry,
     settings,
     sqlalchemy_plugin,
 )
 from starlite_saqlalchemy.constants import IS_LOCAL_ENVIRONMENT, IS_TEST_ENVIRONMENT
-from starlite_saqlalchemy.exceptions import HealthCheckConfigurationError
+from starlite_saqlalchemy.exceptions import HealthCheckConfigurationError, MissingDependencyError
 from starlite_saqlalchemy.health import (
     AbstractHealthCheck,
     AppHealthCheck,
@@ -62,7 +60,6 @@ from starlite_saqlalchemy.health import (
 from starlite_saqlalchemy.service import make_service_callback
 from starlite_saqlalchemy.sqlalchemy_plugin import SQLAlchemyHealthCheck
 from starlite_saqlalchemy.type_encoders import type_encoders_map
-from starlite_saqlalchemy.worker import create_worker_instance
 
 if TYPE_CHECKING:
     from starlite.config.app import AppConfig
@@ -209,7 +206,13 @@ class ConfigureApp:
         self.configure_worker(app_config)
 
         app_config.before_startup = lifespan.before_startup_handler
-        app_config.on_shutdown.extend([http.on_shutdown, redis.client.close])
+        app_config.on_shutdown.append(http.on_shutdown)
+        if self.config.do_cache:
+            from starlite_saqlalchemy import (  # pylint: disable=import-outside-toplevel
+                redis,
+            )
+
+            app_config.on_shutdown.append(redis.client.close)
         return app_config
 
     def configure_after_exception(self, app_config: AppConfig) -> None:
@@ -232,6 +235,11 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_cache and app_config.cache_config == DEFAULT_CACHE_CONFIG:
+            self._check_module_installed("redis", "cache")
+            from starlite_saqlalchemy import (  # pylint: disable=import-outside-toplevel
+                cache,
+            )
+
             app_config.cache_config = cache.config
 
     def configure_collection_dependencies(self, app_config: AppConfig) -> None:
@@ -337,6 +345,11 @@ class ConfigureApp:
             else not (IS_LOCAL_ENVIRONMENT or IS_TEST_ENVIRONMENT)
         )
         if do_sentry:
+            self._check_module_installed("sentry_sdk", "sentry")
+            from starlite_saqlalchemy import (  # pylint: disable=import-outside-toplevel
+                sentry,
+            )
+
             app_config.on_startup.append(sentry.configure)
 
     def configure_sqlalchemy_plugin(self, app_config: AppConfig) -> None:
@@ -370,6 +383,11 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_worker:
+            self._check_module_installed("saq", "worker")
+            from starlite_saqlalchemy.worker import (  # pylint: disable=import-outside-toplevel
+                create_worker_instance,
+            )
+
             worker_kwargs: dict[str, Any] = {"functions": self.config.worker_functions}
             if self.config.do_logging:
                 worker_kwargs["before_process"] = log.worker.before_process
@@ -383,3 +401,12 @@ class ConfigureApp:
         if isinstance(item, list):
             return item
         return [] if item is None else [item]
+
+    def _check_module_installed(self, module: str, config: str) -> None:
+        try:
+            import_module(module)
+        except ModuleNotFoundError as error:
+            raise MissingDependencyError(
+                f'You enabled {config} configuration but package "{module}" is not installed. '
+                f'You may need to run: "poetry install starlite-saqlalchemy[{config}]"'
+            ) from error

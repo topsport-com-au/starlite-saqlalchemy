@@ -17,7 +17,6 @@ from starlite_saqlalchemy import utils
 from starlite_saqlalchemy.db import async_session_factory
 from starlite_saqlalchemy.exceptions import NotFoundError
 from starlite_saqlalchemy.repository.sqlalchemy import ModelT
-from starlite_saqlalchemy.worker import default_job_config_dict, queue
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -135,6 +134,8 @@ class Service(Generic[T]):
             job_config: Configuration object to control the job that is enqueued.
             **kwargs: Arguments to be passed to the method when called. Must be JSON serializable.
         """
+        from starlite_saqlalchemy.worker import queue, default_job_config_dict  # pylint: disable=C0415
+
         module = inspect.getmodule(self)
         if module is None:  # pragma: no cover
             logger.warning("Callback not enqueued, no module resolved for %s", self)

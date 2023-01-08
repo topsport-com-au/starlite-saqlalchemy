@@ -8,7 +8,7 @@ import pytest
 from starlite import Starlite
 from starlite.cache import SimpleCacheBackend
 
-from starlite_saqlalchemy import init_plugin, sentry
+from starlite_saqlalchemy import init_plugin, worker, sentry
 
 if TYPE_CHECKING:
     from typing import Any
@@ -46,8 +46,7 @@ def test_config_switches() -> None:
     assert app.openapi_config is None
     assert app.response_class is None
     assert isinstance(app.cache.backend, SimpleCacheBackend)
-    # client.close and redis.close go in there unconditionally atm
-    assert len(app.on_shutdown) == 2
+    assert len(app.on_shutdown) == 1
     assert not app.after_exception
     assert not app.dependencies
     assert not app.exception_handlers
@@ -60,7 +59,7 @@ def test_do_worker_but_not_logging(monkeypatch: MonkeyPatch) -> None:
     """Tests branch where we can have the worker enabled, but logging
     disabled."""
     mock = MagicMock()
-    monkeypatch.setattr(init_plugin, "create_worker_instance", mock)
+    monkeypatch.setattr(worker, "create_worker_instance", mock)
     config = init_plugin.PluginConfig(do_logging=False)
     Starlite(route_handlers=[], on_app_init=[init_plugin.ConfigureApp(config=config)])
     mock.assert_called_once()
