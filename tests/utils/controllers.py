@@ -13,7 +13,7 @@ from tests.utils.domain.authors import ReadDTO, Service, WriteDTO
 DETAIL_ROUTE = "/{author_id:uuid}"
 
 
-def provides_service(db_session: AsyncSession) -> Service:
+async def provides_service(db_session: AsyncSession) -> Service:
     """Constructs repository and service objects for the request."""
     return Service(session=db_session)
 
