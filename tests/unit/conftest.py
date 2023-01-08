@@ -5,12 +5,11 @@ from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
 import pytest
-from saq.job import Job
 from starlite.datastructures import State
 from starlite.enums import ScopeType
 from starlite.testing import TestClient
 
-from starlite_saqlalchemy import sqlalchemy_plugin, worker
+from starlite_saqlalchemy import sqlalchemy_plugin
 from starlite_saqlalchemy.testing import GenericMockRepository
 from tests.utils.domain.authors import Author
 from tests.utils.domain.authors import Service as AuthorService
@@ -26,6 +25,28 @@ if TYPE_CHECKING:
     from starlite import Starlite
     from starlite.types import HTTPResponseBodyEvent, HTTPResponseStartEvent, HTTPScope
 
+# In case we run unit tests without extra dependencies installed
+try:
+    from saq.job import Job
+
+    from starlite_saqlalchemy import worker  # pylint: disable=ungrouped-imports
+
+    @pytest.fixture()
+    def job() -> Job:
+        """SAQ Job instance."""
+        return Job(function="whatever", kwargs={"a": "b"})
+
+    @pytest.fixture(scope="session", autouse=True)
+    def _patch_worker() -> abc.Iterator:
+        monkeypatch = pytest.MonkeyPatch()
+        monkeypatch.setattr(worker.Worker, "on_app_startup", MagicMock())
+        monkeypatch.setattr(worker.Worker, "stop", MagicMock())
+        yield
+        monkeypatch.undo()
+
+except ModuleNotFoundError:
+    pass
+
 
 @pytest.fixture(scope="session", autouse=True)
 def _patch_sqlalchemy_plugin() -> abc.Iterator:
@@ -35,15 +56,6 @@ def _patch_sqlalchemy_plugin() -> abc.Iterator:
         "on_shutdown",
         MagicMock(),
     )
-    yield
-    monkeypatch.undo()
-
-
-@pytest.fixture(scope="session", autouse=True)
-def _patch_worker() -> abc.Iterator:
-    monkeypatch = pytest.MonkeyPatch()
-    monkeypatch.setattr(worker.Worker, "on_app_startup", MagicMock())
-    monkeypatch.setattr(worker.Worker, "stop", MagicMock())
     yield
     monkeypatch.undo()
 
@@ -160,9 +172,3 @@ def http_scope(app: Starlite) -> HTTPScope:
 def state() -> State:
     """Starlite application state datastructure."""
     return State()
-
-
-@pytest.fixture()
-def job() -> Job:
-    """SAQ Job instance."""
-    return Job(function="whatever", kwargs={"a": "b"})

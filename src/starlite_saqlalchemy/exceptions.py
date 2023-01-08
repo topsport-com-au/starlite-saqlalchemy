@@ -51,6 +51,10 @@ class AuthorizationError(StarliteSaqlalchemyError):
     """A user tried to do something they shouldn't have."""
 
 
+class MissingDependencyError(StarliteSaqlalchemyError):
+    """A required dependency is not installed."""
+
+
 class _HTTPConflictException(HTTPException):
     """Request conflict with the current state of the target resource."""
 
