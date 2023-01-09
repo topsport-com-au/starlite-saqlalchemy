@@ -3,6 +3,7 @@
 # pylint: disable=broad-except
 import argparse
 import asyncio
+from typing import TYPE_CHECKING
 
 import uvicorn
 import uvloop
@@ -10,6 +11,11 @@ from sqlalchemy import text
 
 from starlite_saqlalchemy import redis, settings
 from starlite_saqlalchemy.db import engine
+
+if TYPE_CHECKING:
+    from collections.abc import Coroutine
+    from typing import Any
+
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
@@ -41,6 +47,31 @@ async def _redis_ready() -> None:
             break
 
 
+def _get_uvicorn_config() -> uvicorn.Config:
+    reload = (
+        settings.server.RELOAD
+        if settings.server.RELOAD is not None
+        else settings.app.ENVIRONMENT == "local"
+    )
+    reload_dirs = settings.server.RELOAD_DIRS if reload else None
+
+    return uvicorn.Config(
+        app=settings.server.APP_LOC,
+        factory=settings.server.APP_LOC_IS_FACTORY,
+        host=settings.server.HOST,
+        loop="none",
+        port=settings.server.PORT,
+        reload=reload,
+        reload_dirs=reload_dirs,
+        timeout_keep_alive=settings.server.KEEPALIVE,
+    )
+
+
+async def _run_server(config: uvicorn.Config) -> "Coroutine[Any, Any, None]":
+    server = uvicorn.Server(config)
+    await server.serve()
+
+
 def run_app() -> None:
     """Run the application."""
     parser = argparse.ArgumentParser(description="Run the application")
@@ -49,18 +80,10 @@ def run_app() -> None:
         "--no-cache", action="store_const", const=False, default=True, dest="check_cache"
     )
     args = parser.parse_args()
+
     with asyncio.Runner() as runner:
         if args.check_db:
             runner.run(_db_ready())
         if args.check_cache:
             runner.run(_redis_ready())
-    uvicorn.run(
-        app=settings.server.APP_LOC,
-        factory=settings.server.APP_LOC_IS_FACTORY,
-        host=settings.server.HOST,
-        loop="none",
-        port=settings.server.PORT,
-        reload=settings.server.RELOAD,
-        reload_dirs=settings.server.RELOAD_DIRS,
-        timeout_keep_alive=settings.server.KEEPALIVE,
-    )
+        runner.run(_run_server(_get_uvicorn_config()))
