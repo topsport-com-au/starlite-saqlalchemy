@@ -3,7 +3,6 @@
 # pylint: disable=broad-except
 import argparse
 import asyncio
-from typing import TYPE_CHECKING
 
 import uvicorn
 import uvloop
@@ -11,11 +10,6 @@ from sqlalchemy import text
 
 from starlite_saqlalchemy import redis, settings
 from starlite_saqlalchemy.db import engine
-
-if TYPE_CHECKING:
-    from collections.abc import Coroutine
-    from typing import Any
-
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
@@ -67,7 +61,8 @@ def _get_uvicorn_config() -> uvicorn.Config:
     )
 
 
-async def _run_server(config: uvicorn.Config) -> "Coroutine[Any, Any, None]":
+async def _run_server(config: uvicorn.Config) -> None:
+    """Run an uvicorn server with the given config."""
     server = uvicorn.Server(config)
     await server.serve()
 

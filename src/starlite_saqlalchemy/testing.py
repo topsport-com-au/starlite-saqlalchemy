@@ -7,7 +7,7 @@ from __future__ import annotations
 import random
 from contextlib import contextmanager
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 from uuid import uuid4
 
 from starlite.status_codes import HTTP_200_OK, HTTP_201_CREATED
@@ -17,7 +17,15 @@ from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyEr
 from starlite_saqlalchemy.repository.abc import AbstractRepository
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Hashable, Iterable, MutableMapping, Sequence
+    from collections.abc import (
+        Callable,
+        Generator,
+        Hashable,
+        Iterable,
+        MutableMapping,
+        Sequence,
+    )
+    from typing import Any
 
     from pydantic import BaseSettings
     from pytest import MonkeyPatch
@@ -31,7 +39,15 @@ MockRepoT = TypeVar("MockRepoT", bound="GenericMockRepository")
 
 
 @contextmanager
-def modify_settings(*update: tuple[BaseSettings, dict[str, Any]]):
+def modify_settings(*update: tuple[BaseSettings, dict[str, Any]]) -> Generator[None, None, None]:
+    """Context manager that modify the desired settings and restore them on
+    exit.
+
+    >>> assert settings.app.ENVIRONMENT = "local"
+    >>> with modify_settings((settings.app, {"ENVIRONMENT": "prod"})):
+    >>>     assert settings.app.ENVIRONMENT == "prod"
+    >>> assert settings.app.ENVIRONMENT == "local"
+    """
     old_settings: list[tuple[BaseSettings, dict[str, Any]]] = []
     try:
         for model, new_values in update:
