@@ -1,6 +1,6 @@
 asgi-lifespan == 2.0.0
 coverage[toml] == 7.0.0; python_version < '3.11'
-coverage == 7.0.1; python_version >= '3.11'
+coverage == 7.0.4; python_version >= '3.11'
 cryptography == 39.0.0
 pytest == 7.2.0
 pytest-asyncio == 0.20.3
