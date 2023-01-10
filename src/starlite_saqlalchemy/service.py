@@ -1,7 +1,8 @@
 """A generic service object implementation.
 
-Service object is generic on the domain model type, which should be a
-SQLAlchemy model.
+Service object is generic on the domain model type.
+
+RepositoryService object is generic on the domain model type which should be a SQLAlchemy model.
 """
 from __future__ import annotations
 
@@ -11,7 +12,7 @@ import logging
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 
 from starlite_saqlalchemy.db import async_session_factory
-from starlite_saqlalchemy.repository.types import ModelT
+from starlite_saqlalchemy.repository.sqlalchemy import ModelT
 from starlite_saqlalchemy.worker import queue
 
 if TYPE_CHECKING:
@@ -30,14 +31,6 @@ ServiceT = TypeVar("ServiceT", bound="Service")
 RepoServiceT = TypeVar("RepoServiceT", bound="RepositoryService")
 
 service_object_identity_map: dict[str, type[Service]] = {}
-
-
-class ServiceException(Exception):
-    """Base class for `Service` related exceptions."""
-
-
-class UnauthorizedException(ServiceException):
-    """A user tried to do something they shouldn't have."""
 
 
 class Service(Generic[T]):

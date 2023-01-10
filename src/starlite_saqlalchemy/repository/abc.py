@@ -4,7 +4,7 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from starlite_saqlalchemy.repository.exceptions import RepositoryNotFoundException
+from starlite_saqlalchemy.exceptions import NotFoundError
 
 if TYPE_CHECKING:
     from .types import FilterTypes
@@ -137,7 +137,7 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
             The item, if it exists.
         """
         if item_or_none is None:
-            raise RepositoryNotFoundException("No item found when one was expected")
+            raise NotFoundError("No item found when one was expected")
         return item_or_none
 
     @classmethod

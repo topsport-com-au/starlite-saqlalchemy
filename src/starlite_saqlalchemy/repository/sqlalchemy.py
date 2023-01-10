@@ -7,11 +7,8 @@ from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
+from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyError
 from starlite_saqlalchemy.repository.abc import AbstractRepository
-from starlite_saqlalchemy.repository.exceptions import (
-    RepositoryConflictException,
-    RepositoryException,
-)
 from starlite_saqlalchemy.repository.filters import (
     BeforeAfter,
     CollectionFilter,
@@ -47,7 +44,7 @@ def wrap_sqlalchemy_exception() -> Any:
         >>> try:
         ...     with wrap_sqlalchemy_exception():
         ...         raise SQLAlchemyError("Original Exception")
-        ... except RepositoryException as exc:
+        ... except StarliteSaqlalchemyError as exc:
         ...     print(f"caught repository exception from {type(exc.__context__)}")
         ...
         caught repository exception from <class 'sqlalchemy.exc.SQLAlchemyError'>
@@ -55,9 +52,9 @@ def wrap_sqlalchemy_exception() -> Any:
     try:
         yield
     except IntegrityError as exc:
-        raise RepositoryConflictException from exc
+        raise ConflictError from exc
     except SQLAlchemyError as exc:
-        raise RepositoryException(f"An exception occurred: {exc}") from exc
+        raise StarliteSaqlalchemyError(f"An exception occurred: {exc}") from exc
 
 
 class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
@@ -148,7 +145,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
                 case CollectionFilter(field_name, values):
                     self._filter_in_collection(field_name, values)
                 case _:
-                    raise RepositoryException(f"Unexpected filter: {filter}")
+                    raise StarliteSaqlalchemyError(f"Unexpected filter: {filter}")
         self._filter_select_by_kwargs(**kwargs)
 
         with wrap_sqlalchemy_exception():

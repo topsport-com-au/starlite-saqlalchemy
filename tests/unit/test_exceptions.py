@@ -1,5 +1,4 @@
 """Tests for exception translation behavior."""
-from typing import TYPE_CHECKING
 from unittest.mock import ANY, MagicMock
 
 import pytest
@@ -15,15 +14,12 @@ from starlite.status_codes import (
 from starlite.testing import RequestFactory, create_test_client
 
 from starlite_saqlalchemy import exceptions
-from starlite_saqlalchemy.repository.exceptions import (
-    RepositoryConflictException,
-    RepositoryException,
-    RepositoryNotFoundException,
+from starlite_saqlalchemy.exceptions import (
+    AuthorizationError,
+    ConflictError,
+    NotFoundError,
+    StarliteSaqlalchemyError,
 )
-from starlite_saqlalchemy.service import ServiceException, UnauthorizedException
-
-if TYPE_CHECKING:
-    from collections import abc
 
 
 def test_after_exception_hook_handler_called(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -67,56 +63,26 @@ def test_after_exception_hook_handler_doesnt_log_400(monkeypatch: pytest.MonkeyP
 @pytest.mark.parametrize(
     ("exc", "status"),
     [
-        (RepositoryConflictException, HTTP_409_CONFLICT),
-        (RepositoryNotFoundException, HTTP_404_NOT_FOUND),
-        (RepositoryException, HTTP_500_INTERNAL_SERVER_ERROR),
+        (AuthorizationError, HTTP_403_FORBIDDEN),
+        (ConflictError, HTTP_409_CONFLICT),
+        (NotFoundError, HTTP_404_NOT_FOUND),
+        (StarliteSaqlalchemyError, HTTP_500_INTERNAL_SERVER_ERROR),
     ],
 )
-def test_repository_exception_to_http_response(exc: type[RepositoryException], status: int) -> None:
+def test_exception_to_http_response(exc: type[StarliteSaqlalchemyError], status: int) -> None:
     """Test translation of repository exceptions to Starlite HTTP exception
     types."""
     app = Starlite(route_handlers=[])
     request = RequestFactory(app=app, server="testserver").get("/wherever")
-    response = exceptions.repository_exception_to_http_response(request, exc())
+    response = exceptions.starlite_saqlalchemy_exception_to_http_response(request, exc())
     assert response.status_code == status
 
 
-@pytest.mark.parametrize(
-    ("exc", "status"),
-    [
-        (UnauthorizedException, HTTP_403_FORBIDDEN),
-        (ServiceException, HTTP_500_INTERNAL_SERVER_ERROR),
-    ],
-)
-def test_service_exception_to_http_response(exc: type[ServiceException], status: int) -> None:
-    """Test translation of service exceptions to Starlite HTTP exception
-    types."""
-    app = Starlite(route_handlers=[])
-    request = RequestFactory(app=app, server="testserver").get("/wherever")
-    response = exceptions.service_exception_to_http_response(request, exc())
-    assert response.status_code == status
-
-
-@pytest.mark.parametrize(
-    ("exc", "func", "expected_message"),
-    [
-        (
-            RepositoryException("message"),
-            exceptions.repository_exception_to_http_response,
-            b"starlite_saqlalchemy.repository.exceptions.RepositoryException: message\n",
-        ),
-        (
-            ServiceException("message"),
-            exceptions.service_exception_to_http_response,
-            b"starlite_saqlalchemy.service.ServiceException: message\n",
-        ),
-    ],
-)
-def test_exception_serves_debug_middleware_response(
-    exc: Exception, func: "abc.Callable", expected_message: bytes
-) -> None:
+def test_exception_serves_debug_middleware_response() -> None:
     """Test behavior of exception translation in debug mode."""
     app = Starlite(route_handlers=[], debug=True)
     request = RequestFactory(app=app, server="testserver").get("/wherever")
-    response = func(request, exc)
-    assert response.body == expected_message
+    response = exceptions.starlite_saqlalchemy_exception_to_http_response(
+        request, StarliteSaqlalchemyError("message")
+    )
+    assert response.body == b"starlite_saqlalchemy.exceptions.StarliteSaqlalchemyError: message\n"

@@ -10,10 +10,7 @@ import pytest
 from sqlalchemy.exc import IntegrityError, InvalidRequestError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from starlite_saqlalchemy.repository.exceptions import (
-    RepositoryConflictException,
-    RepositoryException,
-)
+from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyError
 from starlite_saqlalchemy.repository.filters import (
     BeforeAfter,
     CollectionFilter,
@@ -42,13 +39,13 @@ def mock_repo() -> SQLAlchemyRepository:
 
 def test_wrap_sqlalchemy_integrity_error() -> None:
     """Test to ensure we wrap IntegrityError."""
-    with (pytest.raises(RepositoryConflictException), wrap_sqlalchemy_exception()):
+    with (pytest.raises(ConflictError), wrap_sqlalchemy_exception()):
         raise IntegrityError(None, None, Exception())
 
 
 def test_wrap_sqlalchemy_generic_error() -> None:
     """Test to ensure we wrap generic SQLAlchemy exceptions."""
-    with (pytest.raises(RepositoryException), wrap_sqlalchemy_exception()):
+    with (pytest.raises(StarliteSaqlalchemyError), wrap_sqlalchemy_exception()):
         raise SQLAlchemyError
 
 
@@ -156,7 +153,7 @@ async def test_sqlalchemy_repo_list_with_collection_filter(
 
 async def test_sqlalchemy_repo_unknown_filter_type_raises(mock_repo: SQLAlchemyRepository) -> None:
     """Test that repo raises exception if list receives unknown filter type."""
-    with pytest.raises(RepositoryException):
+    with pytest.raises(StarliteSaqlalchemyError):
         await mock_repo.list("not a filter")  # type:ignore[arg-type]
 
 
@@ -245,5 +242,5 @@ def test_filter_collection_by_kwargs_raises_repository_exception_for_attribute_e
     mock_repo._select.filter_by = MagicMock(  # type:ignore[assignment]
         side_effect=InvalidRequestError,
     )
-    with pytest.raises(RepositoryException):
+    with pytest.raises(StarliteSaqlalchemyError):
         mock_repo.filter_collection_by_kwargs(a=1)

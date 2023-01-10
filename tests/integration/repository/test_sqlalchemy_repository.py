@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
-from starlite_saqlalchemy.repository.exceptions import RepositoryException
+from starlite_saqlalchemy.exceptions import StarliteSaqlalchemyError
 from tests.utils.domain import authors
 
 
@@ -16,5 +16,5 @@ def fx_repo(session: AsyncSession) -> authors.Repository:
 
 
 def test_filter_by_kwargs_with_incorrect_attribute_name(repo: authors.Repository) -> None:
-    with pytest.raises(RepositoryException):
+    with pytest.raises(StarliteSaqlalchemyError):
         repo.filter_collection_by_kwargs(whoops="silly me")

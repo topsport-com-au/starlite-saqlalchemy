@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, TypeVar
 from uuid import uuid4
 
 import pytest
+from asyncpg.pgproto import pgproto
 from starlite import Starlite
 from structlog.contextvars import clear_contextvars
 from structlog.testing import CapturingLogger
@@ -82,7 +83,11 @@ def fx_raw_authors() -> list[dict[str, Any]]:
 @pytest.fixture(name="authors")
 def fx_authors(raw_authors: list[dict[str, Any]]) -> list[authors.Author]:
     """Collection of parsed Author models."""
-    return [authors.ReadDTO(**raw).to_mapped() for raw in raw_authors]
+    mapped_authors = [authors.ReadDTO(**raw).to_mapped() for raw in raw_authors]
+    # convert these to pgproto UUIDs as that is what we get back from sqlalchemy
+    for author in mapped_authors:
+        author.id = pgproto.UUID(str(author.id))
+    return mapped_authors
 
 
 @pytest.fixture(name="raw_books")
@@ -103,7 +108,11 @@ def fx_raw_books(raw_authors: list[dict[str, Any]]) -> list[dict[str, Any]]:
 @pytest.fixture(name="books")
 def fx_books(raw_books: list[dict[str, Any]]) -> list[books.Book]:
     """Collection of parsed Book models."""
-    return [books.ReadDTO(**raw).to_mapped() for raw in raw_books]
+    mapped_books = [books.ReadDTO(**raw).to_mapped() for raw in raw_books]
+    # convert these to pgproto UUIDs as that is what we get back from sqlalchemy
+    for book in mapped_books:
+        book.id = pgproto.UUID(str(book.id))
+    return mapped_books
 
 
 @pytest.fixture(name="create_module")

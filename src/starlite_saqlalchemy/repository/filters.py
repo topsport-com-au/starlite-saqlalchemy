@@ -16,9 +16,9 @@ class BeforeAfter:
     field_name: str
     """Name of the model attribute to filter on."""
     before: datetime | None
-    """Filter results where field earlier than this [datetime][datetime.datetime]"""
+    """Filter results where field earlier than this."""
     after: datetime | None
-    """Filter results where field later than this [datetime][datetime.datetime]"""
+    """Filter results where field later than this."""
 
 
 @dataclass

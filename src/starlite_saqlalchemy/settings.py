@@ -81,7 +81,10 @@ class LogSettings(BaseSettings):
     INCLUDE_COMPRESSED_BODY: bool = False
     """Include 'body' of compressed responses in log output."""
     LEVEL: int = 20
-    """Stdlib log levels. Only emit logs at this level, or higher."""
+    """Stdlib log levels.
+
+    Only emit logs at this level, or higher.
+    """
     OBFUSCATE_COOKIES: set[str] = {"session"}
     """Request cookie keys to obfuscate."""
     OBFUSCATE_HEADERS: set[str] = {"Authorization", "X-API-KEY"}
@@ -98,8 +101,10 @@ class LogSettings(BaseSettings):
         "result",
         "error",
     ]
-    """Attributes of the SAQ [`Job`](https://github.com/tobymao/saq/blob/master/saq/job.py)
-    to be logged.
+    """Attributes of the SAQ.
+
+    [`Job`](https://github.com/tobymao/saq/blob/master/saq/job.py) to be
+    logged.
     """
     REQUEST_FIELDS: list[RequestExtractorField] = [
         "path",
@@ -111,14 +116,16 @@ class LogSettings(BaseSettings):
         "path_params",
         "body",
     ]
-    """Attributes of the [Request][starlite.connection.request.Request] to be logged."""
+    """Attributes of the [Request][starlite.connection.request.Request] to be
+    logged."""
     RESPONSE_FIELDS: list[ResponseExtractorField] = [
         "status_code",
         "cookies",
         "headers",
         "body",
     ]
-    """Attributes of the [Response][starlite.response.Response] to be logged."""
+    """Attributes of the [Response][starlite.response.Response] to be
+    logged."""
     WORKER_EVENT: str = "Worker"
     """Log event name for logs from SAQ worker."""
     SAQ_LEVEL: int = 30
@@ -127,7 +134,7 @@ class LogSettings(BaseSettings):
     """Level to log SAQ logs."""
     UVICORN_ACCESS_LEVEL: int = 30
     """Level to log uvicorn access logs."""
-    UVICORN_ERROR_LEVEL: int = 30
+    UVICORN_ERROR_LEVEL: int = 20
     """Level to log uvicorn error logs."""
 
 
@@ -164,7 +171,8 @@ class DatabaseSettings(BaseSettings):
     ECHO_POOL: bool | Literal["debug"] = False
     """Enable SQLAlchemy connection pool logs."""
     POOL_DISABLE: bool = False
-    """Disable SQLAlchemy pooling, same as setting pool to
+    """Disable SQLAlchemy pooling, same as setting pool to.
+
     [`NullPool`][sqlalchemy.pool.NullPool].
     """
     POOL_MAX_OVERFLOW: int = 10
@@ -201,7 +209,10 @@ class SentrySettings(BaseSettings):
         env_prefix = "SENTRY_"
 
     DSN: str = ""
-    """The sentry DSN. Set as empty string to disable sentry reporting."""
+    """The sentry DSN.
+
+    Set as empty string to disable sentry reporting.
+    """
     TRACES_SAMPLE_RATE: float = 0.0001
     """% of requests traced by sentry, `0.0` means none, `1.0` means all."""
 
@@ -230,6 +241,20 @@ class ServerSettings(BaseSettings):
     """Directories to watch for reloading."""
 
 
+class HTTPClientSettings(BaseSettings):
+    """HTTP Client configurations."""
+
+    class Config:
+        case_sensitive = True
+        env_file = ".env"
+        env_prefix = "HTTP_"
+
+    BACKOFF_MAX: float = 60
+    BACKOFF_MIN: float = 0
+    EXPONENTIAL_BACKOFF_BASE: float = 2
+    EXPONENTIAL_BACKOFF_MULTIPLIER: float = 1
+
+
 # `.parse_obj()` thing is a workaround for pyright and pydantic interplay, see:
 # https://github.com/pydantic/pydantic/issues/3753#issuecomment-1087417884
 api = APISettings.parse_obj({})
@@ -238,6 +263,8 @@ app = AppSettings.parse_obj({})
 """App settings."""
 db = DatabaseSettings.parse_obj({})
 """Database settings."""
+http = HTTPClientSettings.parse_obj({})
+"""HTTP Client Settings."""
 log = LogSettings.parse_obj({})
 """Log settings."""
 openapi = OpenAPISettings.parse_obj({})

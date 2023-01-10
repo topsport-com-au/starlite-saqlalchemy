@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
+        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # @v2.0.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -30,8 +30,8 @@ jobs:
             github.com:443
             objects.githubusercontent.com:443
             pypi.org:443
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # @v3.2.0
+      - uses: actions/setup-python@5ccb29d8773c3f3f653e1705f474dfaa8a06a912 #v4.4.0
         with:
           python-version: ${{env.PYTHON_LATEST}}
       - name: Install Dependencies
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
+        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # @v2.0.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -51,8 +51,8 @@ jobs:
             github.com:443
             objects.githubusercontent.com:443
             pypi.org:443
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # @v3.2.0
+      - uses: actions/setup-python@5ccb29d8773c3f3f653e1705f474dfaa8a06a912 #v4.4.0
         with:
           python-version: ${{env.PYTHON_LATEST}}
       - name: Install Dependencies
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
+        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # @v2.0.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -73,8 +73,8 @@ jobs:
             objects.githubusercontent.com:443
             pypi.org:443
             registry.npmjs.org:443
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # @v3.2.0
+      - uses: actions/setup-python@5ccb29d8773c3f3f653e1705f474dfaa8a06a912 #v4.4.0
         with:
           python-version: ${{env.PYTHON_LATEST}}
       - name: Install Dependencies
@@ -91,7 +91,7 @@ jobs:
           - "3.11"
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
+        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # @v2.0.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -103,8 +103,8 @@ jobs:
             pypi.org:443
             registry-1.docker.io:443
             auth.docker.io:443
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # @v3.2.0
+      - uses: actions/setup-python@5ccb29d8773c3f3f653e1705f474dfaa8a06a912 #v4.4.0
         with:
           python-version: ${{matrix.python-version}}
       - name: Install Dependencies
@@ -120,7 +120,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
+        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # @v2.0.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -129,8 +129,8 @@ jobs:
             github.com:443
             objects.githubusercontent.com:443
             pypi.org:443
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # @v3.2.0
+      - uses: actions/setup-python@5ccb29d8773c3f3f653e1705f474dfaa8a06a912 #v4.4.0
         with:
           python-version: ${{env.PYTHON_LATEST}}
       - run: python -m pip install --upgrade wheel tox
@@ -157,7 +157,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
+        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # @v2.0.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -169,8 +169,8 @@ jobs:
             pypi.org:443
             uploads.github.com:443
       - name: Checkout repository
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # @v3.2.0
+      - uses: actions/setup-python@5ccb29d8773c3f3f653e1705f474dfaa8a06a912 #v4.4.0
         with:
           python-version: ${{env.PYTHON_LATEST}}
       - name: Initialize CodeQL With Dependencies
@@ -193,10 +193,10 @@ jobs:
     if: github.event.pull_request.head.repo.fork == false
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
+        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # @v2.0.0
         with:
           egress-policy: audit
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # @v3.2.0
         with:
           fetch-depth: 0
       - name: Download coverage report
@@ -223,7 +223,7 @@ jobs:
     runs-on: Ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
+        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # @v2.0.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -243,7 +243,7 @@ jobs:
       REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@2e205a28d0e1da00c5f53b161f4067b052c61f34 # @v1.5.0
+        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # @v2.0.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -254,11 +254,11 @@ jobs:
             pypi.org:443
             upload.pypi.org:443
             uploads.github.com:443
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # @v3.1.0
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # @v3.2.0
         with:
           fetch-depth: 0
           token: ${{ secrets.SEMANTIC_RELEASES_TOKEN }}
-      - uses: actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984 #v4.3.0
+      - uses: actions/setup-python@5ccb29d8773c3f3f653e1705f474dfaa8a06a912 #v4.4.0
         with:
           python-version: ${{env.PYTHON_LATEST}}
       - run: python -m pip install python-semantic-release

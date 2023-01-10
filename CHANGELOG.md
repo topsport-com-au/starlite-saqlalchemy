@@ -2,6 +2,48 @@
 
 <!--next-version-placeholder-->
 
+## v0.23.2 (2023-01-07)
+### Fix
+* **logging:** Reading empty body when extracting request data ([#207](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/207)) ([`5400e44`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5400e443cc01877a9859d67f199fb1d988446944))
+
+## v0.23.1 (2023-01-07)
+### Fix
+* **docs:** Fix starlite objects.inv url ([`b6b43a2`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/b6b43a2ae326ce27594442c208001651bb7180c2))
+
+## v0.23.0 (2023-01-07)
+### Feature
+* **exceptions:** Centralizes exceptions ([`69c6cdb`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/69c6cdba87982276f290e18c9b13a087ee00e45a))
+* **worker:** Natively serialize pydantic and pgproto.UUID types. ([`9cb59ee`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/9cb59ee238d08c2c918263323c87d0d707d857d4))
+
+### Fix
+* **server:** Fix uvicorn reloading. ([`5e639ea`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5e639eacef5286fca555bb3112853f42370d1c42))
+* **log:** Default uvicorn log level INFO ([`edd499b`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/edd499b3b5e707095135e9317662b25e9068f239))
+* **logging:** Catch logging errors ([`d6c0f7e`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/d6c0f7e224ba85d2ca0fe1410e690d543d01fe95))
+
+### Breaking
+* centralizes exceptions ([`69c6cdb`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/69c6cdba87982276f290e18c9b13a087ee00e45a))
+
+### Documentation
+* **service:** Fix stale module docstring. ([`0805244`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/0805244a9de45cd7111814c58841f1aa34c6a6ce))
+
+## v0.22.1 (2023-01-02)
+### Fix
+* **docs:** Update starlite objects.inv url ([#201](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/201)) ([`bcdc251`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/bcdc2511c320c28972485cb7feb828abf3417ecb))
+
+## v0.22.0 (2023-01-02)
+### Feature
+* New http client pattern. ([#200](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/200)) ([`5538f83`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5538f83123d30c80a7121f18ba1f6f8885fc731b))
+
+### Breaking
+* new http client pattern. ([#200](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/200)) ([`5538f83`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5538f83123d30c80a7121f18ba1f6f8885fc731b))
+
+## v0.21.0 (2023-01-01)
+### Feature
+* Support new starlite type encoders pattern ([`34aea07`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/34aea0748979c3236668cee1fe19b3aa32f5ee3e))
+
+### Breaking
+* support new starlite type encoders pattern ([`34aea07`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/34aea0748979c3236668cee1fe19b3aa32f5ee3e))
+
 ## v0.20.1 (2022-12-17)
 ### Fix
 * Ensures PluginConfig doesn't carry forward refs downstream. ([#176](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/176)) ([`b37c262`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/b37c26204bc18eeaff67d626d5089738fae1abf7))
