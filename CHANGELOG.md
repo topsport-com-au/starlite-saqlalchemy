@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.24.0 (2023-01-11)
+### Feature
+* **logs:** Add duration measures to worker logs. ([`b209a23`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/b209a231c26fb6d174feb36fccbab2daeca466b0))
+* **worker:** Adds job config. ([#225](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/225)) ([`f20209b`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/f20209bb784fb79c60f2a8e7294f2a55c77b60da))
+
+### Fix
+* Remove NotImplementedError from Service base class. ([#222](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/222)) ([`b812f1c`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/b812f1c35abdffab8ca266778fd6c7141a9474e7))
+
 ## v0.23.2 (2023-01-07)
 ### Fix
 * **logging:** Reading empty body when extracting request data ([#207](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/207)) ([`5400e44`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5400e443cc01877a9859d67f199fb1d988446944))
