@@ -31,10 +31,13 @@ class Queue(saq.Queue):
     """Async task queue."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        """[SAQ
-        Queue](https://github.com/tobymao/saq/blob/master/saq/queue.py).
+        """Create an SAQ Queue.
 
-        Configures `orjson` for JSON serialization/deserialization if not
+        See: https://github.com/tobymao/saq/blob/master/saq/queue.py
+
+        Names the queue per the application slug - namespaces SAQ's redis keys to the app.
+
+        Configures `msgspec` for JSON serialization/deserialization if not
         otherwise configured.
 
         Args:
