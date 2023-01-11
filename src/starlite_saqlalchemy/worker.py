@@ -69,7 +69,6 @@ class Worker(saq.Worker):
         loop.create_task(self.start())
 
 
-
 queue = Queue(redis.client)
 """Async worker queue.
 
