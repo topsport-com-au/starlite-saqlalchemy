@@ -47,10 +47,14 @@ class Queue(saq.Queue):
             *args: Passed through to `saq.Queue.__init__()`
             **kwargs: Passed through to `saq.Queue.__init__()`
         """
-        kwargs.setdefault("name", settings.app.slug)
+        kwargs.setdefault("name", "background-worker")
         kwargs.setdefault("dump", encoder.encode)
         kwargs.setdefault("load", msgspec.json.decode)
         super().__init__(*args, **kwargs)
+
+    def namespace(self, key: str) -> str:
+        """Makes the namespace unique per app."""
+        return f"{settings.app.slug}:{self.name}:{key}"
 
 
 class Worker(saq.Worker):
@@ -63,6 +67,7 @@ class Worker(saq.Worker):
         """Attach the worker to the running event loop."""
         loop = asyncio.get_running_loop()
         loop.create_task(self.start())
+
 
 
 queue = Queue(redis.client)
