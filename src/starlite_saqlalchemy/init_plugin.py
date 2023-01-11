@@ -43,6 +43,7 @@ from starlite_saqlalchemy import (
     dependencies,
     exceptions,
     http,
+    lifespan,
     log,
     openapi,
     redis,
@@ -198,6 +199,7 @@ class ConfigureApp:
         self.configure_type_encoders(app_config)
         self.configure_worker(app_config)
 
+        app_config.before_startup = lifespan.before_startup_handler
         app_config.on_shutdown.extend([http.on_shutdown, redis.client.close])
         return app_config
 
