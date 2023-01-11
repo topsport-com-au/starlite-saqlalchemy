@@ -346,6 +346,9 @@ async def test_after_process(job: Job, cap_logger: CapturingLogger) -> None:
                 "event": "Worker",
                 "level": "info",
                 "timestamp": ANY,
+                "pickup_time_ms": 0,
+                "completed_time_ms": 0,
+                "total_time_ms": 0,
             },
         )
     ] == cap_logger.calls
@@ -373,6 +376,9 @@ async def test_after_process_logs_at_error(job: Job, cap_logger: CapturingLogger
                 "event": "Worker",
                 "level": "error",
                 "timestamp": ANY,
+                "pickup_time_ms": 0,
+                "completed_time_ms": 0,
+                "total_time_ms": 0,
             },
         )
     ] == cap_logger.calls

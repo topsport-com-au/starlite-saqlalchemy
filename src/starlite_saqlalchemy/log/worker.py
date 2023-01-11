@@ -28,6 +28,10 @@ async def after_process(ctx: Context) -> None:
     # parse log context from `ctx`
     job: Job = ctx["job"]
     log_ctx = {k: getattr(job, k) for k in settings.log.JOB_FIELDS}
+    # add duration measures
+    log_ctx["pickup_time_ms"] = job.started - job.queued
+    log_ctx["completed_time_ms"] = job.completed - job.started
+    log_ctx["total_time_ms"] = job.completed - job.queued
     # emit the log
     if job.error:
         level = logging.ERROR
