@@ -12,6 +12,7 @@ import logging
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 
 from starlite_saqlalchemy.db import async_session_factory
+from starlite_saqlalchemy.exceptions import NotFoundError
 from starlite_saqlalchemy.repository.sqlalchemy import ModelT
 from starlite_saqlalchemy.worker import queue
 
@@ -50,6 +51,8 @@ class Service(Generic[T]):
         cls.__id__ = f"{cls.__module__}.{cls.__name__}"
         service_object_identity_map[cls.__id__] = cls
 
+    # pylint:disable=unused-argument
+
     async def create(self, data: T) -> T:
         """Create an instance of `T`.
 
@@ -59,7 +62,7 @@ class Service(Generic[T]):
         Returns:
             Representation of created instance.
         """
-        raise NotImplementedError
+        return data
 
     async def list(self, **kwargs: Any) -> list[T]:
         """Return view of the collection of `T`.
@@ -70,7 +73,7 @@ class Service(Generic[T]):
         Returns:
             The list of instances retrieved from the repository.
         """
-        raise NotImplementedError
+        return []
 
     async def update(self, id_: Any, data: T) -> T:
         """Update existing instance of `T` with `data`.
@@ -82,7 +85,7 @@ class Service(Generic[T]):
         Returns:
             Updated representation.
         """
-        raise NotImplementedError
+        return data
 
     async def upsert(self, id_: Any, data: T) -> T:
         """Create or update an instance of `T` with `data`.
@@ -94,7 +97,7 @@ class Service(Generic[T]):
         Returns:
             Updated or created representation.
         """
-        raise NotImplementedError
+        return data
 
     async def get(self, id_: Any) -> T:
         """Retrieve a representation of `T` with that is identified by `id_`
@@ -105,7 +108,7 @@ class Service(Generic[T]):
         Returns:
             Representation of instance with identifier `id_`.
         """
-        raise NotImplementedError
+        raise NotFoundError
 
     async def delete(self, id_: Any) -> T:
         """Delete `T` that is identified by `id_`.
@@ -116,7 +119,7 @@ class Service(Generic[T]):
         Returns:
             Representation of the deleted instance.
         """
-        raise NotImplementedError
+        raise NotFoundError
 
     async def enqueue_background_task(self, method_name: str, **kwargs: Any) -> None:
         """Enqueue an async callback for the operation and data.
