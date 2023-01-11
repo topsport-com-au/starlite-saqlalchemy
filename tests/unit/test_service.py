@@ -9,6 +9,7 @@ from uuid import uuid4
 import pytest
 
 from starlite_saqlalchemy import db, service, worker
+from starlite_saqlalchemy.exceptions import NotFoundError
 from tests.utils import domain
 
 if TYPE_CHECKING:
@@ -130,3 +131,17 @@ async def test_service_new_context_manager() -> None:
     """Simple test of `Service.new()` context manager behavior."""
     async with service.Service[domain.authors.Author].new() as service_obj:
         assert isinstance(service_obj, service.Service)
+
+
+async def test_service_method_default_behavior() -> None:
+    """Test default behavior of base service methods."""
+    service_obj = service.Service[object]()
+    data = object()
+    assert await service_obj.create(data) is data
+    assert await service_obj.list() == []
+    assert await service_obj.update("abc", data) is data
+    assert await service_obj.upsert("abc", data) is data
+    with pytest.raises(NotFoundError):
+        await service_obj.get("abc")
+    with pytest.raises(NotFoundError):
+        await service_obj.delete("abc")
