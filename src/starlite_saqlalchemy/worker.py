@@ -47,10 +47,21 @@ class Queue(saq.Queue):
             *args: Passed through to `saq.Queue.__init__()`
             **kwargs: Passed through to `saq.Queue.__init__()`
         """
-        kwargs.setdefault("name", settings.app.slug)
+        kwargs.setdefault("name", "background-worker")
         kwargs.setdefault("dump", encoder.encode)
         kwargs.setdefault("load", msgspec.json.decode)
         super().__init__(*args, **kwargs)
+
+    def namespace(self, key: str) -> str:
+        """Namespace for the Queue.
+
+        Args:
+            key (str): The unique key to use for the namespace.
+
+        Returns:
+            str: The worker namespace
+        """
+        return f"{settings.app.slug}:{self.name}:{key}"
 
 
 class Worker(saq.Worker):
