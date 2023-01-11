@@ -53,7 +53,14 @@ class Queue(saq.Queue):
         super().__init__(*args, **kwargs)
 
     def namespace(self, key: str) -> str:
-        """Makes the namespace unique per app."""
+        """Namespace for the Queue.
+
+        Args:
+            key (str): The unique key to use for the namespace.
+
+        Returns:
+            str: The worker namespace
+        """
         return f"{settings.app.slug}:{self.name}:{key}"
 
 
