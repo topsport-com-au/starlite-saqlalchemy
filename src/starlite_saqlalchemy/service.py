@@ -11,10 +11,13 @@ import inspect
 import logging
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 
+from saq.job import Job
+
+from starlite_saqlalchemy import utils
 from starlite_saqlalchemy.db import async_session_factory
 from starlite_saqlalchemy.exceptions import NotFoundError
 from starlite_saqlalchemy.repository.sqlalchemy import ModelT
-from starlite_saqlalchemy.worker import queue
+from starlite_saqlalchemy.worker import default_job_config_dict, queue
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -23,6 +26,7 @@ if TYPE_CHECKING:
 
     from starlite_saqlalchemy.repository.abc import AbstractRepository
     from starlite_saqlalchemy.repository.types import FilterTypes
+    from starlite_saqlalchemy.worker import JobConfig
 
 
 logger = logging.getLogger(__name__)
@@ -121,23 +125,34 @@ class Service(Generic[T]):
         """
         raise NotFoundError
 
-    async def enqueue_background_task(self, method_name: str, **kwargs: Any) -> None:
+    async def enqueue_background_task(
+        self, method_name: str, job_config: JobConfig | None = None, **kwargs: Any
+    ) -> None:
         """Enqueue an async callback for the operation and data.
 
         Args:
             method_name: Method on the service object that should be called by the async worker.
+            job_config: Configuration object to control the job that is enqueued.
             **kwargs: Arguments to be passed to the method when called. Must be JSON serializable.
         """
         module = inspect.getmodule(self)
         if module is None:  # pragma: no cover
             logger.warning("Callback not enqueued, no module resolved for %s", self)
             return
-        await queue.enqueue(
-            make_service_callback.__qualname__,
-            service_type_id=self.__id__,
-            service_method_name=method_name,
-            **kwargs,
+        job_config_dict: dict[str, Any]
+        if job_config is None:
+            job_config_dict = default_job_config_dict
+        else:
+            job_config_dict = utils.dataclass_as_dict_shallow(job_config, exclude_none=True)
+
+        kwargs["service_type_id"] = self.__id__
+        kwargs["service_method_name"] = method_name
+        job = Job(
+            function=make_service_callback.__qualname__,
+            kwargs=kwargs,
+            **job_config_dict,
         )
+        await queue.enqueue(job)
 
     @classmethod
     @contextlib.asynccontextmanager
@@ -249,11 +264,7 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
 
 
 async def make_service_callback(
-    _ctx: Context,
-    *,
-    service_type_id: str,
-    service_method_name: str,
-    **kwargs: Any,
+    _ctx: Context, *, service_type_id: str, service_method_name: str, **kwargs: Any
 ) -> None:
     """Make an async service callback.
 
