@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock
 from uuid import uuid4
 
 import pytest
+from saq import Job
 
 from starlite_saqlalchemy import db, service, worker
 from starlite_saqlalchemy.exceptions import NotFoundError
@@ -119,12 +120,15 @@ async def test_enqueue_service_callback(monkeypatch: "MonkeyPatch") -> None:
     monkeypatch.setattr(worker.queue, "enqueue", enqueue_mock)
     service_instance = domain.authors.Service(session=db.async_session_factory())
     await service_instance.enqueue_background_task("receive_callback", raw_obj={"a": "b"})
-    enqueue_mock.assert_called_once_with(
-        "make_service_callback",
-        service_type_id="tests.utils.domain.authors.Service",
-        service_method_name="receive_callback",
-        raw_obj={"a": "b"},
-    )
+    enqueue_mock.assert_called_once()
+    assert isinstance(enqueue_mock.mock_calls[0].args[0], Job)
+    job = enqueue_mock.mock_calls[0].args[0]
+    assert job.function == service.make_service_callback.__qualname__
+    assert job.kwargs == {
+        "service_type_id": "tests.utils.domain.authors.Service",
+        "service_method_name": "receive_callback",
+        "raw_obj": {"a": "b"},
+    }
 
 
 async def test_service_new_context_manager() -> None:
