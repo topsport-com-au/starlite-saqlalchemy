@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
 
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from starlite.plugins.sql_alchemy import SQLAlchemyConfig, SQLAlchemyPlugin
 from starlite.plugins.sql_alchemy.config import (
     SESSION_SCOPE_KEY,
@@ -10,6 +12,7 @@ from starlite.plugins.sql_alchemy.config import (
 )
 
 from starlite_saqlalchemy import db, settings
+from starlite_saqlalchemy.health import Health, HealthCheckProtocol
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -38,6 +41,25 @@ async def before_send_handler(message: "Message", _: "State", scope: "Scope") ->
         if session is not None and message["type"] in SESSION_TERMINUS_ASGI_EVENTS:
             await session.close()
             del scope[SESSION_SCOPE_KEY]  # type:ignore[misc]
+
+
+class SQLAlchemyHealthCheck(HealthCheckProtocol):
+    def __init__(self) -> None:
+        self.engine = create_async_engine(settings.db.URL, logging_name="health")
+        self.session = async_sessionmaker(bind=self.engine)
+
+    async def ready(self) -> bool:
+        """Perform a health check on the database.
+
+        Returns:
+            `True` if healthy.
+        """
+        return (  # type:ignore[no-any-return]  # pragma: no cover
+            await self.session.execute(text("SELECT 1"))
+        ).scalar_one() == 1
+
+    def error(self, health: Health) -> str:
+        return f"DB not {health.value}."
 
 
 config = SQLAlchemyConfig(

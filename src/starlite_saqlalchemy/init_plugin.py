@@ -51,14 +51,18 @@ from starlite_saqlalchemy import (
     settings,
     sqlalchemy_plugin,
 )
-from starlite_saqlalchemy.health import health_check
+from starlite_saqlalchemy.health import HealthController
 from starlite_saqlalchemy.service import make_service_callback
+from starlite_saqlalchemy.sqlalchemy_plugin import SQLAlchemyHealthCheck
 from starlite_saqlalchemy.type_encoders import type_encoders_map
 from starlite_saqlalchemy.worker import create_worker_instance
 
 if TYPE_CHECKING:
     from starlite.config.app import AppConfig
     from starlite.types import TypeEncodersMap
+
+    from starlite_saqlalchemy.health import HealthCheckProtocol
+
 
 T = TypeVar("T")
 
@@ -160,6 +164,7 @@ class PluginConfig(BaseModel):
     """Chain of structlog log processors."""
     type_encoders: TypeEncodersMap = type_encoders_map
     """Map of type to serializer callable."""
+    health_checks: Sequence[type[HealthCheckProtocol]] = [SQLAlchemyHealthCheck]
 
 
 class ConfigureApp:
@@ -283,7 +288,10 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_health_check:
-            app_config.route_handlers.append(health_check)
+            HealthController.health_checks = [
+                health_check() for health_check in self.config.health_checks
+            ]
+            app_config.route_handlers.append(HealthController)
 
     def configure_logging(self, app_config: AppConfig) -> None:
         """Configure application logging.
