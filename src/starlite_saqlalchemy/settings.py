@@ -5,11 +5,29 @@ settings class, except `AppSettings`.
 """
 from __future__ import annotations
 
+from importlib import import_module
+
 # pylint: disable=missing-class-docstring
 from typing import Literal
 
 from pydantic import AnyUrl, BaseSettings, PostgresDsn, parse_obj_as
 from starlite.utils.extractors import RequestExtractorField, ResponseExtractorField
+
+IS_REDIS_INSTALLED = True
+IS_SAQ_INSTALLED = True
+IS_SENTRY_SDK_INSTALLED = True
+
+for package in ("redis", "saq", "sentry_sdk"):
+    try:
+        import_module(package)
+    except ModuleNotFoundError:
+        match package:
+            case "redis":
+                IS_REDIS_INSTALLED = False
+            case "saq":
+                IS_SAQ_INSTALLED = False
+            case "sentry_sdk":
+                IS_SENTRY_SDK_INSTALLED = False
 
 
 # noinspection PyUnresolvedReferences

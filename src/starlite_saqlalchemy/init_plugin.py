@@ -1,3 +1,4 @@
+# pylint: disable=import-outside-toplevel
 """The application configuration plugin and config object.
 
 Example:
@@ -30,7 +31,6 @@ The `PluginConfig` has switches to disable every aspect of the plugin behavior.
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence  # noqa: TC003
-from importlib import import_module
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from pydantic import BaseModel
@@ -200,9 +200,7 @@ class ConfigureApp:
         app_config.before_startup = lifespan.before_startup_handler
         app_config.on_shutdown.append(http.on_shutdown)
         if self.config.do_cache:
-            from starlite_saqlalchemy import (  # pylint: disable=import-outside-toplevel
-                redis,
-            )
+            from starlite_saqlalchemy import redis
 
             app_config.on_shutdown.append(redis.client.close)
         return app_config
@@ -227,10 +225,9 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_cache and app_config.cache_config == DEFAULT_CACHE_CONFIG:
-            self._check_module_installed("redis", "cache")
-            from starlite_saqlalchemy import (  # pylint: disable=import-outside-toplevel
-                cache,
-            )
+            if not settings.IS_REDIS_INSTALLED:
+                raise MissingDependencyError(module="redis", config="redis")
+            from starlite_saqlalchemy import cache
 
             app_config.cache_config = cache.config
 
@@ -325,10 +322,9 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_sentry:
-            self._check_module_installed("sentry_sdk", "sentry")
-            from starlite_saqlalchemy import (  # pylint: disable=import-outside-toplevel
-                sentry,
-            )
+            if not settings.IS_SENTRY_SDK_INSTALLED:
+                raise MissingDependencyError(module="sentry_sdk", config="sentry")
+            from starlite_saqlalchemy import sentry
 
             app_config.on_startup.append(sentry.configure)
 
@@ -363,10 +359,9 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_worker:
-            self._check_module_installed("saq", "worker")
-            from starlite_saqlalchemy.worker import (  # pylint: disable=import-outside-toplevel
-                create_worker_instance,
-            )
+            if not settings.IS_SAQ_INSTALLED:
+                raise MissingDependencyError(module="saq", config="worker")
+            from starlite_saqlalchemy.worker import create_worker_instance
 
             worker_kwargs: dict[str, Any] = {"functions": self.config.worker_functions}
             if self.config.do_logging:
@@ -381,12 +376,3 @@ class ConfigureApp:
         if isinstance(item, list):
             return item
         return [] if item is None else [item]
-
-    def _check_module_installed(self, module: str, config: str) -> None:
-        try:
-            import_module(module)
-        except ModuleNotFoundError as error:
-            raise MissingDependencyError(
-                f'You enabled {config} configuration but package "{module}" is not installed. '
-                f'You may need to run: "poetry install starlite-saqlalchemy[{config}]"'
-            ) from error

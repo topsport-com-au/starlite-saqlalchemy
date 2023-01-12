@@ -83,8 +83,9 @@ sentry-sdk = { version = "*", optional = true }
 
 [tool.poetry.extras]
 cache = ["redis", "hiredis"]
-worker = ["saq"]
+worker = ["saq", "hiredis"]
 sentry = ["sentry-sdk"]
+all = ["redis", "hiredis", "saq", "sentry-sdk"]
 
 [tool.poetry.urls]
 GitHub = "https://github.com/topsport-com-au"

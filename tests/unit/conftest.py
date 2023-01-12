@@ -9,7 +9,7 @@ from starlite.datastructures import State
 from starlite.enums import ScopeType
 from starlite.testing import TestClient
 
-from starlite_saqlalchemy import sqlalchemy_plugin
+from starlite_saqlalchemy import settings, sqlalchemy_plugin
 from starlite_saqlalchemy.testing import GenericMockRepository
 from tests.utils.domain.authors import Author
 from tests.utils.domain.authors import Service as AuthorService
@@ -22,30 +22,30 @@ if TYPE_CHECKING:
     from collections import abc
 
     from pytest import MonkeyPatch
+    from saq.job import Job
     from starlite import Starlite
     from starlite.types import HTTPResponseBodyEvent, HTTPResponseStartEvent, HTTPScope
 
-# In case we run unit tests without extra dependencies installed
-try:
+
+@pytest.fixture()
+def job() -> Job:
+    """SAQ Job instance."""
+    if settings.IS_SAQ_INSTALLED is False:
+        pytest.skip("SAQ not available")
     from saq.job import Job
 
-    from starlite_saqlalchemy import worker  # pylint: disable=ungrouped-imports
+    return Job(function="whatever", kwargs={"a": "b"})
 
-    @pytest.fixture()
-    def job() -> Job:
-        """SAQ Job instance."""
-        return Job(function="whatever", kwargs={"a": "b"})
 
-    @pytest.fixture(scope="session", autouse=True)
-    def _patch_worker() -> abc.Iterator:
-        monkeypatch = pytest.MonkeyPatch()
-        monkeypatch.setattr(worker.Worker, "on_app_startup", MagicMock())
-        monkeypatch.setattr(worker.Worker, "stop", MagicMock())
-        yield
-        monkeypatch.undo()
+@pytest.fixture(scope="session", autouse=settings.IS_SAQ_INSTALLED)
+def _patch_worker() -> abc.Iterator:
+    from starlite_saqlalchemy import worker
 
-except ModuleNotFoundError:
-    pass
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setattr(worker.Worker, "on_app_startup", MagicMock())
+    monkeypatch.setattr(worker.Worker, "stop", MagicMock())
+    yield
+    monkeypatch.undo()
 
 
 @pytest.fixture(scope="session", autouse=True)
