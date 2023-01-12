@@ -6,7 +6,7 @@ import logging
 import starlite
 from sqlalchemy import text
 
-from starlite_saqlalchemy import redis
+from starlite_saqlalchemy import redis, settings
 from starlite_saqlalchemy.db import engine
 
 logger = logging.getLogger(__name__)
@@ -41,5 +41,7 @@ async def _redis_ready() -> None:
 
 async def before_startup_handler(_: starlite.Starlite) -> None:
     """Do things before the app starts up."""
-    await _db_ready()
-    await _redis_ready()
+    if settings.app.CHECK_DB_READY:
+        await _db_ready()
+    if settings.app.CHECK_REDIS_READY:
+        await _redis_ready()

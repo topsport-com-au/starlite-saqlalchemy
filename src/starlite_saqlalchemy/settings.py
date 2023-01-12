@@ -27,6 +27,10 @@ class AppSettings(BaseSettings):
 
     BUILD_NUMBER: str = ""
     """Identifier for CI build."""
+    CHECK_DB_READY: bool = True
+    """Check for database readiness on startup."""
+    CHECK_REDIS_READY: bool = True
+    """Check for redis readiness on startup."""
     DEBUG: bool = False
     """Run `Starlite` with `debug=True`."""
     ENVIRONMENT: str = "prod"
