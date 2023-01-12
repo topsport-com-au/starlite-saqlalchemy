@@ -45,7 +45,9 @@ async def before_send_handler(message: "Message", _: "State", scope: "Scope") ->
 
 class SQLAlchemyHealthCheck(HealthCheckProtocol):
     def __init__(self) -> None:
-        self.engine = create_async_engine(settings.db.URL, logging_name="health")
+        self.engine = create_async_engine(
+            settings.db.URL, logging_name="starlite_saqlalchemy.health"
+        )
         self.session = async_sessionmaker(bind=self.engine)
 
     async def ready(self) -> bool:
