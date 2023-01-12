@@ -1,0 +1,3652 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+    
+    
+      
+        <title>settings - starlite-saqlalchemy</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.975780f9.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.2505c338.min.css">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="None" data-md-color-accent="None">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#starlite_saqlalchemy.settings.api" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="starlite-saqlalchemy" class="md-header__button md-logo" aria-label="starlite-saqlalchemy" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            starlite-saqlalchemy
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              settings
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/topsport-com-au/starlite-saqlalchemy" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../.." class="md-tabs__link">
+      starlite-saqlalchemy
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../config/" class="md-tabs__link">
+        Usage
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../" class="md-tabs__link md-tabs__link--active">
+        Reference
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="starlite-saqlalchemy" class="md-nav__button md-logo" aria-label="starlite-saqlalchemy" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    starlite-saqlalchemy
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/topsport-com-au/starlite-saqlalchemy" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        starlite-saqlalchemy
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Usage
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Usage" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Usage
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../config/" class="md-nav__link">
+        Configuration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dto/" class="md-nav__link">
+        DTOs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../async_worker/" class="md-nav__link">
+        Async Worker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../logging/" class="md-nav__link">
+        Logging
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" checked>
+      
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../">starlite_saqlalchemy</a>
+          
+            <label for="__nav_3_1">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="starlite_saqlalchemy" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          starlite_saqlalchemy
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cache/" class="md-nav__link">
+        cache
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compression/" class="md-nav__link">
+        compression
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3_1_3" type="checkbox" id="__nav_3_1_3" checked>
+      
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../db/">db</a>
+          
+            <label for="__nav_3_1_3">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="db" data-md-level="3">
+        <label class="md-nav__title" for="__nav_3_1_3">
+          <span class="md-nav__icon md-icon"></span>
+          db
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../db/orm/" class="md-nav__link">
+        orm
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dependencies/" class="md-nav__link">
+        dependencies
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3_1_5" type="checkbox" id="__nav_3_1_5" checked>
+      
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../dto/">dto</a>
+          
+            <label for="__nav_3_1_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="dto" data-md-level="3">
+        <label class="md-nav__title" for="__nav_3_1_5">
+          <span class="md-nav__icon md-icon"></span>
+          dto
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dto/from_mapped/" class="md-nav__link">
+        from_mapped
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dto/types/" class="md-nav__link">
+        types
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dto/utils/" class="md-nav__link">
+        utils
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../endpoint_decorator/" class="md-nav__link">
+        endpoint_decorator
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exceptions/" class="md-nav__link">
+        exceptions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../health/" class="md-nav__link">
+        health
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../http/" class="md-nav__link">
+        http
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../init_plugin/" class="md-nav__link">
+        init_plugin
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lifespan/" class="md-nav__link">
+        lifespan
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3_1_12" type="checkbox" id="__nav_3_1_12" checked>
+      
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../log/">log</a>
+          
+            <label for="__nav_3_1_12">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="log" data-md-level="3">
+        <label class="md-nav__title" for="__nav_3_1_12">
+          <span class="md-nav__icon md-icon"></span>
+          log
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../log/controller/" class="md-nav__link">
+        controller
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../log/msgspec_renderer/" class="md-nav__link">
+        msgspec_renderer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../log/worker/" class="md-nav__link">
+        worker
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../openapi/" class="md-nav__link">
+        openapi
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../redis/" class="md-nav__link">
+        redis
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3_1_15" type="checkbox" id="__nav_3_1_15" checked>
+      
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../repository/">repository</a>
+          
+            <label for="__nav_3_1_15">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="repository" data-md-level="3">
+        <label class="md-nav__title" for="__nav_3_1_15">
+          <span class="md-nav__icon md-icon"></span>
+          repository
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../repository/abc/" class="md-nav__link">
+        abc
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../repository/filters/" class="md-nav__link">
+        filters
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../repository/sqlalchemy/" class="md-nav__link">
+        sqlalchemy
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../repository/types/" class="md-nav__link">
+        types
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scripts/" class="md-nav__link">
+        scripts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sentry/" class="md-nav__link">
+        sentry
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../service/" class="md-nav__link">
+        service
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          settings
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        settings
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.api" class="md-nav__link">
+    api
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.app" class="md-nav__link">
+    app
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.db" class="md-nav__link">
+    db
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.http" class="md-nav__link">
+    http
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.log" class="md-nav__link">
+    log
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.openapi" class="md-nav__link">
+    openapi
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.redis" class="md-nav__link">
+    redis
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.sentry" class="md-nav__link">
+    sentry
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.server" class="md-nav__link">
+    server
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.worker" class="md-nav__link">
+    worker
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.APISettings" class="md-nav__link">
+    APISettings
+  </a>
+  
+    <nav class="md-nav" aria-label="APISettings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.APISettings.CACHE_EXPIRATION" class="md-nav__link">
+    CACHE_EXPIRATION
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.APISettings.DB_SESSION_DEPENDENCY_KEY" class="md-nav__link">
+    DB_SESSION_DEPENDENCY_KEY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.APISettings.DEFAULT_PAGINATION_LIMIT" class="md-nav__link">
+    DEFAULT_PAGINATION_LIMIT
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.APISettings.DTO_INFO_KEY" class="md-nav__link">
+    DTO_INFO_KEY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.APISettings.HEALTH_PATH" class="md-nav__link">
+    HEALTH_PATH
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.AppSettings" class="md-nav__link">
+    AppSettings
+  </a>
+  
+    <nav class="md-nav" aria-label="AppSettings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.AppSettings.BUILD_NUMBER" class="md-nav__link">
+    BUILD_NUMBER
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.AppSettings.CHECK_DB_READY" class="md-nav__link">
+    CHECK_DB_READY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.AppSettings.CHECK_REDIS_READY" class="md-nav__link">
+    CHECK_REDIS_READY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.AppSettings.DEBUG" class="md-nav__link">
+    DEBUG
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.AppSettings.ENVIRONMENT" class="md-nav__link">
+    ENVIRONMENT
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.AppSettings.NAME" class="md-nav__link">
+    NAME
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.AppSettings.slug" class="md-nav__link">
+    slug
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.DatabaseSettings" class="md-nav__link">
+    DatabaseSettings
+  </a>
+  
+    <nav class="md-nav" aria-label="DatabaseSettings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.DatabaseSettings.ECHO" class="md-nav__link">
+    ECHO
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.DatabaseSettings.ECHO_POOL" class="md-nav__link">
+    ECHO_POOL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.DatabaseSettings.POOL_DISABLE" class="md-nav__link">
+    POOL_DISABLE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.DatabaseSettings.POOL_MAX_OVERFLOW" class="md-nav__link">
+    POOL_MAX_OVERFLOW
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.DatabaseSettings.POOL_SIZE" class="md-nav__link">
+    POOL_SIZE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.DatabaseSettings.POOL_TIMEOUT" class="md-nav__link">
+    POOL_TIMEOUT
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.HTTPClientSettings" class="md-nav__link">
+    HTTPClientSettings
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings" class="md-nav__link">
+    LogSettings
+  </a>
+  
+    <nav class="md-nav" aria-label="LogSettings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.EXCLUDE_PATHS" class="md-nav__link">
+    EXCLUDE_PATHS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.HTTP_EVENT" class="md-nav__link">
+    HTTP_EVENT
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.INCLUDE_COMPRESSED_BODY" class="md-nav__link">
+    INCLUDE_COMPRESSED_BODY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.JOB_FIELDS" class="md-nav__link">
+    JOB_FIELDS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.LEVEL" class="md-nav__link">
+    LEVEL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.OBFUSCATE_COOKIES" class="md-nav__link">
+    OBFUSCATE_COOKIES
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.OBFUSCATE_HEADERS" class="md-nav__link">
+    OBFUSCATE_HEADERS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.REQUEST_FIELDS" class="md-nav__link">
+    REQUEST_FIELDS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.RESPONSE_FIELDS" class="md-nav__link">
+    RESPONSE_FIELDS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.SAQ_LEVEL" class="md-nav__link">
+    SAQ_LEVEL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.SQLALCHEMY_LEVEL" class="md-nav__link">
+    SQLALCHEMY_LEVEL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.UVICORN_ACCESS_LEVEL" class="md-nav__link">
+    UVICORN_ACCESS_LEVEL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.UVICORN_ERROR_LEVEL" class="md-nav__link">
+    UVICORN_ERROR_LEVEL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.LogSettings.WORKER_EVENT" class="md-nav__link">
+    WORKER_EVENT
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.OpenAPISettings" class="md-nav__link">
+    OpenAPISettings
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenAPISettings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.OpenAPISettings.CONTACT_EMAIL" class="md-nav__link">
+    CONTACT_EMAIL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.OpenAPISettings.CONTACT_NAME" class="md-nav__link">
+    CONTACT_NAME
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.OpenAPISettings.TITLE" class="md-nav__link">
+    TITLE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.OpenAPISettings.VERSION" class="md-nav__link">
+    VERSION
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.RedisSettings" class="md-nav__link">
+    RedisSettings
+  </a>
+  
+    <nav class="md-nav" aria-label="RedisSettings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.RedisSettings.URL" class="md-nav__link">
+    URL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.SentrySettings" class="md-nav__link">
+    SentrySettings
+  </a>
+  
+    <nav class="md-nav" aria-label="SentrySettings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.SentrySettings.DSN" class="md-nav__link">
+    DSN
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.SentrySettings.TRACES_SAMPLE_RATE" class="md-nav__link">
+    TRACES_SAMPLE_RATE
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.ServerSettings" class="md-nav__link">
+    ServerSettings
+  </a>
+  
+    <nav class="md-nav" aria-label="ServerSettings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.ServerSettings.APP_LOC" class="md-nav__link">
+    APP_LOC
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.ServerSettings.APP_LOC_IS_FACTORY" class="md-nav__link">
+    APP_LOC_IS_FACTORY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.ServerSettings.HOST" class="md-nav__link">
+    HOST
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.ServerSettings.KEEPALIVE" class="md-nav__link">
+    KEEPALIVE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.ServerSettings.PORT" class="md-nav__link">
+    PORT
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.ServerSettings.RELOAD" class="md-nav__link">
+    RELOAD
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.ServerSettings.RELOAD_DIRS" class="md-nav__link">
+    RELOAD_DIRS
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.WorkerSettings" class="md-nav__link">
+    WorkerSettings
+  </a>
+  
+    <nav class="md-nav" aria-label="WorkerSettings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.WorkerSettings.JOB_HEARTBEAT" class="md-nav__link">
+    JOB_HEARTBEAT
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.WorkerSettings.JOB_RETRIES" class="md-nav__link">
+    JOB_RETRIES
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.WorkerSettings.JOB_RETRY_BACKOFF" class="md-nav__link">
+    JOB_RETRY_BACKOFF
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.WorkerSettings.JOB_RETRY_DELAY" class="md-nav__link">
+    JOB_RETRY_DELAY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.WorkerSettings.JOB_TIMEOUT" class="md-nav__link">
+    JOB_TIMEOUT
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starlite_saqlalchemy.settings.WorkerSettings.JOB_TTL" class="md-nav__link">
+    JOB_TTL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sqlalchemy_plugin/" class="md-nav__link">
+        sqlalchemy_plugin
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        testing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../type_encoders/" class="md-nav__link">
+        type_encoders
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        utils
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../worker/" class="md-nav__link">
+        worker
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/topsport-com-au/starlite-saqlalchemy/edit/master/docs/src/starlite_saqlalchemy/settings.py" title="Edit this page" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+  <h1>settings</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+  <div class="doc doc-contents first">
+  
+      <p>All configuration via environment.</p>
+<p>Take note of the environment variable prefixes required for each
+settings class, except <code>AppSettings</code>.</p>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.api" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">api</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.api" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">api</span> <span class="o">=</span> <span class="n">APISettings</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">({})</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Api settings.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.app" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">app</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.app" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">app</span> <span class="o">=</span> <span class="n">AppSettings</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">({})</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>App settings.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.db" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">db</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.db" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">db</span> <span class="o">=</span> <span class="n">DatabaseSettings</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">({})</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Database settings.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.http" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">http</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.http" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">http</span> <span class="o">=</span> <span class="n">HTTPClientSettings</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">({})</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>HTTP Client Settings.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.log" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">log</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.log" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">log</span> <span class="o">=</span> <span class="n">LogSettings</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">({})</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Log settings.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.openapi" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">openapi</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.openapi" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">openapi</span> <span class="o">=</span> <span class="n">OpenAPISettings</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">({})</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Openapi settings.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.redis" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">redis</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.redis" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">redis</span> <span class="o">=</span> <span class="n">RedisSettings</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">({})</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Redis settings.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.sentry" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">sentry</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.sentry" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">sentry</span> <span class="o">=</span> <span class="n">SentrySettings</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">({})</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Sentry settings.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.server" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">server</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.server" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">server</span> <span class="o">=</span> <span class="n">ServerSettings</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">({})</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Server settings.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.worker" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">worker</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.worker" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">worker</span> <span class="o">=</span> <span class="n">WorkerSettings</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">({})</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Worker settings.</p>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.APISettings" class="doc doc-heading">
+        <span class="doc doc-object-name doc-class-name">APISettings</span>
+
+
+<a href="#starlite_saqlalchemy.settings.APISettings" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
+
+  
+      <p>API specific configuration.</p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.APISettings.CACHE_EXPIRATION" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">CACHE_EXPIRATION</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.APISettings.CACHE_EXPIRATION" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CACHE_EXPIRATION</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Default cache key expiration in seconds.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.APISettings.DB_SESSION_DEPENDENCY_KEY" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">DB_SESSION_DEPENDENCY_KEY</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.APISettings.DB_SESSION_DEPENDENCY_KEY" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DB_SESSION_DEPENDENCY_KEY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;db_session&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Parameter name for SQLAlchemy session dependency injection.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.APISettings.DEFAULT_PAGINATION_LIMIT" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">DEFAULT_PAGINATION_LIMIT</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.APISettings.DEFAULT_PAGINATION_LIMIT" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEFAULT_PAGINATION_LIMIT</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Max records received for collection routes.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.APISettings.DTO_INFO_KEY" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">DTO_INFO_KEY</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.APISettings.DTO_INFO_KEY" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DTO_INFO_KEY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;dto&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Key used for DTO field config in SQLAlchemy info dict.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.APISettings.HEALTH_PATH" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">HEALTH_PATH</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.APISettings.HEALTH_PATH" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">HEALTH_PATH</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;/health&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Route that the health check is served under.</p>
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.AppSettings" class="doc doc-heading">
+        <span class="doc doc-object-name doc-class-name">AppSettings</span>
+
+
+<a href="#starlite_saqlalchemy.settings.AppSettings" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
+
+  
+      <p>Generic application settings.</p>
+<p>These settings are returned as json by the healthcheck endpoint, so
+do not include any sensitive values here, or if you do ensure to
+exclude them from serialization in the <code>Config</code> object.</p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.AppSettings.BUILD_NUMBER" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">BUILD_NUMBER</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.AppSettings.BUILD_NUMBER" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">BUILD_NUMBER</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Identifier for CI build.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.AppSettings.CHECK_DB_READY" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">CHECK_DB_READY</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.AppSettings.CHECK_DB_READY" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CHECK_DB_READY</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Check for database readiness on startup.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.AppSettings.CHECK_REDIS_READY" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">CHECK_REDIS_READY</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.AppSettings.CHECK_REDIS_READY" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CHECK_REDIS_READY</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Check for redis readiness on startup.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.AppSettings.DEBUG" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">DEBUG</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.AppSettings.DEBUG" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEBUG</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Run <code>Starlite</code> with <code>debug=True</code>.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.AppSettings.ENVIRONMENT" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">ENVIRONMENT</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.AppSettings.ENVIRONMENT" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ENVIRONMENT</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;prod&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>'dev', 'prod', etc.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.AppSettings.NAME" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">NAME</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.AppSettings.NAME" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;my-starlite-saqlalchemy-app&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Application name.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.AppSettings.slug" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">slug</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.AppSettings.slug" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">slug</span><span class="p">:</span> <span class="nb">str</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Return a slugified name.</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+          </td>
+          <td><p><code>self.NAME</code>, all lowercase and hyphens instead of spaces.</p></td>
+        </tr>
+    </tbody>
+  </table>
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.DatabaseSettings" class="doc doc-heading">
+        <span class="doc doc-object-name doc-class-name">DatabaseSettings</span>
+
+
+<a href="#starlite_saqlalchemy.settings.DatabaseSettings" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
+
+  
+      <p>Configures the database for the application.</p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.DatabaseSettings.ECHO" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">ECHO</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.DatabaseSettings.ECHO" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ECHO</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Enable SQLAlchemy engine logs.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.DatabaseSettings.ECHO_POOL" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">ECHO_POOL</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.DatabaseSettings.ECHO_POOL" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ECHO_POOL</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;debug&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Enable SQLAlchemy connection pool logs.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.DatabaseSettings.POOL_DISABLE" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">POOL_DISABLE</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.DatabaseSettings.POOL_DISABLE" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">POOL_DISABLE</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Disable SQLAlchemy pooling, same as setting pool to.</p>
+<p><a class="autorefs autorefs-external" href="https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.NullPool"><code>NullPool</code></a>.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.DatabaseSettings.POOL_MAX_OVERFLOW" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">POOL_MAX_OVERFLOW</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.DatabaseSettings.POOL_MAX_OVERFLOW" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">POOL_MAX_OVERFLOW</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>See <a class="autorefs autorefs-external" href="https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool"><code>max_overflow</code></a>.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.DatabaseSettings.POOL_SIZE" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">POOL_SIZE</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.DatabaseSettings.POOL_SIZE" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">POOL_SIZE</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>See <a class="autorefs autorefs-external" href="https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool"><code>pool_size</code></a>.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.DatabaseSettings.POOL_TIMEOUT" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">POOL_TIMEOUT</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.DatabaseSettings.POOL_TIMEOUT" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">POOL_TIMEOUT</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>See <a class="autorefs autorefs-external" href="https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.QueuePool"><code>timeout</code></a>.</p>
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.HTTPClientSettings" class="doc doc-heading">
+        <span class="doc doc-object-name doc-class-name">HTTPClientSettings</span>
+
+
+<a href="#starlite_saqlalchemy.settings.HTTPClientSettings" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
+
+  
+      <p>HTTP Client configurations.</p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.LogSettings" class="doc doc-heading">
+        <span class="doc doc-object-name doc-class-name">LogSettings</span>
+
+
+<a href="#starlite_saqlalchemy.settings.LogSettings" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
+
+  
+      <p>Logging config for the application.</p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.EXCLUDE_PATHS" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">EXCLUDE_PATHS</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.EXCLUDE_PATHS" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">EXCLUDE_PATHS</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">A(?!x)x&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Regex to exclude paths from logging.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.HTTP_EVENT" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">HTTP_EVENT</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.HTTP_EVENT" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">HTTP_EVENT</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;HTTP&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Log event name for logs from Starlite handlers.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.INCLUDE_COMPRESSED_BODY" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">INCLUDE_COMPRESSED_BODY</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.INCLUDE_COMPRESSED_BODY" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">INCLUDE_COMPRESSED_BODY</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Include 'body' of compressed responses in log output.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.JOB_FIELDS" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">JOB_FIELDS</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.JOB_FIELDS" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">JOB_FIELDS</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;function&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;kwargs&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;key&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">&quot;scheduled&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">&quot;attempts&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">&quot;completed&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">&quot;queued&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="s2">&quot;started&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="s2">&quot;result&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">]</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Attributes of the SAQ.</p>
+<p><a href="https://github.com/tobymao/saq/blob/master/saq/job.py"><code>Job</code></a> to be
+logged.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.LEVEL" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">LEVEL</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.LEVEL" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">LEVEL</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Stdlib log levels.</p>
+<p>Only emit logs at this level, or higher.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.OBFUSCATE_COOKIES" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">OBFUSCATE_COOKIES</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.OBFUSCATE_COOKIES" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">OBFUSCATE_COOKIES</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;session&#39;</span><span class="p">}</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Request cookie keys to obfuscate.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.OBFUSCATE_HEADERS" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">OBFUSCATE_HEADERS</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.OBFUSCATE_HEADERS" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">OBFUSCATE_HEADERS</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Authorization&#39;</span><span class="p">,</span> <span class="s1">&#39;X-API-KEY&#39;</span><span class="p">}</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Request header keys to obfuscate.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.REQUEST_FIELDS" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">REQUEST_FIELDS</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.REQUEST_FIELDS" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">REQUEST_FIELDS</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RequestExtractorField</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;path&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;method&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;content_type&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">&quot;headers&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">&quot;cookies&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">&quot;query&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">&quot;path_params&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="s2">&quot;body&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">]</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Attributes of the <a class="autorefs autorefs-external" href="https://starlite-api.github.io/starlite/dev/reference/connection/1-request/#starlite.connection.request.Request">Request</a> to be
+logged.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.RESPONSE_FIELDS" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">RESPONSE_FIELDS</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.RESPONSE_FIELDS" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">RESPONSE_FIELDS</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ResponseExtractorField</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;status_code&#39;</span><span class="p">,</span> <span class="s1">&#39;cookies&#39;</span><span class="p">,</span> <span class="s1">&#39;headers&#39;</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span><span class="p">]</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Attributes of the <a class="autorefs autorefs-external" href="https://starlite-api.github.io/starlite/dev/reference/response/0-base/#starlite.response.Response">Response</a> to be
+logged.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.SAQ_LEVEL" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">SAQ_LEVEL</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.SAQ_LEVEL" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">SAQ_LEVEL</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Level to log SAQ logs.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.SQLALCHEMY_LEVEL" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">SQLALCHEMY_LEVEL</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.SQLALCHEMY_LEVEL" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">SQLALCHEMY_LEVEL</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Level to log SAQ logs.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.UVICORN_ACCESS_LEVEL" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">UVICORN_ACCESS_LEVEL</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.UVICORN_ACCESS_LEVEL" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">UVICORN_ACCESS_LEVEL</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Level to log uvicorn access logs.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.UVICORN_ERROR_LEVEL" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">UVICORN_ERROR_LEVEL</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.UVICORN_ERROR_LEVEL" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">UVICORN_ERROR_LEVEL</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Level to log uvicorn error logs.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.LogSettings.WORKER_EVENT" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">WORKER_EVENT</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.LogSettings.WORKER_EVENT" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">WORKER_EVENT</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Worker&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Log event name for logs from SAQ worker.</p>
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.OpenAPISettings" class="doc doc-heading">
+        <span class="doc doc-object-name doc-class-name">OpenAPISettings</span>
+
+
+<a href="#starlite_saqlalchemy.settings.OpenAPISettings" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
+
+  
+      <p>Configures OpenAPI for the application.</p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.OpenAPISettings.CONTACT_EMAIL" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">CONTACT_EMAIL</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.OpenAPISettings.CONTACT_EMAIL" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONTACT_EMAIL</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;peter.github@proton.me&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Email for contact on document.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.OpenAPISettings.CONTACT_NAME" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">CONTACT_NAME</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.OpenAPISettings.CONTACT_NAME" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONTACT_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Peter&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Name of contact on document.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.OpenAPISettings.TITLE" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">TITLE</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.OpenAPISettings.TITLE" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">TITLE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s1">&#39;My Starlite-SAQAlchemy App&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Document title.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.OpenAPISettings.VERSION" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">VERSION</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.OpenAPISettings.VERSION" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">VERSION</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;v1.0&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Document version.</p>
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.RedisSettings" class="doc doc-heading">
+        <span class="doc doc-object-name doc-class-name">RedisSettings</span>
+
+
+<a href="#starlite_saqlalchemy.settings.RedisSettings" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
+
+  
+      <p>Redis settings for the application.</p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.RedisSettings.URL" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">URL</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.RedisSettings.URL" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">URL</span><span class="p">:</span> <span class="n">AnyUrl</span> <span class="o">=</span> <span class="n">parse_obj_as</span><span class="p">(</span><span class="n">AnyUrl</span><span class="p">,</span> <span class="s1">&#39;redis://localhost:6379/0&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>A Redis connection URL.</p>
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.SentrySettings" class="doc doc-heading">
+        <span class="doc doc-object-name doc-class-name">SentrySettings</span>
+
+
+<a href="#starlite_saqlalchemy.settings.SentrySettings" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
+
+  
+      <p>Configures sentry for the application.</p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.SentrySettings.DSN" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">DSN</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.SentrySettings.DSN" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DSN</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>The sentry DSN.</p>
+<p>Set as empty string to disable sentry reporting.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.SentrySettings.TRACES_SAMPLE_RATE" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">TRACES_SAMPLE_RATE</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.SentrySettings.TRACES_SAMPLE_RATE" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">TRACES_SAMPLE_RATE</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0001</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>% of requests traced by sentry, <code>0.0</code> means none, <code>1.0</code> means all.</p>
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.ServerSettings" class="doc doc-heading">
+        <span class="doc doc-object-name doc-class-name">ServerSettings</span>
+
+
+<a href="#starlite_saqlalchemy.settings.ServerSettings" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
+
+  
+      <p>Server configurations.</p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.ServerSettings.APP_LOC" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">APP_LOC</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.ServerSettings.APP_LOC" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">APP_LOC</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;app.main:create_app&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Path to app executable, or factory.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.ServerSettings.APP_LOC_IS_FACTORY" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">APP_LOC_IS_FACTORY</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.ServerSettings.APP_LOC_IS_FACTORY" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">APP_LOC_IS_FACTORY</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Indicate if APP_LOC points to an executable or factory.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.ServerSettings.HOST" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">HOST</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.ServerSettings.HOST" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">HOST</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Server network host.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.ServerSettings.KEEPALIVE" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">KEEPALIVE</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.ServerSettings.KEEPALIVE" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">KEEPALIVE</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">65</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Seconds to hold connections open (65 is &gt; AWS lb idle timeout).</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.ServerSettings.PORT" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">PORT</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.ServerSettings.PORT" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">PORT</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8000</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Server port.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.ServerSettings.RELOAD" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">RELOAD</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.ServerSettings.RELOAD" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">RELOAD</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Turn on hot reloading.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.ServerSettings.RELOAD_DIRS" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">RELOAD_DIRS</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.ServerSettings.RELOAD_DIRS" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">RELOAD_DIRS</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;src/&#39;</span><span class="p">]</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Directories to watch for reloading.</p>
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="starlite_saqlalchemy.settings.WorkerSettings" class="doc doc-heading">
+        <span class="doc doc-object-name doc-class-name">WorkerSettings</span>
+
+
+<a href="#starlite_saqlalchemy.settings.WorkerSettings" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
+
+  
+      <p>Global SAQ Job configuration.</p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.WorkerSettings.JOB_HEARTBEAT" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">JOB_HEARTBEAT</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.WorkerSettings.JOB_HEARTBEAT" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">JOB_HEARTBEAT</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Max time a job can survive without emitting a heartbeat. <code>0</code> to disable.</p>
+<p><code>job.update()</code> will trigger a heartbeat.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.WorkerSettings.JOB_RETRIES" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">JOB_RETRIES</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.WorkerSettings.JOB_RETRIES" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">JOB_RETRIES</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Max attempts for any job.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.WorkerSettings.JOB_RETRY_BACKOFF" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">JOB_RETRY_BACKOFF</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.WorkerSettings.JOB_RETRY_BACKOFF" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">JOB_RETRY_BACKOFF</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">60</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>If true, use exponential backoff for retry delays.</p>
+<ul>
+<li>The first retry will have whatever retry_delay is.</li>
+<li>The second retry will have retry_delay<em>2. The third retry will have retry_delay</em>4. And so on.</li>
+<li>This always includes jitter, where the final retry delay is a random number between 0 and the calculated retry delay.</li>
+<li>If retry_backoff is set to a number, that number is the maximum retry delay, in seconds."</li>
+</ul>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.WorkerSettings.JOB_RETRY_DELAY" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">JOB_RETRY_DELAY</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.WorkerSettings.JOB_RETRY_DELAY" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">JOB_RETRY_DELAY</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Seconds to delay before retrying a job.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.WorkerSettings.JOB_TIMEOUT" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">JOB_TIMEOUT</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.WorkerSettings.JOB_TIMEOUT" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">JOB_TIMEOUT</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Max time a job can run for, in seconds.</p>
+<p>Set to <code>0</code> for no timeout.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="starlite_saqlalchemy.settings.WorkerSettings.JOB_TTL" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">JOB_TTL</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#starlite_saqlalchemy.settings.WorkerSettings.JOB_TTL" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">JOB_TTL</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">600</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Lifetime of available job information, in seconds.</p>
+<p>0: indefinite
+-1: disabled (no info retained)</p>
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../service/" class="md-footer__link md-footer__link--prev" aria-label="Previous: service" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              service
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../sqlalchemy_plugin/" class="md-footer__link md-footer__link--next" aria-label="Next: sqlalchemy_plugin" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              sqlalchemy_plugin
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "navigation.expand", "toc.integrate", "search.suggest", "search.highlight", "search.share"], "search": "../../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      
+    
+    
+  </body>
+</html>
