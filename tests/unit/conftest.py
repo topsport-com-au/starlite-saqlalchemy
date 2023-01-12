@@ -22,6 +22,7 @@ from ..utils import controllers
 if TYPE_CHECKING:
     from collections import abc
 
+    from pytest import MonkeyPatch
     from starlite import Starlite
     from starlite.types import HTTPResponseBodyEvent, HTTPResponseStartEvent, HTTPScope
 
@@ -89,6 +90,13 @@ def fx_book_repository(
 ) -> GenericMockRepository[Book]:
     """Mock Book repo instance."""
     return book_repository_type()
+
+
+@pytest.fixture(name="app")
+def fx_app(app: Starlite, monkeypatch: MonkeyPatch) -> Starlite:
+    """Remove service readiness checks for unit tests."""
+    monkeypatch.setattr(app, "before_startup", [])
+    return app
 
 
 @pytest.fixture(name="client")
