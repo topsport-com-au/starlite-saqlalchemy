@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v0.25.0 (2023-01-12)
+### Feature
+* **app:** Toggle service readiness checks via environment. ([`76b5928`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/76b5928e198b9ecad21a072fbd343b7586cf4bc9))
+* **worker:** Allow multiple queues per worker configuration ([`6d2734d`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/6d2734d21a92939a6c3a42101b27cadee5815a8b))
+
+### Fix
+* **server:** Fix reloading config ([#231](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/231)) ([`ca5dc88`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ca5dc885cece8eecc3a3b5fd0b0d9a63d66ff963))
+
+### Breaking
+* fix reloading config ([#231](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/231)) ([`ca5dc88`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ca5dc885cece8eecc3a3b5fd0b0d9a63d66ff963))
+
 ## v0.24.0 (2023-01-11)
 ### Feature
 * **logs:** Add duration measures to worker logs. ([`b209a23`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/b209a231c26fb6d174feb36fccbab2daeca466b0))
