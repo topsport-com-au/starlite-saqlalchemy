@@ -26,7 +26,7 @@ for package in ("redis", "saq", "sentry_sdk"):
                 IS_REDIS_INSTALLED = False
             case "saq":
                 IS_SAQ_INSTALLED = False
-            case "sentry_sdk":
+            case "sentry_sdk":  # pragma: no cover
                 IS_SENTRY_SDK_INSTALLED = False
 
 
