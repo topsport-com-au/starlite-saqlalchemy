@@ -76,3 +76,6 @@ class Base(DeclarativeBase):
     def __tablename__(cls) -> str:  # pylint: disable=no-self-argument
         """Infer table name from class name."""
         return cls.__name__.lower()
+
+
+dto.from_mapped.pydantic_dto_factory.add_registry(Base.registry)

@@ -1,7 +1,7 @@
-"""Tests for the dto factory."""
+"""Tests for the dto factory."""  # noqa: FA100
 # pylint: disable=missing-class-docstring,invalid-name
 from datetime import date, datetime, timedelta
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Union, get_args, get_origin
 from uuid import UUID, uuid4
 
 import pytest
@@ -68,6 +68,8 @@ def fx_base() -> type[DeclarativeBase]:
     class Base(DeclarativeBase):
         id: Mapped[int] = mapped_column(primary_key=True)
 
+    dto.from_mapped.pydantic_dto_factory.clear_mapped_classes()
+    dto.from_mapped.pydantic_dto_factory.add_registry(Base.registry)
     return Base
 
 
@@ -286,6 +288,46 @@ def test_to_mapped_model_with_collection_relationship(base: type[DeclarativeBase
     assert all(isinstance(val, A) for val in mapped_instance.a)
 
 
+def test_to_mapped_model_with_collection_relationship_default(
+    base: type[DeclarativeBase],
+) -> None:
+    """Test default value of DTO with collection relationship."""
+
+    class A(base):
+        __tablename__ = "a"
+        b_id: Mapped[int] = mapped_column(ForeignKey("b.id"))
+
+    class B(base):
+        __tablename__ = "b"
+
+        a: Mapped[list[A]] = relationship("A")
+
+    DTO = dto.FromMapped[Annotated[B, "write"]]
+    dto_instance = DTO.parse_obj({"id": 1})
+    mapped_instance = dto_instance.to_mapped()
+    assert isinstance(mapped_instance.a, list)
+    assert len(mapped_instance.a) == 0
+
+
+def test_to_mapped_model_with_collection_relationship_optional(
+    base: type[DeclarativeBase],
+) -> None:
+    """Test collection relationship typed as optional."""
+
+    class A(base):
+        __tablename__ = "a"
+        b_id: Mapped[int] = mapped_column(ForeignKey("b.id"))
+
+    class B(base):
+        __tablename__ = "b"
+
+        a: Mapped[list[A] | None] = relationship("A")
+
+    DTO = dto.FromMapped[Annotated[B, "write"]]
+    assert get_origin(DTO.__fields__["a"].annotation) is Union
+    assert type(None) in get_args(DTO.__fields__["a"].annotation)
+
+
 def test_to_mapped_model_with_scalar_relationship(base: type[DeclarativeBase]) -> None:
     """Test building DTO with Scalar relationship, and parsing data."""
 
@@ -301,6 +343,39 @@ def test_to_mapped_model_with_scalar_relationship(base: type[DeclarativeBase]) -
     dto_instance = DTO.parse_obj({"id": 2, "a": {"id": 1}})
     mapped_instance = dto_instance.to_mapped()
     assert isinstance(mapped_instance.a, A)
+
+
+def test_to_mapped_model_with_scalar_relationship_default(base: type[DeclarativeBase]) -> None:
+    """Test default value of DTO with Scalar relationship, and parsing data."""
+
+    class A(base):
+        __tablename__ = "a"
+
+    class B(base):
+        __tablename__ = "b"
+        a_id: Mapped[int] = mapped_column(ForeignKey("a.id"), info=dto.field("private"))
+        a: Mapped[A] = relationship("A")
+
+    DTO = dto.FromMapped[Annotated[B, "write"]]
+    dto_instance = DTO.parse_obj({"id": 2})
+    mapped_instance = dto_instance.to_mapped()
+    assert mapped_instance.a is None
+
+
+def test_to_mapped_model_with_scalar_relationship_optional(base: type[DeclarativeBase]) -> None:
+    """Test relationship typed as optional."""
+
+    class A(base):
+        __tablename__ = "a"
+
+    class B(base):
+        __tablename__ = "b"
+        a_id: Mapped[int] = mapped_column(ForeignKey("a.id"), info=dto.field("private"))
+        a: Mapped[A | None] = relationship("A")
+
+    DTO = dto.FromMapped[Annotated[B, "write"]]
+    assert get_origin(DTO.__fields__["a"].annotation) is Union
+    assert type(None) in get_args(DTO.__fields__["a"].annotation)
 
 
 def test_dto_field_pydantic_field(base: type[DeclarativeBase]) -> None:
@@ -347,3 +422,64 @@ def test_dto_mapped_union_relationship(base: type[DeclarativeBase]) -> None:
     assert field.default is None
     assert issubclass(field.type_, BaseModel)
     assert "val" in field.type_.__fields__
+
+
+def test_dto_references_cycle(base: type[DeclarativeBase]) -> None:
+    """Test a simple reference cycle."""
+
+    class A(base):
+        __tablename__ = "a"
+
+        name: Mapped[str]
+        children: Mapped[list["B"] | None] = relationship("B", back_populates="a")  # noqa: F821
+
+    class B(base):
+        __tablename__ = "b"
+
+        name: Mapped[str]
+        a_id: Mapped[int] = mapped_column(ForeignKey("a.id"))
+        a: Mapped["A"] = relationship("A", back_populates="children")
+
+    dto_model_child = dto.FromMapped[Annotated[B, "write"]]
+
+    dto_child_instance = dto_model_child.parse_obj(
+        {"id": 1, "name": "b", "a_id": 1, "a": {"id": 1, "name": "a"}}
+    )
+    mapped_child_instance = dto_child_instance.to_mapped()
+    assert isinstance(mapped_child_instance, B)
+    assert isinstance(mapped_child_instance.a, A)
+
+
+def test_dto_references_inner_cycle(base: type[DeclarativeBase]) -> None:
+    """Test a reference cycle that do not start in the first SQLAlchemy
+    model."""
+
+    class A(base):
+        __tablename__ = "a"
+        b_id: Mapped[int] = mapped_column(ForeignKey("b.id"))
+        b: Mapped["B"] = relationship("B")  # noqa: F821
+
+    class B(base):
+        __tablename__ = "b"
+
+        children: Mapped[list["C"]] = relationship("C", back_populates="b")  # noqa: F821
+
+    class C(base):
+        __tablename__ = "c"
+
+        b_id: Mapped[int] = mapped_column(ForeignKey("b.id"))
+        b: Mapped["B"] = relationship("B", back_populates="children")
+
+    dto_model_child = dto.FromMapped[Annotated[A, "write"]]
+
+    dto_child_instance = dto_model_child.parse_obj(
+        {
+            "id": 1,
+            "b_id": 1,
+            "b": {"id": 1, "children": [{"id": 1, "b_id": 1}, {"id": 2, "b_id": 1}]},
+        }
+    )
+    mapped_a_instance = dto_child_instance.to_mapped()
+    assert isinstance(mapped_a_instance, A)
+    assert isinstance(mapped_a_instance.b, B)
+    assert all(isinstance(child, C) for child in mapped_a_instance.b.children)
