@@ -12,7 +12,7 @@ from starlite.plugins.sql_alchemy.config import (
 )
 
 from starlite_saqlalchemy import db, settings
-from starlite_saqlalchemy.health import Health, HealthCheckProtocol
+from starlite_saqlalchemy.health import AbstractHealthCheck
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,7 +43,9 @@ async def before_send_handler(message: "Message", _: "State", scope: "Scope") ->
             del scope[SESSION_SCOPE_KEY]  # type:ignore[misc]
 
 
-class SQLAlchemyHealthCheck(HealthCheckProtocol):
+class SQLAlchemyHealthCheck(AbstractHealthCheck):
+    name: str = "db"
+
     def __init__(self) -> None:
         self.engine = create_async_engine(
             settings.db.URL, logging_name="starlite_saqlalchemy.health"
@@ -60,8 +62,8 @@ class SQLAlchemyHealthCheck(HealthCheckProtocol):
             await self.session.execute(text("SELECT 1"))
         ).scalar_one() == 1
 
-    def error(self, health: Health) -> str:
-        return f"DB not {health.value}."
+    # def error(self, health: Health) -> str:
+    #     return f"DB not {health.value}."
 
 
 config = SQLAlchemyConfig(
