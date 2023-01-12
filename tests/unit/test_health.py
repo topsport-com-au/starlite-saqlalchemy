@@ -68,9 +68,12 @@ def test_health_custom_health_check(client: "TestClient", monkeypatch: "MonkeyPa
     """Test registering custom health checks."""
 
     class MyHealthCheck(AbstractHealthCheck):
+        """Custom health check."""
+
         name = "MyHealthCheck"
 
         async def ready(self) -> bool:
+            """Readiness check."""
             return False
 
     HealthController.health_checks.append(MyHealthCheck())
@@ -87,35 +90,17 @@ def test_health_custom_health_check(client: "TestClient", monkeypatch: "MonkeyPa
     )
 
 
-def test_health_check_no_name_error(client: "TestClient") -> None:
+def test_health_check_no_name_error() -> None:
+    """Test registering an health check without specifying its name raise an
+    error."""
+
     class MyHealthCheck(AbstractHealthCheck):
+        """Custom health check."""
+
         async def ready(self) -> bool:
+            """Readiness check."""
             return False
 
     config = init_plugin.PluginConfig(health_checks=[MyHealthCheck])
     with pytest.raises(HealthCheckConfigurationError):
         Starlite(route_handlers=[], on_app_init=[init_plugin.ConfigureApp(config=config)])
-
-
-# @pytest.mark.parametrize(
-#     ("debug", "expected_error"),
-#     [(True, "Health check failed: MyHealthCheck.ready."), (False, "App is not ready.")],
-# )
-# def test_health_default_error(
-#     client: "TestClient", monkeypatch: "MonkeyPatch", debug: bool, expected_error: str
-# ) -> None:
-#     """Test registering custom health checks."""
-
-#     class MyHealthCheck(HealthCheckProtocol):
-#         name = "MyHealthCheck"
-
-#         async def ready(self) -> bool:
-#             return False
-
-#     with modify_settings((settings.app, {"DEBUG": debug})):
-#         HealthController.health_checks.append(MyHealthCheck())
-#         repo_health_mock = AsyncMock(return_value=True)
-#         monkeypatch.setattr(SQLAlchemyHealthCheck, "ready", repo_health_mock)
-#         resp = client.get(settings.api.HEALTH_PATH)
-#         assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
-#         assert resp.json() == {"status_code": 503, "detail": expected_error}

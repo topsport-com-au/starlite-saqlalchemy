@@ -40,7 +40,7 @@ class HealthCheckFailure(ServiceUnavailableException):
 class AbstractHealthCheck(ABC):
     """Base protocol for implementing health checks."""
 
-    name: str = None
+    name: str = ""
 
     async def live(self) -> bool:
         """Run a liveness check.
@@ -89,7 +89,7 @@ class HealthController(Controller):
         for health_check in self.health_checks:
             try:
                 health[health_check.name] = await health_check.ready()
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 health[health_check.name] = False
         if not all(health.values()):
             raise HealthCheckFailure(health=health)

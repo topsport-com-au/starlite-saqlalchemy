@@ -44,13 +44,15 @@ async def before_send_handler(message: "Message", _: "State", scope: "Scope") ->
 
 
 class SQLAlchemyHealthCheck(AbstractHealthCheck):
+    """SQLAlchemy health check."""
+
     name: str = "db"
 
     def __init__(self) -> None:
         self.engine = create_async_engine(
             settings.db.URL, logging_name="starlite_saqlalchemy.health"
         )
-        self.session = async_sessionmaker(bind=self.engine)
+        self.session_maker = async_sessionmaker(bind=self.engine)
 
     async def ready(self) -> bool:
         """Perform a health check on the database.
@@ -58,9 +60,10 @@ class SQLAlchemyHealthCheck(AbstractHealthCheck):
         Returns:
             `True` if healthy.
         """
-        return (  # type:ignore[no-any-return]  # pragma: no cover
-            await self.session.execute(text("SELECT 1"))
-        ).scalar_one() == 1
+        async with self.session_maker() as session:
+            return (  # type:ignore[no-any-return]  # pragma: no cover
+                await session.execute(text("SELECT 1"))
+            ).scalar_one() == 1
 
     # def error(self, health: Health) -> str:
     #     return f"DB not {health.value}."
