@@ -134,7 +134,10 @@ class Service(Generic[T]):
             job_config: Configuration object to control the job that is enqueued.
             **kwargs: Arguments to be passed to the method when called. Must be JSON serializable.
         """
-        from starlite_saqlalchemy.worker import queue, default_job_config_dict  # pylint: disable=C0415
+        from starlite_saqlalchemy.worker import (  # pylint: disable=C0415
+            default_job_config_dict,
+            queue,
+        )
 
         module = inspect.getmodule(self)
         if module is None:  # pragma: no cover
