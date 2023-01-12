@@ -1,3 +1,5 @@
+# pylint: disable=import-outside-toplevel
+
 """Unit test specific config."""
 from __future__ import annotations
 
