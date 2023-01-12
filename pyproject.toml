@@ -87,8 +87,9 @@ sentry-sdk = { version = "*", optional = true }
 
 [tool.poetry.extras]
 cache = ["redis", "hiredis"]
-worker = ["saq"]
+worker = ["saq", "hiredis"]
 sentry = ["sentry-sdk"]
+all = ["redis", "hiredis", "saq", "sentry-sdk"]
 
 [tool.poetry.plugins."pytest11"]
 pytest_starlite_saqlalchemy = "pytest_starlite_saqlalchemy"

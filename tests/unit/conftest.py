@@ -7,6 +7,7 @@ import pytest
 from starlite.datastructures import State
 from starlite.enums import ScopeType
 
+from starlite_saqlalchemy import settings, sqlalchemy_plugin
 from starlite_saqlalchemy.testing import GenericMockRepository
 from tests.utils.domain.authors import Author
 from tests.utils.domain.authors import Service as AuthorService

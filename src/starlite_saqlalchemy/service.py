@@ -11,12 +11,16 @@ import inspect
 import logging
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 
-from saq.job import Job
-
-from starlite_saqlalchemy import utils
+from starlite_saqlalchemy import settings, utils
 from starlite_saqlalchemy.db import async_session_factory
 from starlite_saqlalchemy.exceptions import NotFoundError
 from starlite_saqlalchemy.repository.sqlalchemy import ModelT
+
+if settings.IS_SAQ_INSTALLED:
+    from saq.job import Job
+
+    from starlite_saqlalchemy.worker import default_job_config_dict, queue
+
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -134,11 +138,6 @@ class Service(Generic[T]):
             job_config: Configuration object to control the job that is enqueued.
             **kwargs: Arguments to be passed to the method when called. Must be JSON serializable.
         """
-        from starlite_saqlalchemy.worker import (  # pylint: disable=C0415
-            default_job_config_dict,
-            queue,
-        )
-
         module = inspect.getmodule(self)
         if module is None:  # pragma: no cover
             logger.warning("Callback not enqueued, no module resolved for %s", self)
