@@ -65,9 +65,6 @@ class SQLAlchemyHealthCheck(AbstractHealthCheck):
                 await session.execute(text("SELECT 1"))
             ).scalar_one() == 1
 
-    # def error(self, health: Health) -> str:
-    #     return f"DB not {health.value}."
-
 
 config = SQLAlchemyConfig(
     before_send_handler=before_send_handler,
