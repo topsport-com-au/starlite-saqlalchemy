@@ -52,7 +52,11 @@ from starlite_saqlalchemy import (
     sqlalchemy_plugin,
 )
 from starlite_saqlalchemy.exceptions import HealthCheckConfigurationError
-from starlite_saqlalchemy.health import AbstractHealthCheck, HealthController
+from starlite_saqlalchemy.health import (
+    AbstractHealthCheck,
+    AppHealthCheck,
+    HealthController,
+)
 from starlite_saqlalchemy.service import make_service_callback
 from starlite_saqlalchemy.sqlalchemy_plugin import SQLAlchemyHealthCheck
 from starlite_saqlalchemy.type_encoders import type_encoders_map
@@ -163,7 +167,7 @@ class PluginConfig(BaseModel):
     """Chain of structlog log processors."""
     type_encoders: TypeEncodersMap = type_encoders_map
     """Map of type to serializer callable."""
-    health_checks: Sequence[type[AbstractHealthCheck]] = [SQLAlchemyHealthCheck]
+    health_checks: Sequence[type[AbstractHealthCheck]] = [AppHealthCheck, SQLAlchemyHealthCheck]
 
 
 class ConfigureApp:

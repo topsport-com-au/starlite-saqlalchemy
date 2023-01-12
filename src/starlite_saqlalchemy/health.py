@@ -59,6 +59,16 @@ class AbstractHealthCheck(ABC):
         """
 
 
+class AppHealthCheck(AbstractHealthCheck):
+    """Simple health check that does not require any dependencies."""
+
+    name = "app"
+
+    async def ready(self) -> bool:
+        """Readiness check used when no other health check is available."""
+        return True
+
+
 class HealthResource(BaseModel):
     """Health data returned by the health endpoint."""
 
