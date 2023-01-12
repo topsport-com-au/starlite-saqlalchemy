@@ -1,3 +1,4 @@
+# pylint: disable=import-outside-toplevel
 """The application configuration plugin and config object.
 
 Example:
@@ -38,7 +39,6 @@ from starlite.plugins.sql_alchemy import SQLAlchemyPlugin
 from structlog.types import Processor  # noqa: TC002
 
 from starlite_saqlalchemy import (
-    cache,
     compression,
     dependencies,
     exceptions,
@@ -46,15 +46,13 @@ from starlite_saqlalchemy import (
     lifespan,
     log,
     openapi,
-    redis,
-    sentry,
     settings,
     sqlalchemy_plugin,
 )
+from starlite_saqlalchemy.exceptions import MissingDependencyError
 from starlite_saqlalchemy.health import health_check
 from starlite_saqlalchemy.service import make_service_callback
 from starlite_saqlalchemy.type_encoders import type_encoders_map
-from starlite_saqlalchemy.worker import create_worker_instance
 
 if TYPE_CHECKING:
     from starlite.config.app import AppConfig
@@ -200,7 +198,11 @@ class ConfigureApp:
         self.configure_worker(app_config)
 
         app_config.before_startup = lifespan.before_startup_handler
-        app_config.on_shutdown.extend([http.on_shutdown, redis.client.close])
+        app_config.on_shutdown.append(http.on_shutdown)
+        if self.config.do_cache:
+            from starlite_saqlalchemy import redis
+
+            app_config.on_shutdown.append(redis.client.close)
         return app_config
 
     def configure_after_exception(self, app_config: AppConfig) -> None:
@@ -223,6 +225,10 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_cache and app_config.cache_config == DEFAULT_CACHE_CONFIG:
+            if not settings.IS_REDIS_INSTALLED:
+                raise MissingDependencyError(module="redis", config="redis")
+            from starlite_saqlalchemy import cache
+
             app_config.cache_config = cache.config
 
     def configure_collection_dependencies(self, app_config: AppConfig) -> None:
@@ -316,6 +322,10 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_sentry:
+            if not settings.IS_SENTRY_SDK_INSTALLED:
+                raise MissingDependencyError(module="sentry_sdk", config="sentry")
+            from starlite_saqlalchemy import sentry
+
             app_config.on_startup.append(sentry.configure)
 
     def configure_sqlalchemy_plugin(self, app_config: AppConfig) -> None:
@@ -349,6 +359,10 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_worker:
+            if not settings.IS_SAQ_INSTALLED:
+                raise MissingDependencyError(module="saq", config="worker")
+            from starlite_saqlalchemy.worker import create_worker_instance
+
             worker_kwargs: dict[str, Any] = {"functions": self.config.worker_functions}
             if self.config.do_logging:
                 worker_kwargs["before_process"] = log.worker.before_process

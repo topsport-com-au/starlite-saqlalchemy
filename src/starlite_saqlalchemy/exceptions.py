@@ -51,6 +51,16 @@ class AuthorizationError(StarliteSaqlalchemyError):
     """A user tried to do something they shouldn't have."""
 
 
+class MissingDependencyError(StarliteSaqlalchemyError):
+    """A required dependency is not installed."""
+
+    def __init__(self, module: str, config: str) -> None:
+        super().__init__(
+            f'You enabled {config} configuration but package "{module}" is not installed. '
+            f'You may need to run: "poetry install starlite-saqlalchemy[{config}]"'
+        )
+
+
 class _HTTPConflictException(HTTPException):
     """Request conflict with the current state of the target resource."""
 

@@ -11,13 +11,15 @@ import inspect
 import logging
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 
-from saq.job import Job
-
-from starlite_saqlalchemy import utils
+from starlite_saqlalchemy import settings, utils
 from starlite_saqlalchemy.db import async_session_factory
 from starlite_saqlalchemy.exceptions import NotFoundError
 from starlite_saqlalchemy.repository.sqlalchemy import ModelT
-from starlite_saqlalchemy.worker import default_job_config_dict, queue
+
+if settings.IS_SAQ_INSTALLED:
+    from starlite_saqlalchemy.worker import default_job_config_dict, queue  # isort:skip
+    from saq.job import Job
+
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
