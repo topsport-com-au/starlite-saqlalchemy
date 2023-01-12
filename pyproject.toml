@@ -10,7 +10,7 @@ ignore-words-list = "alog"
 
 [tool.coverage.run]
 branch = true
-omit = ["*/starlite_saqlalchemy/scripts.py", "tests/*"]
+omit = ["*/starlite_saqlalchemy/scripts.py", "*/starlite_saqlalchemy/lifespan.py", "tests/*"]
 relative_files = true
 source_pkgs = ["starlite_saqlalchemy"]
 
