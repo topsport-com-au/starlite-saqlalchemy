@@ -17,9 +17,8 @@ from starlite_saqlalchemy.exceptions import NotFoundError
 from starlite_saqlalchemy.repository.sqlalchemy import ModelT
 
 if settings.IS_SAQ_INSTALLED:
+    from starlite_saqlalchemy.worker import default_job_config_dict, queue  # isort:skip
     from saq.job import Job
-
-    from starlite_saqlalchemy.worker import default_job_config_dict, queue
 
 
 if TYPE_CHECKING:

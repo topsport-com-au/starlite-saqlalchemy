@@ -1,3 +1,5 @@
+# pylint: disable=import-outside-toplevel
+
 """Unit test specific config."""
 from __future__ import annotations
 
@@ -32,6 +34,7 @@ def job() -> Job:
     """SAQ Job instance."""
     if settings.IS_SAQ_INSTALLED is False:
         pytest.skip("SAQ not available")
+
     from saq.job import Job
 
     return Job(function="whatever", kwargs={"a": "b"})
