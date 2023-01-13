@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.26.1 (2023-01-13)
+### Fix
+* **logging:** Don't log exc info for client errors. ([`d497e68`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/d497e68c0ee0da5258d70c069e0ba041a42722b0))
+
 ## v0.26.0 (2023-01-13)
 ### Feature
 * **health:** Custom health checks ([#237](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/237)) ([`bfe64f4`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/bfe64f4cafbaf6b96adfb03749922393de0f38f4))
