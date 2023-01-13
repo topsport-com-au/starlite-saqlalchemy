@@ -63,10 +63,15 @@ config = LoggingConfig(
     root={"level": logging.getLevelName(settings.log.LEVEL), "handlers": ["queue_listener"]},
     formatters={
         "standard": {
-            "format": (
-                "%(asctime)s loglevel=%(levelname)-6s logger=%(name)s %(funcName)s() "
-                "L%(lineno)-4d %(message)s"
-            )
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processors": [
+                # structlog.stdlib/
+                structlog.processors.TimeStamper(fmt="iso", utc=True),
+                structlog.stdlib.add_log_level,
+                structlog.stdlib.ExtraAdder(),
+                structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                structlog.dev.ConsoleRenderer(colors=True),
+            ],
         }
     },
     loggers={
