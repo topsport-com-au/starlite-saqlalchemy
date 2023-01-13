@@ -13,7 +13,7 @@ from structlog.contextvars import clear_contextvars
 from structlog.testing import CapturingLogger
 
 import starlite_saqlalchemy
-from starlite_saqlalchemy import ConfigureApp, log
+from starlite_saqlalchemy import ConfigureApp, PluginConfig, log
 from tests.utils.domain import authors, books
 
 if TYPE_CHECKING:
@@ -55,7 +55,11 @@ def fx_app() -> Starlite:
     Returns:
         The application instance.
     """
-    return Starlite(route_handlers=[], on_app_init=[ConfigureApp()], openapi_config=None)
+    return Starlite(
+        route_handlers=[],
+        on_app_init=[ConfigureApp(config=PluginConfig(do_sentry=False))],
+        openapi_config=None,
+    )
 
 
 @pytest.fixture(name="raw_authors")
