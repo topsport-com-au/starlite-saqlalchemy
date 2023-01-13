@@ -135,7 +135,7 @@ class LogSettings(BaseSettings):
     SAQ_LEVEL: int = 30
     """Level to log SAQ logs."""
     SQLALCHEMY_LEVEL: int = 30
-    """Level to log SAQ logs."""
+    """Level to log SQLAlchemy logs."""
     UVICORN_ACCESS_LEVEL: int = 30
     """Level to log uvicorn access logs."""
     UVICORN_ERROR_LEVEL: int = 20

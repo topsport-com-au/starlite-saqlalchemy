@@ -51,6 +51,10 @@ class AuthorizationError(StarliteSaqlalchemyError):
     """A user tried to do something they shouldn't have."""
 
 
+class HealthCheckConfigurationError(StarliteSaqlalchemyError):
+    """An error occurred while registering an health check."""
+
+
 class _HTTPConflictException(HTTPException):
     """Request conflict with the current state of the target resource."""
 
