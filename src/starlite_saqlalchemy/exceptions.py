@@ -12,6 +12,7 @@ from starlite.exceptions import (
     HTTPException,
     InternalServerException,
     NotFoundException,
+    PermissionDeniedException,
 )
 from starlite.middleware.exceptions.debug_response import create_debug_response
 from starlite.utils.exception import create_exception_response
@@ -39,15 +40,19 @@ class StarliteSaqlalchemyError(Exception):
     """Base exception type for the lib's custom exception types."""
 
 
-class ConflictError(StarliteSaqlalchemyError):
+class StarliteSaqlalchemyClientError(StarliteSaqlalchemyError):
+    """Base exception type for client errors."""
+
+
+class ConflictError(StarliteSaqlalchemyClientError):
     """Exception for data integrity errors."""
 
 
-class NotFoundError(StarliteSaqlalchemyError):
+class NotFoundError(StarliteSaqlalchemyClientError):
     """Referenced identity doesn't exist."""
 
 
-class AuthorizationError(StarliteSaqlalchemyError):
+class AuthorizationError(StarliteSaqlalchemyClientError):
     """A user tried to do something they shouldn't have."""
 
 
@@ -61,12 +66,6 @@ class _HTTPConflictException(HTTPException):
     status_code = 409
 
 
-class _HTTPForbiddenException(HTTPException):
-    """Server understands the request but refuses to authorize it."""
-
-    status_code = 403
-
-
 async def after_exception_hook_handler(exc: Exception, _scope: Scope, _state: State) -> None:
     """Binds `exc_info` key with exception instance as value to structlog
     context vars.
@@ -78,6 +77,8 @@ async def after_exception_hook_handler(exc: Exception, _scope: Scope, _state: St
         _scope: scope of the request
         _state: application state
     """
+    if isinstance(exc, StarliteSaqlalchemyClientError):
+        return
     if isinstance(exc, HTTPException) and exc.status_code < 500:
         return
     bind_contextvars(exc_info=sys.exc_info())
@@ -101,7 +102,7 @@ def starlite_saqlalchemy_exception_to_http_response(
     elif isinstance(exc, ConflictError):
         http_exc = _HTTPConflictException
     elif isinstance(exc, AuthorizationError):
-        http_exc = _HTTPForbiddenException
+        http_exc = PermissionDeniedException
     else:
         http_exc = InternalServerException
     if http_exc is InternalServerException and request.app.debug:
