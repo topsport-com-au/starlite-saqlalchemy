@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.26.0 (2023-01-13)
+### Feature
+* **health:** Custom health checks ([#237](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/237)) ([`bfe64f4`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/bfe64f4cafbaf6b96adfb03749922393de0f38f4))
+
 ## v0.25.0 (2023-01-12)
 ### Feature
 * **app:** Toggle service readiness checks via environment. ([`76b5928`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/76b5928e198b9ecad21a072fbd343b7586cf4bc9))
