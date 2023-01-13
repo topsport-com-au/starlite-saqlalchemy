@@ -19,6 +19,8 @@ from sqlalchemy.pool import NullPool
 from starlite import Provide, Router
 
 from starlite_saqlalchemy import db, sqlalchemy_plugin, worker
+from starlite_saqlalchemy.health import AppHealthCheck, HealthController
+from starlite_saqlalchemy.sqlalchemy_plugin import SQLAlchemyHealthCheck
 from tests.utils import controllers
 
 if TYPE_CHECKING:
@@ -187,11 +189,15 @@ async def _seed_db(engine: AsyncEngine, authors: list[Author]) -> abc.AsyncItera
 
 @pytest.fixture(autouse=True)
 def _patch_db(app: Starlite, engine: AsyncEngine, monkeypatch: pytest.MonkeyPatch) -> None:
+    session_maker = async_sessionmaker(bind=engine)
     monkeypatch.setitem(app.state, sqlalchemy_plugin.config.engine_app_state_key, engine)
+    sqla_health_check = SQLAlchemyHealthCheck()
+    monkeypatch.setattr(sqla_health_check, "session_maker", session_maker)
+    monkeypatch.setattr(HealthController, "health_checks", [AppHealthCheck(), sqla_health_check])
     monkeypatch.setitem(
         app.state,
         sqlalchemy_plugin.config.session_maker_app_state_key,
-        async_sessionmaker(bind=engine),
+        session_maker,
     )
 
 
