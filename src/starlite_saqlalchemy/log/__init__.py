@@ -35,12 +35,22 @@ default_processors = [
     structlog.processors.TimeStamper(fmt="iso", utc=True),
 ]
 
+stdlib_processors = [
+    structlog.processors.TimeStamper(fmt="iso", utc=True),
+    structlog.stdlib.add_log_level,
+    structlog.stdlib.ExtraAdder(),
+    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+]
+
 if settings.app.ENVIRONMENT == "local":  # pragma: no cover
     LoggerFactory: Any = structlog.WriteLoggerFactory
-    default_processors.extend([structlog.dev.ConsoleRenderer()])
+    console_processor = structlog.dev.ConsoleRenderer(colors=True)
+    default_processors.extend([console_processor])
+    stdlib_processors.append(console_processor)
 else:
     LoggerFactory = structlog.BytesLoggerFactory
     default_processors.extend([structlog.processors.dict_tracebacks, msgspec_json_renderer])
+    stdlib_processors.append(structlog.processors.dict_tracebacks)
 
 
 def configure(processors: Sequence[Processor]) -> None:
@@ -62,16 +72,7 @@ def configure(processors: Sequence[Processor]) -> None:
 config = LoggingConfig(
     root={"level": logging.getLevelName(settings.log.LEVEL), "handlers": ["queue_listener"]},
     formatters={
-        "standard": {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processors": [
-                structlog.processors.TimeStamper(fmt="iso", utc=True),
-                structlog.stdlib.add_log_level,
-                structlog.stdlib.ExtraAdder(),
-                structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-                structlog.dev.ConsoleRenderer(colors=True),
-            ],
-        }
+        "standard": {"()": structlog.stdlib.ProcessorFormatter, "processors": stdlib_processors}
     },
     loggers={
         "uvicorn.access": {
