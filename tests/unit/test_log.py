@@ -452,3 +452,11 @@ async def test_log_request_with_invalid_json_payload(client: TestClient[Starlite
     client.app.register(test_handler)
     resp = client.post("/", content=b'{"a": "b",}', headers={"content-type": "application/json"})
     assert resp.status_code == HTTP_400_BAD_REQUEST
+
+
+def test_event_filter() -> None:
+    """Functionality test for the event filter processor."""
+    event_filter = log.utils.EventFilter(["a_key"])
+    log_event = {"a_key": "a_val", "b_key": "b_val"}
+    log_event = event_filter(..., "", log_event)  # type:ignore[assignment]
+    assert log_event == {"b_key": "b_val"}

@@ -11,7 +11,7 @@ from starlite.config.logging import LoggingConfig
 from starlite_saqlalchemy import settings
 
 from . import controller, worker
-from .msgspec_renderer import msgspec_json_renderer
+from .utils import EventFilter, msgspec_json_renderer
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -39,6 +39,7 @@ stdlib_processors = [
     structlog.processors.TimeStamper(fmt="iso", utc=True),
     structlog.stdlib.add_log_level,
     structlog.stdlib.ExtraAdder(),
+    EventFilter(["color_message"]),
     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
 ]
 
