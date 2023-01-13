@@ -60,6 +60,32 @@ def test_after_exception_hook_handler_doesnt_log_400(monkeypatch: pytest.MonkeyP
     logger_mock.assert_not_called()
 
 
+def test_after_exception_hook_handler_doesnt_log_internal_client_errors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Tests that the handler doesn't call the logger if starlite-saqlalchemy
+    client exception."""
+    logger_mock = MagicMock()
+    monkeypatch.setattr(exceptions, "bind_contextvars", logger_mock)
+    exc = NotFoundError()
+
+    @get("/error")
+    def raises() -> None:
+        raise exc
+
+    with create_test_client(
+        route_handlers=[raises],
+        after_exception=exceptions.after_exception_hook_handler,
+        exception_handlers={
+            StarliteSaqlalchemyError: exceptions.starlite_saqlalchemy_exception_to_http_response
+        },
+    ) as client:
+        resp = client.get("/error")
+        assert resp.status_code == HTTP_404_NOT_FOUND
+
+    logger_mock.assert_not_called()
+
+
 @pytest.mark.parametrize(
     ("exc", "status"),
     [
