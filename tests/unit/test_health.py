@@ -31,7 +31,7 @@ def test_health_check(client: "TestClient", monkeypatch: "MonkeyPatch") -> None:
     resp = client.get(settings.api.HEALTH_PATH)
     assert resp.status_code == HTTP_200_OK
     health = HealthResource(
-        app=settings.app.dict(),
+        app=settings.app,
         health={SQLAlchemyHealthCheck.name: True, AppHealthCheck.name: True},
     )
     assert resp.json() == health.dict()
@@ -45,7 +45,7 @@ def test_health_check_false_response(client: "TestClient", monkeypatch: "MonkeyP
     resp = client.get(settings.api.HEALTH_PATH)
     assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
     health = HealthResource(
-        app=settings.app.dict(),
+        app=settings.app,
         health={SQLAlchemyHealthCheck.name: False, AppHealthCheck.name: True},
     )
     assert resp.json() == health.dict()
@@ -58,7 +58,7 @@ def test_health_check_exception_raised(client: "TestClient", monkeypatch: "Monke
     resp = client.get(settings.api.HEALTH_PATH)
     assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
     health = HealthResource(
-        app=settings.app.dict(),
+        app=settings.app,
         health={SQLAlchemyHealthCheck.name: False, AppHealthCheck.name: True},
     )
     assert resp.json() == health.dict()
@@ -82,7 +82,7 @@ def test_health_custom_health_check(client: "TestClient", monkeypatch: "MonkeyPa
     resp = client.get(settings.api.HEALTH_PATH)
     assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
     health = HealthResource(
-        app=settings.app.dict(),
+        app=settings.app,
         health={
             AppHealthCheck.name: True,
             SQLAlchemyHealthCheck.name: True,
