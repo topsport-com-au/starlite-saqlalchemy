@@ -1,7 +1,7 @@
 """Sentry config for our application."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, TypedDict, cast
 
 import sentry_sdk
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
@@ -11,16 +11,17 @@ from starlite_saqlalchemy import settings
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
-    from typing import Any, TypedDict
+    from typing import Any
 
     from starlite.types import HTTPScope
 
-    class SamplingContext(TypedDict):
-        """Sentry context sent to traces sampler function."""
 
-        asgi_scope: HTTPScope
-        parent_sampled: bool | None
-        transaction_context: dict[str, Any]
+class SamplingContext(TypedDict):
+    """Sentry context sent to traces sampler function."""
+
+    asgi_scope: HTTPScope
+    parent_sampled: bool | None
+    transaction_context: dict[str, Any]
 
 
 def sentry_traces_sampler(sampling_context: Mapping[str, Any]) -> float:
