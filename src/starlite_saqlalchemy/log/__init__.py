@@ -65,7 +65,6 @@ config = LoggingConfig(
         "standard": {
             "()": structlog.stdlib.ProcessorFormatter,
             "processors": [
-                # structlog.stdlib/
                 structlog.processors.TimeStamper(fmt="iso", utc=True),
                 structlog.stdlib.add_log_level,
                 structlog.stdlib.ExtraAdder(),
