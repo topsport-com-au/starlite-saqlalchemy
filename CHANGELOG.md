@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.27.0 (2023-01-14)
+### Feature
+* **log:** Colorful logs for stdlib logging ([#242](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/242)) ([`ca2ce6f`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ca2ce6f4ba719014b67bb979fcef85355590b070))
+
 ## v0.26.1 (2023-01-13)
 ### Fix
 * **logging:** Don't log exc info for client errors. ([`d497e68`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/d497e68c0ee0da5258d70c069e0ba041a42722b0))
