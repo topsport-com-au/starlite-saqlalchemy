@@ -11,7 +11,7 @@ from starlite.config.logging import LoggingConfig
 from starlite_saqlalchemy import settings
 
 from . import controller, worker
-from .msgspec_renderer import msgspec_json_renderer
+from .utils import EventFilter, msgspec_json_renderer
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -35,12 +35,23 @@ default_processors = [
     structlog.processors.TimeStamper(fmt="iso", utc=True),
 ]
 
+stdlib_processors = [
+    structlog.processors.TimeStamper(fmt="iso", utc=True),
+    structlog.stdlib.add_log_level,
+    structlog.stdlib.ExtraAdder(),
+    EventFilter(["color_message"]),
+    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+]
+
 if settings.app.ENVIRONMENT == "local":  # pragma: no cover
     LoggerFactory: Any = structlog.WriteLoggerFactory
-    default_processors.extend([structlog.dev.ConsoleRenderer()])
+    console_processor = structlog.dev.ConsoleRenderer(colors=True)
+    default_processors.extend([console_processor])
+    stdlib_processors.append(console_processor)
 else:
     LoggerFactory = structlog.BytesLoggerFactory
     default_processors.extend([structlog.processors.dict_tracebacks, msgspec_json_renderer])
+    stdlib_processors.append(structlog.processors.dict_tracebacks)
 
 
 def configure(processors: Sequence[Processor]) -> None:
@@ -62,12 +73,7 @@ def configure(processors: Sequence[Processor]) -> None:
 config = LoggingConfig(
     root={"level": logging.getLevelName(settings.log.LEVEL), "handlers": ["queue_listener"]},
     formatters={
-        "standard": {
-            "format": (
-                "%(asctime)s loglevel=%(levelname)-6s logger=%(name)s %(funcName)s() "
-                "L%(lineno)-4d %(message)s"
-            )
-        }
+        "standard": {"()": structlog.stdlib.ProcessorFormatter, "processors": stdlib_processors}
     },
     loggers={
         "uvicorn.access": {
