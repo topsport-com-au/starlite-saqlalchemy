@@ -435,7 +435,6 @@ async def test_exception_in_before_send_handler_read_empty_body(
     assert "exception" not in call.kwargs
 
 
-@pytest.mark.xfail(reason="starlite is returning 500 for invalid payloads as of v1.48.1")
 async def test_log_request_with_invalid_json_payload(client: TestClient[Starlite]) -> None:
     """Test logs emitted with invalid client payload.
 
