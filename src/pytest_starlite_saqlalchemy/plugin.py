@@ -19,14 +19,14 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    "cap_logger",
-    "fx_app",
-    "fx_client",
-    "pytest_addoption",
-    "is_unit_test",
     "_patch_http_close",
     "_patch_sqlalchemy_plugin",
     "_patch_worker",
+    "fx_app",
+    "fx_cap_logger",
+    "fx_client",
+    "fx_is_unit_test",
+    "pytest_addoption",
 )
 
 
@@ -50,8 +50,8 @@ def pytest_addoption(parser: Parser) -> None:
     )
 
 
-@pytest.fixture()
-def is_unit_test(request: FixtureRequest) -> bool:
+@pytest.fixture(name="is_unit_test")
+def fx_is_unit_test(request: FixtureRequest) -> bool:
     """Uses the ini option `unit_test_pattern` to determine if the test is part
     of unit or integration tests."""
     unittest_pattern: str = request.config.getini("unit_test_pattern")  # pyright:ignore
@@ -67,7 +67,7 @@ def _patch_http_close(monkeypatch: MonkeyPatch) -> None:
 
 
 @pytest.fixture(autouse=True)
-def _patch_sqlalchemy_plugin(is_unit_test, monkeypatch: MonkeyPatch) -> None:
+def _patch_sqlalchemy_plugin(is_unit_test: bool, monkeypatch: MonkeyPatch) -> None:
     if is_unit_test:
         from starlite_saqlalchemy import sqlalchemy_plugin
 
@@ -79,7 +79,7 @@ def _patch_sqlalchemy_plugin(is_unit_test, monkeypatch: MonkeyPatch) -> None:
 
 
 @pytest.fixture(autouse=True)
-def _patch_worker(is_unit_test, monkeypatch: MonkeyPatch) -> None:
+def _patch_worker(is_unit_test: bool, monkeypatch: MonkeyPatch) -> None:
     """We don't want the worker to start for unittests."""
     if is_unit_test:
         from starlite_saqlalchemy import worker
@@ -120,8 +120,8 @@ def fx_client(app: Starlite) -> Generator[TestClient, None, None]:
         yield client
 
 
-@pytest.fixture()
-def cap_logger(monkeypatch: MonkeyPatch) -> CapturingLogger:
+@pytest.fixture(name="cap_logger")
+def fx_cap_logger(monkeypatch: MonkeyPatch) -> CapturingLogger:
     """Used to monkeypatch the app logger, so we can inspect output."""
     import starlite_saqlalchemy
 

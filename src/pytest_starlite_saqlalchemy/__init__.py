@@ -5,9 +5,9 @@ from .plugin import (
     _patch_http_close,
     _patch_sqlalchemy_plugin,
     _patch_worker,
-    cap_logger,
     fx_app,
+    fx_cap_logger,
     fx_client,
-    is_unit_test,
+    fx_is_unit_test,
     pytest_addoption,
 )
