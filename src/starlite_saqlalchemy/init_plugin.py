@@ -132,7 +132,7 @@ class PluginConfig(BaseModel):
     Set the OpenAPI config object to
     [`AppConfig.openapi_config`][starlite.config.app.AppConfig.openapi_config].
     """
-    do_sentry: bool = True
+    do_sentry: bool | None = None
     """Configure sentry.
 
     Configure the application to initialize Sentry on startup. Adds a handler to
@@ -330,7 +330,12 @@ class ConfigureApp:
         Args:
             app_config: The Starlite application config object.
         """
-        if self.config.do_sentry:
+        do_sentry = (
+            self.config.do_sentry
+            if self.config.do_sentry is not None
+            else settings.app.ENVIRONMENT not in {"local", "test"}
+        )
+        if do_sentry:
             app_config.on_startup.append(sentry.configure)
 
     def configure_sqlalchemy_plugin(self, app_config: AppConfig) -> None:
