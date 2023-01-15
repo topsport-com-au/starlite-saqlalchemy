@@ -292,7 +292,6 @@ async def test_before_send_handler_extract_request_data(
     assert data == {
         "path": "/",
         "method": "POST",
-        "content_type": ("application/json", {}),
         "headers": {"content-length": "10", "content-type": "application/json"},
         "cookies": {},
         "query": b"",

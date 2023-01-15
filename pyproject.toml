@@ -48,9 +48,11 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Software Development",
     "Topic :: System :: Installation/Setup",
+    "Framework :: Pytest",
 ]
 packages = [
-    { include = "starlite_saqlalchemy", from = "src" }
+    { include = "starlite_saqlalchemy", from = "src" },
+    { include = "pytest_starlite_saqlalchemy", from = "src" }
 ]
 
 [tool.poetry.dependencies]
@@ -71,6 +73,9 @@ tenacity = "*"
 uvicorn = "*"
 uvloop = "*"
 
+[tool.poetry.plugins."pytest11"]
+pytest_starlite_saqlalchemy = "pytest_starlite_saqlalchemy"
+
 [tool.poetry.urls]
 GitHub = "https://github.com/topsport-com-au"
 Bugs = "https://github.com/topsport-com-au/starlite-saqlalchemy/issues"
@@ -88,6 +93,7 @@ addopts = ["-ra", "--strict-config"]
 asyncio_mode = "auto"
 env_files = ["tests.env"]
 testpaths = ["tests/unit"]
+test_app = "tests.utils.app:create_app"
 
 [tool.pylint.main]
 disable = [

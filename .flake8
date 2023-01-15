@@ -6,6 +6,7 @@ type-checking-exempt-modules = from sqlalchemy.orm
 per-file-ignores =
     examples/dto/*:T201,TC
     examples/tests/*:SCS108,PT013
+    src/pytest_starlite_saqlalchemy/__init__.py:F401
     src/starlite_saqlalchemy/dependencies.py:TC
     src/starlite_saqlalchemy/health.py:TC
     src/starlite_saqlalchemy/repository/filters.py:TC

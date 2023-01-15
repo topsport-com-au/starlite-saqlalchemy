@@ -8,5 +8,4 @@ __all__ = (
     "ControllerTest",
     "GenericMockRepository",
     "modify_settings",
-    "pytest_plugin",
 )

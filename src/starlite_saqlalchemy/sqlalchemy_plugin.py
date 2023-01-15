@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from starlite.datastructures.state import State
     from starlite.types import Message, Scope
 
-__all__ = ["config", "plugin"]
+__all__ = ["SQLAlchemyHealthCheck", "config", "plugin"]
 
 
 async def before_send_handler(message: "Message", _: "State", scope: "Scope") -> None:
@@ -49,6 +49,7 @@ class SQLAlchemyHealthCheck(AbstractHealthCheck):
     name: str = "db"
 
     def __init__(self) -> None:
+        """Health check with database check."""
         self.engine = create_async_engine(
             settings.db.URL, logging_name="starlite_saqlalchemy.health"
         )
