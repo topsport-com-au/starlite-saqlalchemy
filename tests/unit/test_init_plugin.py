@@ -8,7 +8,8 @@ import pytest
 from starlite import Starlite
 from starlite.cache import SimpleCacheBackend
 
-from starlite_saqlalchemy import init_plugin
+from starlite_saqlalchemy import init_plugin, sentry, settings
+from starlite_saqlalchemy.testing import modify_settings
 
 if TYPE_CHECKING:
     from typing import Any
@@ -82,3 +83,20 @@ def test_ensure_list(in_: Any, out: Any) -> None:
     """Test _ensure_list() functionality."""
     # pylint: disable=protected-access
     assert init_plugin.ConfigureApp._ensure_list(in_) == out
+
+
+@pytest.mark.parametrize(
+    ("env", "exp"),
+    [
+        ("dev", True),
+        ("prod", True),
+        ("local", False),
+        ("test", False),
+    ],
+)
+def test_sentry_environment_gate(env: str, exp: bool) -> None:
+    """Test that the sentry integration is configured under different
+    environment names."""
+    with modify_settings((settings.app, {"ENVIRONMENT": env})):
+        app = Starlite(route_handlers=[], on_app_init=[init_plugin.ConfigureApp()])
+        assert bool(sentry.configure in app.on_startup) is exp  # noqa: SIM901
