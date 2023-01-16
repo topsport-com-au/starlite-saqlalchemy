@@ -76,6 +76,9 @@ uvloop = "*"
 [tool.poetry.plugins."pytest11"]
 pytest_starlite_saqlalchemy = "pytest_starlite_saqlalchemy"
 
+[tool.poetry.plugins."console_scripts"]
+run-app = "starlite_saqlalchemy.scripts:run_app"
+
 [tool.poetry.urls]
 GitHub = "https://github.com/topsport-com-au"
 Bugs = "https://github.com/topsport-com-au/starlite-saqlalchemy/issues"
