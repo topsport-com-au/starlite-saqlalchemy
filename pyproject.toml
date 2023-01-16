@@ -12,11 +12,11 @@ ignore-words-list = "alog"
 branch = true
 omit = ["*/starlite_saqlalchemy/scripts.py", "*/starlite_saqlalchemy/lifespan.py", "tests/*"]
 relative_files = true
-source_pkgs = ["starlite_saqlalchemy"]
+source_pkgs = ["starlite_saqlalchemy", "pytest_starlite_saqlalchemy"]
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
-others = [".", "*/starlite_saqlalchemy"]
+others = [".", "*/starlite_saqlalchemy", "*/pytest_starlite_saqlalchemy"]
 
 [tool.coverage.report]
 show_missing = true

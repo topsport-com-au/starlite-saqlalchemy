@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 
     from pytest import Config, FixtureRequest, MonkeyPatch, Parser
 
-
 __all__ = (
     "_patch_http_close",
     "_patch_sqlalchemy_plugin",
@@ -109,7 +108,6 @@ def fx_app(pytestconfig: Config, monkeypatch: MonkeyPatch) -> Starlite:
             app = app_or_callable()
 
     monkeypatch.setattr(app, "before_startup", [])
-
     return app
 
 
