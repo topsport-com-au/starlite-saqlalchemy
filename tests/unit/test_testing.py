@@ -6,7 +6,11 @@ from unittest.mock import MagicMock
 
 import httpx
 import pytest
-from starlite.status_codes import HTTP_200_OK, HTTP_404_NOT_FOUND
+from starlite.status_codes import (
+    HTTP_200_OK,
+    HTTP_404_NOT_FOUND,
+    HTTP_405_METHOD_NOT_ALLOWED,
+)
 
 from starlite_saqlalchemy import testing
 from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyError
@@ -210,3 +214,12 @@ def test_tester_run_method(params: dict[str, Any] | None) -> None:
             ("test_member_request", ("POST", "create", 201), {}),
             ("test_member_request", ("DELETE", "delete", 200), {}),
         ]
+
+
+def test_tester_ignores_405_response(
+    tester: testing.ControllerTest, mock_response: MagicMock
+) -> None:
+    """Test that 405 responses don't raise from asserts."""
+    mock_response.status_code = HTTP_405_METHOD_NOT_ALLOWED
+    tester.test_get_collection()
+    tester.test_member_request("GET", "get", HTTP_200_OK)
