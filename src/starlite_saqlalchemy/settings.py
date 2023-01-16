@@ -35,6 +35,17 @@ class AppSettings(BaseSettings):
     """Run `Starlite` with `debug=True`."""
     ENVIRONMENT: str = "prod"
     """'dev', 'prod', etc."""
+    TEST_ENVIRONMENT_NAME: str = "test"
+    """Value of ENVIRONMENT used to determine if running tests.
+
+    This should be the value of `ENVIRONMENT` in `test.env`.
+    """
+    LOCAL_ENVIRONMENT_NAME: str = "local"
+    """Value of ENVIRONMENT used to determine if running in local development
+    mode.
+
+    This should be the value of `ENVIRONMENT` in your local `.env` file.
+    """
     NAME: str = "my-starlite-saqlalchemy-app"
     """Application name."""
 

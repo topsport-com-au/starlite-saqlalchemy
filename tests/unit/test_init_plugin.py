@@ -8,8 +8,7 @@ import pytest
 from starlite import Starlite
 from starlite.cache import SimpleCacheBackend
 
-from starlite_saqlalchemy import init_plugin, sentry, settings
-from starlite_saqlalchemy.testing import modify_settings
+from starlite_saqlalchemy import init_plugin, sentry
 
 if TYPE_CHECKING:
     from typing import Any
@@ -86,17 +85,12 @@ def test_ensure_list(in_: Any, out: Any) -> None:
 
 
 @pytest.mark.parametrize(
-    ("env", "exp"),
-    [
-        ("dev", True),
-        ("prod", True),
-        ("local", False),
-        ("test", False),
-    ],
+    ("env", "exp"), [("dev", True), ("prod", True), ("local", False), ("test", False)]
 )
-def test_sentry_environment_gate(env: str, exp: bool) -> None:
+def test_sentry_environment_gate(env: str, exp: bool, monkeypatch: MonkeyPatch) -> None:
     """Test that the sentry integration is configured under different
     environment names."""
-    with modify_settings((settings.app, {"ENVIRONMENT": env})):
-        app = Starlite(route_handlers=[], on_app_init=[init_plugin.ConfigureApp()])
-        assert bool(sentry.configure in app.on_startup) is exp  # noqa: SIM901
+    monkeypatch.setattr(init_plugin, "IS_LOCAL_ENVIRONMENT", env == "local")
+    monkeypatch.setattr(init_plugin, "IS_TEST_ENVIRONMENT", env == "test")
+    app = Starlite(route_handlers=[], on_app_init=[init_plugin.ConfigureApp()])
+    assert bool(sentry.configure in app.on_startup) is exp  # noqa: SIM901
