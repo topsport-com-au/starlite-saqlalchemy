@@ -8,7 +8,7 @@ import pytest
 from starlite import Starlite
 from starlite.cache import SimpleCacheBackend
 
-from starlite_saqlalchemy import init_plugin, worker, sentry
+from starlite_saqlalchemy import init_plugin, sentry, worker
 
 if TYPE_CHECKING:
     from typing import Any
