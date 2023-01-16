@@ -2,15 +2,12 @@
 import uvicorn
 
 from starlite_saqlalchemy import settings
+from starlite_saqlalchemy.constants import IS_LOCAL_ENVIRONMENT
 
 
 def determine_should_reload() -> bool:
     """Evaluate whether reloading should be enabled."""
-    return (
-        settings.server.RELOAD
-        if settings.server.RELOAD is not None
-        else settings.app.ENVIRONMENT == "local"
-    )
+    return settings.server.RELOAD if settings.server.RELOAD is not None else IS_LOCAL_ENVIRONMENT
 
 
 def determine_reload_dirs(should_reload: bool) -> list[str] | None:

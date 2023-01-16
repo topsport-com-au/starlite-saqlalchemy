@@ -51,6 +51,7 @@ from starlite_saqlalchemy import (
     settings,
     sqlalchemy_plugin,
 )
+from starlite_saqlalchemy.constants import IS_LOCAL_ENVIRONMENT, IS_TEST_ENVIRONMENT
 from starlite_saqlalchemy.exceptions import HealthCheckConfigurationError
 from starlite_saqlalchemy.health import (
     AbstractHealthCheck,
@@ -333,7 +334,7 @@ class ConfigureApp:
         do_sentry = (
             self.config.do_sentry
             if self.config.do_sentry is not None
-            else settings.app.ENVIRONMENT not in {"local", "test"}
+            else not (IS_LOCAL_ENVIRONMENT or IS_TEST_ENVIRONMENT)
         )
         if do_sentry:
             app_config.on_startup.append(sentry.configure)

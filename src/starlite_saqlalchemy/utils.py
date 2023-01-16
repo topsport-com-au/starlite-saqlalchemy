@@ -3,6 +3,11 @@ import dataclasses
 from typing import Any
 
 
+def case_insensitive_string_compare(a: str, b: str, /) -> bool:
+    """Compare `a` and `b`, stripping whitespace and ignoring case."""
+    return a.strip().lower() == b.strip().lower()
+
+
 def dataclass_as_dict_shallow(dataclass: Any, *, exclude_none: bool = False) -> dict[str, Any]:
     """Convert a dataclass to dict, without deepcopy."""
     ret: dict[str, Any] = {}

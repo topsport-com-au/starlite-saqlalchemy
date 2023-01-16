@@ -9,6 +9,7 @@ import structlog
 from starlite.config.logging import LoggingConfig
 
 from starlite_saqlalchemy import settings
+from starlite_saqlalchemy.constants import IS_LOCAL_ENVIRONMENT
 
 from . import controller, worker
 from .utils import EventFilter, msgspec_json_renderer
@@ -43,7 +44,7 @@ stdlib_processors = [
     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
 ]
 
-if settings.app.ENVIRONMENT == "local":  # pragma: no cover
+if IS_LOCAL_ENVIRONMENT:  # pragma: no cover
     LoggerFactory: Any = structlog.WriteLoggerFactory
     console_processor = structlog.dev.ConsoleRenderer(colors=True)
     default_processors.extend([console_processor])
