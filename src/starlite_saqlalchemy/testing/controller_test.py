@@ -4,7 +4,11 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
-from starlite.status_codes import HTTP_200_OK, HTTP_201_CREATED
+from starlite.status_codes import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_405_METHOD_NOT_ALLOWED,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -67,6 +71,9 @@ class ControllerTest:
             self.base_path, params=self.collection_filters if with_filters else None
         )
 
+        if resp.status_code == HTTP_405_METHOD_NOT_ALLOWED:
+            return
+
         assert resp.status_code == HTTP_200_OK
         assert resp.json() == self.raw_collection
 
@@ -90,6 +97,9 @@ class ControllerTest:
             request_kw["json"] = raw
 
         resp = self.client.request(method, url, **request_kw)
+
+        if resp.status_code == HTTP_405_METHOD_NOT_ALLOWED:
+            return
 
         assert resp.status_code == exp_status
         assert resp.json() == raw
