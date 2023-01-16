@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v0.28.0 (2023-01-16)
+### Feature
+* Run-app entrypoint ([`8ddd2f2`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/8ddd2f2a2a89acde5c434533f85c961ce01f03f1))
+* **testing:** Pytest plugin ([#246](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/246)) ([`1fe8966`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/1fe896684b007b069c19b26b8e05c30e48c7a0e6))
+* **sentry:** Add starlite sentry integration ([#239](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/239)) ([`951d098`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/951d0983ea04e529e6e9f1b917979aa70e160a47))
+
+### Fix
+* Ignore 405s in ControllerTest utility. ([`6221bab`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/6221bab624a144cc98790f7b43858ef589985dbf))
+
 ## v0.27.0 (2023-01-14)
 ### Feature
 * **log:** Colorful logs for stdlib logging ([#242](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/242)) ([`ca2ce6f`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/ca2ce6f4ba719014b67bb979fcef85355590b070))
