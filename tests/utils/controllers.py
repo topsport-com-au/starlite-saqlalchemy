@@ -4,7 +4,7 @@ from __future__ import annotations
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlite import Dependency, delete, get, post, put
+from starlite import Dependency, Provide, Router, delete, get, post, put
 from starlite.status_codes import HTTP_200_OK
 
 from starlite_saqlalchemy.repository.types import FilterTypes
@@ -49,3 +49,18 @@ async def update_author(data: WriteDTO, service: Service, author_id: UUID) -> Re
 async def delete_author(service: Service, author_id: UUID) -> ReadDTO:
     """Delete Author by ID."""
     return ReadDTO.from_orm(await service.delete(author_id))
+
+
+def create_router() -> Router:
+    """Create a router for our test domain controllers."""
+    return Router(
+        path="/authors",
+        route_handlers=[
+            create_author,
+            delete_author,
+            get_author,
+            get_authors,
+            update_author,
+        ],
+        dependencies={"service": Provide(provides_service)},
+    )

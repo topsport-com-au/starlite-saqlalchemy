@@ -113,7 +113,6 @@ class LogSettings(BaseSettings):
     REQUEST_FIELDS: list[RequestExtractorField] = [
         "path",
         "method",
-        "content_type",
         "headers",
         "cookies",
         "query",

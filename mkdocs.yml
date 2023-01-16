@@ -7,6 +7,8 @@ nav:
     - DTOs: dto.md
     - Async Worker: async_worker.md
     - Logging: logging.md
+    - Testing:
+      - Pytest Plugin: testing/pytest_plugin.md
   - Reference: reference/
 watch:
   - src/starlite_saqlalchemy

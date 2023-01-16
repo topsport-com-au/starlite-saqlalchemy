@@ -8,12 +8,7 @@ from uuid import uuid4
 
 import pytest
 from asyncpg.pgproto import pgproto
-from starlite import Starlite
-from structlog.contextvars import clear_contextvars
-from structlog.testing import CapturingLogger
 
-import starlite_saqlalchemy
-from starlite_saqlalchemy import ConfigureApp, log
 from tests.utils.domain import authors, books
 
 if TYPE_CHECKING:
@@ -23,39 +18,6 @@ if TYPE_CHECKING:
     from typing import Any
 
     from pytest import MonkeyPatch
-
-
-@pytest.fixture(name="cap_logger")
-def fx_capturing_logger(monkeypatch: MonkeyPatch) -> CapturingLogger:
-    """Used to monkeypatch the app logger, so we can inspect output."""
-    cap_logger = CapturingLogger()
-    starlite_saqlalchemy.log.configure(
-        starlite_saqlalchemy.log.default_processors  # type:ignore[arg-type]
-    )
-    # clear context for every test
-    clear_contextvars()
-    # pylint: disable=protected-access
-    logger = starlite_saqlalchemy.log.controller.LOGGER.bind()
-    logger._logger = cap_logger
-    # drop rendering processor to get a dict, not bytes
-    # noinspection PyProtectedMember
-    logger._processors = log.default_processors[:-1]
-    monkeypatch.setattr(starlite_saqlalchemy.log.controller, "LOGGER", logger)
-    monkeypatch.setattr(starlite_saqlalchemy.log.worker, "LOGGER", logger)
-    return cap_logger
-
-
-@pytest.fixture(name="app")
-def fx_app() -> Starlite:
-    """Always use this `app` fixture and never do `from app.main import app`
-    inside a test module. We need to delay import of the `app.main` module
-    until as late as possible to ensure we can mock everything necessary before
-    the application instance is constructed.
-
-    Returns:
-        The application instance.
-    """
-    return Starlite(route_handlers=[], on_app_init=[ConfigureApp()], openapi_config=None)
 
 
 @pytest.fixture(name="raw_authors")

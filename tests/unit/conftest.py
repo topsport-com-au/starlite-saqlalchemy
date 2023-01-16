@@ -2,15 +2,12 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from unittest.mock import MagicMock
 
 import pytest
 from saq.job import Job
 from starlite.datastructures import State
 from starlite.enums import ScopeType
-from starlite.testing import TestClient
 
-from starlite_saqlalchemy import sqlalchemy_plugin, worker
 from starlite_saqlalchemy.testing import GenericMockRepository
 from tests.utils.domain.authors import Author
 from tests.utils.domain.authors import Service as AuthorService
@@ -20,32 +17,9 @@ from tests.utils.domain.books import Service as BookService
 from ..utils import controllers
 
 if TYPE_CHECKING:
-    from collections import abc
 
-    from pytest import MonkeyPatch
     from starlite import Starlite
     from starlite.types import HTTPResponseBodyEvent, HTTPResponseStartEvent, HTTPScope
-
-
-@pytest.fixture(scope="session", autouse=True)
-def _patch_sqlalchemy_plugin() -> abc.Iterator:
-    monkeypatch = pytest.MonkeyPatch()
-    monkeypatch.setattr(
-        sqlalchemy_plugin.SQLAlchemyConfig,  # type:ignore[attr-defined]
-        "on_shutdown",
-        MagicMock(),
-    )
-    yield
-    monkeypatch.undo()
-
-
-@pytest.fixture(scope="session", autouse=True)
-def _patch_worker() -> abc.Iterator:
-    monkeypatch = pytest.MonkeyPatch()
-    monkeypatch.setattr(worker.Worker, "on_app_startup", MagicMock())
-    monkeypatch.setattr(worker.Worker, "stop", MagicMock())
-    yield
-    monkeypatch.undo()
 
 
 @pytest.fixture(name="author_repository_type")
@@ -90,27 +64,6 @@ def fx_book_repository(
 ) -> GenericMockRepository[Book]:
     """Mock Book repo instance."""
     return book_repository_type()
-
-
-@pytest.fixture(name="app")
-def fx_app(app: Starlite, monkeypatch: MonkeyPatch) -> Starlite:
-    """Remove service readiness checks for unit tests."""
-    monkeypatch.setattr(app, "before_startup", [])
-    return app
-
-
-@pytest.fixture(name="client")
-def fx_client(app: Starlite) -> abc.Iterator[TestClient]:
-    """Client instance attached to app.
-
-    Args:
-        app: The app for testing.
-
-    Returns:
-        Test client instance.
-    """
-    with TestClient(app=app) as client_:
-        yield client_
 
 
 @pytest.fixture()
