@@ -48,7 +48,6 @@ async def test_logging(app: "Starlite", cap_logger: CapturingLogger) -> None:
                 "request": {
                     "path": "/authors/97108ac1-ffcb-411d-8b1e-d9183399f63b",
                     "method": "PUT",
-                    "content_type": ("application/json", {}),
                     "headers": {
                         "host": "testserver",
                         "accept": "*/*",

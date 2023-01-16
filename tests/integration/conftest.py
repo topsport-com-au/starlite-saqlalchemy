@@ -1,9 +1,9 @@
 """Config for integration tests."""
-# pylint: disable=redefined-outer-name
 from __future__ import annotations
 
 import asyncio
 import timeit
+from asyncio import AbstractEventLoop, get_event_loop_policy
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -16,15 +16,13 @@ from redis.exceptions import ConnectionError as RedisConnectionError
 from sqlalchemy.engine import URL
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
-from starlite import Provide, Router
 
 from starlite_saqlalchemy import db, sqlalchemy_plugin, worker
 from starlite_saqlalchemy.health import AppHealthCheck, HealthController
 from starlite_saqlalchemy.sqlalchemy_plugin import SQLAlchemyHealthCheck
-from tests.utils import controllers
 
 if TYPE_CHECKING:
-    from collections import abc
+    from collections.abc import AsyncIterator, Awaitable, Callable, Iterator
     from typing import Any
 
     from pytest_docker.plugin import Services  # type:ignore[import]
@@ -37,10 +35,10 @@ here = Path(__file__).parent
 
 
 @pytest.fixture(scope="session")
-def event_loop() -> abc.Iterator[asyncio.AbstractEventLoop]:
+def event_loop() -> Iterator[AbstractEventLoop]:
     """Need the event loop scoped to the session so that we can use it to check
     containers are ready in session scoped containers fixture."""
-    policy = asyncio.get_event_loop_policy()
+    policy = get_event_loop_policy()
     loop = policy.new_event_loop()
     yield loop
     loop.close()
@@ -56,7 +54,7 @@ def docker_compose_file() -> Path:
 
 
 async def wait_until_responsive(
-    check: abc.Callable[..., abc.Awaitable], timeout: float, pause: float, **kwargs: Any
+    check: Callable[..., Awaitable], timeout: float, pause: float, **kwargs: Any
 ) -> None:
     """Wait until a service is responsive.
 
@@ -130,8 +128,8 @@ async def _containers(
     await wait_until_responsive(timeout=30.0, pause=0.1, check=redis_responsive, host=docker_ip)
 
 
-@pytest.fixture()
-async def redis(docker_ip: str) -> Redis:
+@pytest.fixture(name="redis")
+async def fx_redis(docker_ip: str) -> Redis:
     """
 
     Args:
@@ -143,8 +141,8 @@ async def redis(docker_ip: str) -> Redis:
     return Redis(host=docker_ip, port=6397)
 
 
-@pytest.fixture()
-async def engine(docker_ip: str) -> AsyncEngine:
+@pytest.fixture(name="engine")
+async def fx_engine(docker_ip: str) -> AsyncEngine:
     """Postgresql instance for end-to-end testing.
 
     Args:
@@ -169,7 +167,7 @@ async def engine(docker_ip: str) -> AsyncEngine:
 
 
 @pytest.fixture(autouse=True)
-async def _seed_db(engine: AsyncEngine, authors: list[Author]) -> abc.AsyncIterator[None]:
+async def _seed_db(engine: AsyncEngine, authors: list[Author]) -> AsyncIterator[None]:
     """Populate test database with.
 
     Args:
@@ -207,42 +205,8 @@ def _patch_redis(app: Starlite, redis: Redis, monkeypatch: pytest.MonkeyPatch) -
     monkeypatch.setattr(worker.queue, "redis", redis)
 
 
-@pytest.fixture()
-def router() -> Router:
-    """
-    Returns:
-        This is a router with controllers added for testing against the test domain.
-    """
-    return Router(
-        path="/authors",
-        route_handlers=[
-            controllers.get_authors,
-            controllers.create_author,
-            controllers.get_author,
-            controllers.update_author,
-            controllers.delete_author,
-        ],
-        dependencies={"service": Provide(controllers.provides_service)},
-        tags=["Authors"],
-    )
-
-
-@pytest.fixture()
-def app(app: Starlite, router: Router) -> Starlite:
-    """
-    Args:
-        app: App from outermost conftest.py
-        router: Router with controllers for tests.
-
-    Returns:
-        App with router attached for integration tests.
-    """
-    app.register(router)
-    return app
-
-
 @pytest.fixture(name="client")
-async def fx_client(app: Starlite) -> abc.AsyncIterator[AsyncClient]:
+async def fx_client(app: Starlite) -> AsyncIterator[AsyncClient]:
     """Async client that calls requests on the app.
 
     We need to use `httpx.AsyncClient` here, as `starlite.TestClient` creates its own event loop to
