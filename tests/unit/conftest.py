@@ -1,5 +1,3 @@
-# pylint: disable=import-outside-toplevel
-
 """Unit test specific config."""
 from __future__ import annotations
 
@@ -9,7 +7,7 @@ import pytest
 from starlite.datastructures import State
 from starlite.enums import ScopeType
 
-from starlite_saqlalchemy import settings, sqlalchemy_plugin
+from starlite_saqlalchemy import settings
 from starlite_saqlalchemy.testing import GenericMockRepository
 from tests.utils.domain.authors import Author
 from tests.utils.domain.authors import Service as AuthorService
@@ -17,6 +15,9 @@ from tests.utils.domain.books import Book
 from tests.utils.domain.books import Service as BookService
 
 from ..utils import controllers
+
+if settings.IS_SAQ_INSTALLED:
+    from saq.job import Job
 
 if TYPE_CHECKING:
 
@@ -109,6 +110,12 @@ def http_scope(app: Starlite) -> HTTPScope:
         "method": "GET",
         "type": ScopeType.HTTP,
     }
+
+
+@pytest.fixture(autouse=settings.IS_SAQ_INSTALLED)
+def job() -> Job:
+    """SAQ Job instance."""
+    return Job(function="whatever", kwargs={"a": "b"})
 
 
 @pytest.fixture()
