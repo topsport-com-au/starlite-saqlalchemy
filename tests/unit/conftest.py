@@ -1,4 +1,5 @@
 """Unit test specific config."""
+# pylint: disable=import-outside-toplevel
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -8,13 +9,6 @@ from starlite.datastructures import State
 from starlite.enums import ScopeType
 
 from starlite_saqlalchemy import constants
-from starlite_saqlalchemy.testing import GenericMockRepository
-from tests.utils.domain.authors import Author
-from tests.utils.domain.authors import Service as AuthorService
-from tests.utils.domain.books import Book
-from tests.utils.domain.books import Service as BookService
-
-from ..utils import controllers
 
 if constants.IS_SAQ_INSTALLED:
     from saq.job import Job
@@ -24,12 +18,19 @@ if TYPE_CHECKING:
     from starlite import Starlite
     from starlite.types import HTTPResponseBodyEvent, HTTPResponseStartEvent, HTTPScope
 
+    from starlite_saqlalchemy.testing import GenericMockRepository
+    from tests.utils.domain.authors import Author
+    from tests.utils.domain.books import Book
 
-@pytest.fixture(name="author_repository_type")
+
+@pytest.fixture(name="author_repository_type", autouse=constants.IS_SQLALCHEMY_INSTALLED)
 def fx_author_repository_type(
     authors: list[Author], monkeypatch: pytest.MonkeyPatch
 ) -> type[GenericMockRepository[Author]]:
     """Mock Author repository, pre-seeded with collection data."""
+    from starlite_saqlalchemy.testing import GenericMockRepository
+    from tests.utils.domain.authors import Author
+    from tests.utils.domain.authors import Service as AuthorService
 
     repo = GenericMockRepository[Author]
     repo.seed_collection(authors)
@@ -37,7 +38,7 @@ def fx_author_repository_type(
     return repo
 
 
-@pytest.fixture(name="author_repository")
+@pytest.fixture(name="author_repository", autouse=constants.IS_SQLALCHEMY_INSTALLED)
 def fx_author_repository(
     author_repository_type: type[GenericMockRepository[Author]],
 ) -> GenericMockRepository[Author]:
@@ -45,11 +46,14 @@ def fx_author_repository(
     return author_repository_type()
 
 
-@pytest.fixture(name="book_repository_type")
+@pytest.fixture(name="book_repository_type", autouse=constants.IS_SQLALCHEMY_INSTALLED)
 def fx_book_repository_type(
     books: list[Book], monkeypatch: pytest.MonkeyPatch
 ) -> type[GenericMockRepository[Book]]:
     """Mock Book repository, pre-seeded with collection data."""
+    from starlite_saqlalchemy.testing import GenericMockRepository
+    from tests.utils.domain.books import Book
+    from tests.utils.domain.books import Service as BookService
 
     class BookRepository(GenericMockRepository[Book]):
         """Mock book repo."""
@@ -61,7 +65,7 @@ def fx_book_repository_type(
     return BookRepository
 
 
-@pytest.fixture(name="book_repository")
+@pytest.fixture(name="book_repository", autouse=constants.IS_SQLALCHEMY_INSTALLED)
 def fx_book_repository(
     book_repository_type: type[GenericMockRepository[Book]],
 ) -> GenericMockRepository[Book]:
@@ -88,6 +92,8 @@ def http_response_body() -> HTTPResponseBodyEvent:
 @pytest.fixture()
 def http_scope(app: Starlite) -> HTTPScope:
     """Minimal ASGI HTTP connection scope."""
+    from ..utils import controllers
+
     return {
         "headers": [],
         "app": app,

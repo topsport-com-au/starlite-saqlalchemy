@@ -1,10 +1,13 @@
 """Tests for db module."""
 # pylint: disable=protected-access
+# pylint: disable=wrong-import-position,wrong-import-order
 from __future__ import annotations
 
-from uuid import uuid4
-
 import pytest
+
+pytest.importorskip("sqlalchemy")
+
+from uuid import uuid4
 
 from starlite_saqlalchemy import db
 

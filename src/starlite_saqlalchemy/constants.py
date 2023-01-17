@@ -21,8 +21,11 @@ IS_SAQ_INSTALLED = True
 IS_SENTRY_SDK_INSTALLED = True
 """Flag indicating if sentry_sdk module is installed."""
 
+IS_SQLALCHEMY_INSTALLED = True
+"""Flag indicating if sqlalchemy module is installed."""
 
-for package in ("redis", "saq", "sentry_sdk"):
+
+for package in ("redis", "saq", "sentry_sdk", "sqlalchemy"):
     try:
         import_module(package)
     except ModuleNotFoundError:
@@ -31,5 +34,7 @@ for package in ("redis", "saq", "sentry_sdk"):
                 IS_REDIS_INSTALLED = False
             case "saq":
                 IS_SAQ_INSTALLED = False
-            case "sentry_sdk":  # pragma: no cover
+            case "sentry_sdk":
                 IS_SENTRY_SDK_INSTALLED = False
+            case "sqlalchemy":  # pragma: no cover
+                IS_SQLALCHEMY_INSTALLED = False

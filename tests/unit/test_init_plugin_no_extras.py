@@ -7,7 +7,12 @@ from starlite_saqlalchemy import constants, init_plugin
 from starlite_saqlalchemy.exceptions import MissingDependencyError
 
 SKIP = any(
-    [constants.IS_SAQ_INSTALLED, constants.IS_SENTRY_SDK_INSTALLED, constants.IS_REDIS_INSTALLED]
+    [
+        constants.IS_SAQ_INSTALLED,
+        constants.IS_SENTRY_SDK_INSTALLED,
+        constants.IS_REDIS_INSTALLED,
+        constants.IS_SQLALCHEMY_INSTALLED,
+    ]
 )
 
 
@@ -18,12 +23,12 @@ SKIP = any(
         ("do_cache", r"^.*\"redis\" is not installed.*$"),
         ("do_sentry", r"^.*\"sentry_sdk\" is not installed.*$"),
         ("do_worker", r"^.*\"saq\" is not installed.*$"),
+        ("do_sqlalchemy_plugin", r"^.*\"sqlalchemy\" is not installed.*$"),
     ],
 )
 def test_extra_dependencies_not_installed(enabled_config: str, error: str) -> None:
     """Tests that the plugin test required dependencies for switches needing
     them."""
-
     kwargs = {
         "do_after_exception": False,
         "do_cache": False,

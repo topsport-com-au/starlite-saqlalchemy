@@ -10,7 +10,11 @@ ignore-words-list = "alog"
 
 [tool.coverage.run]
 branch = true
-omit = ["*/starlite_saqlalchemy/scripts.py", "*/starlite_saqlalchemy/lifespan.py", "tests/*"]
+omit = [
+    "*/starlite_saqlalchemy/scripts.py",
+    "*/starlite_saqlalchemy/lifespan.py",
+    "tests/*",
+]
 relative_files = true
 source_pkgs = ["starlite_saqlalchemy", "pytest_starlite_saqlalchemy"]
 
@@ -62,7 +66,7 @@ classifiers = [
 ]
 packages = [
     { include = "starlite_saqlalchemy", from = "src" },
-    { include = "pytest_starlite_saqlalchemy", from = "src" }
+    { include = "pytest_starlite_saqlalchemy", from = "src" },
 ]
 
 [tool.poetry.dependencies]
@@ -72,7 +76,6 @@ httpx = "*"
 msgspec = "*"
 pydantic = "*"
 python-dotenv = "*"
-sqlalchemy = "==2.0.0rc2"
 starlite = "^1.40.1"
 tenacity = "*"
 uvicorn = "*"
@@ -84,12 +87,14 @@ hiredis = { version = "*", optional = true }
 redis = { version = "*", optional = true }
 saq = { version = "^0.9.1", optional = true }
 sentry-sdk = { version = "*", optional = true }
+sqlalchemy = { version = "==2.0.0rc2", optional = true }
 
 [tool.poetry.extras]
 cache = ["redis", "hiredis"]
 worker = ["saq", "hiredis"]
 sentry = ["sentry-sdk"]
-all = ["redis", "hiredis", "saq", "sentry-sdk"]
+sqlalchemy = ["sqlalchemy"]
+all = ["redis", "hiredis", "saq", "sentry-sdk", "sqlalchemy"]
 
 [tool.poetry.plugins."pytest11"]
 pytest_starlite_saqlalchemy = "pytest_starlite_saqlalchemy"
@@ -110,11 +115,17 @@ add-select = "D401,D404,D417"
 convention = "google"
 
 [tool.pytest.ini_options]
-addopts = ["-ra", "--strict-config"]
+addopts = [
+    "-ra",
+    "--strict-config",
+    "-p",
+    "no:pytest_starlite_saqlalchemy",
+    "-p",
+    "no:pytest_dotenv",
+]
 asyncio_mode = "auto"
 env_files = ["tests.env"]
 testpaths = ["tests/unit"]
-test_app = "tests.utils.app:create_app"
 
 [tool.pylint.main]
 disable = [

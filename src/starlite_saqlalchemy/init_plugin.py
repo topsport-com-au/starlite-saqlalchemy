@@ -35,7 +35,6 @@ from typing import TYPE_CHECKING, Any, TypeVar
 
 from pydantic import BaseModel
 from starlite.app import DEFAULT_CACHE_CONFIG, DEFAULT_OPENAPI_CONFIG
-from starlite.plugins.sql_alchemy import SQLAlchemyPlugin
 from starlite.types import TypeEncodersMap  # noqa: TC002
 from structlog.types import Processor  # noqa: TC002
 
@@ -48,13 +47,13 @@ from starlite_saqlalchemy import (
     log,
     openapi,
     settings,
-    sqlalchemy_plugin,
 )
 from starlite_saqlalchemy.constants import (
     IS_LOCAL_ENVIRONMENT,
     IS_REDIS_INSTALLED,
     IS_SAQ_INSTALLED,
     IS_SENTRY_SDK_INSTALLED,
+    IS_SQLALCHEMY_INSTALLED,
     IS_TEST_ENVIRONMENT,
 )
 from starlite_saqlalchemy.exceptions import (
@@ -67,7 +66,6 @@ from starlite_saqlalchemy.health import (
     HealthController,
 )
 from starlite_saqlalchemy.service import make_service_callback
-from starlite_saqlalchemy.sqlalchemy_plugin import SQLAlchemyHealthCheck
 from starlite_saqlalchemy.type_encoders import type_encoders_map
 
 if TYPE_CHECKING:
@@ -174,7 +172,7 @@ class PluginConfig(BaseModel):
     """Chain of structlog log processors."""
     type_encoders: TypeEncodersMap = type_encoders_map
     """Map of type to serializer callable."""
-    health_checks: Sequence[type[AbstractHealthCheck]] = [AppHealthCheck, SQLAlchemyHealthCheck]
+    health_checks: list[type[AbstractHealthCheck]] = [AppHealthCheck]
 
 
 class ConfigureApp:
@@ -182,12 +180,12 @@ class ConfigureApp:
 
     __slots__ = ("config",)
 
-    def __init__(self, config: PluginConfig = PluginConfig()) -> None:
+    def __init__(self, config: PluginConfig | None = None) -> None:
         """
         Args:
             config: Plugin configuration object.
         """
-        self.config = config
+        self.config = config if config is not None else PluginConfig()
 
     def __call__(self, app_config: AppConfig) -> AppConfig:
         """Entrypoint to the app config plugin.
@@ -206,13 +204,13 @@ class ConfigureApp:
         self.configure_compression(app_config)
         self.configure_debug(app_config)
         self.configure_exception_handlers(app_config)
-        self.configure_health_check(app_config)
         self.configure_logging(app_config)
         self.configure_openapi(app_config)
         self.configure_sentry(app_config)
         self.configure_sqlalchemy_plugin(app_config)
         self.configure_type_encoders(app_config)
         self.configure_worker(app_config)
+        self.configure_health_check(app_config)
 
         app_config.before_startup = lifespan.before_startup_handler
         app_config.on_shutdown.append(http.on_shutdown)
@@ -367,7 +365,17 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_sqlalchemy_plugin:
-            app_config.plugins.append(SQLAlchemyPlugin(config=sqlalchemy_plugin.config))
+            if not IS_SQLALCHEMY_INSTALLED:
+                raise MissingDependencyError(module="sqlalchemy")
+            from starlite.plugins.sql_alchemy import SQLAlchemyPlugin
+
+            from starlite_saqlalchemy.sqlalchemy_plugin import (
+                SQLAlchemyHealthCheck,
+                config,
+            )
+
+            self.config.health_checks.append(SQLAlchemyHealthCheck)
+            app_config.plugins.append(SQLAlchemyPlugin(config))
 
     def configure_type_encoders(self, app_config: AppConfig) -> None:
         """Set mapping of type encoders on the application config.

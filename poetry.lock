@@ -216,15 +216,12 @@ files = [
     {file = "fast_query_parsers-0.3.0.tar.gz", hash = "sha256:df972c0b58d0bf51fa43b67d2604ab795984015d47552d02175ebcc685e4852b"},
 ]
 
-[package.dependencies]
-maturin = "*"
-
 [[package]]
 name = "greenlet"
 version = "2.0.1"
 description = "Lightweight in-process concurrent programming"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
 files = [
     {file = "greenlet-2.0.1-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:9ed358312e63bf683b9ef22c8e442ef6c5c02973f0c2a939ec1d7b50c974015c"},
@@ -549,36 +546,6 @@ files = [
     {file = "MarkupSafe-2.1.1-cp39-cp39-win_amd64.whl", hash = "sha256:46d00d6cfecdde84d40e572d63735ef81423ad31184100411e6e3388d405e247"},
     {file = "MarkupSafe-2.1.1.tar.gz", hash = "sha256:7f91197cc9e48f989d12e4e6fbc46495c446636dfc81b9ccf50bb0ec74b91d4b"},
 ]
-
-[[package]]
-name = "maturin"
-version = "0.14.10"
-description = "Build and publish crates with pyo3, rust-cpython and cffi bindings as well as rust binaries as python packages"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "maturin-0.14.10-py3-none-linux_armv6l.whl", hash = "sha256:ec8269c02cc435893308dfd50f57f14fb1be3554e4e61c5bf49b97363b289775"},
-    {file = "maturin-0.14.10-py3-none-macosx_10_7_x86_64.whl", hash = "sha256:e9c19dc0a28109280f7d091ca7b78e25f3fc340fcfac92801829a21198fa20eb"},
-    {file = "maturin-0.14.10-py3-none-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:cf950ebfe449a97617b91d75e09766509e21a389ce3f7b6ef15130ad8a95430a"},
-    {file = "maturin-0.14.10-py3-none-manylinux_2_12_i686.manylinux2010_i686.musllinux_1_1_i686.whl", hash = "sha256:c0d25e82cb6e5de9f1c028fcf069784be4165b083e79412371edce05010b68f3"},
-    {file = "maturin-0.14.10-py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.musllinux_1_1_x86_64.whl", hash = "sha256:9da98bee0a548ecaaa924cc8cb94e49075d5e71511c62a1633a6962c7831a29b"},
-    {file = "maturin-0.14.10-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64.whl", hash = "sha256:2f097a63f3bed20a7da56fc7ce4d44ef8376ee9870604da16b685f2d02c87c79"},
-    {file = "maturin-0.14.10-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.musllinux_1_1_armv7l.whl", hash = "sha256:4946ad7545ba5fc0ad08bc98bc8e9f6ffabb6ded71db9ed282ad4596b998d42a"},
-    {file = "maturin-0.14.10-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.musllinux_1_1_ppc64le.whl", hash = "sha256:98bfed21c3498857b3381efeb041d77e004a93b22261bf9690fe2b9fbb4c210f"},
-    {file = "maturin-0.14.10-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:b157e2e8a0216d02df1d0451201fcb977baf0dcd223890abfbfbfd01e0b44630"},
-    {file = "maturin-0.14.10-py3-none-win32.whl", hash = "sha256:5abf311d4618b673efa30cacdac5ae2d462e49da58db9a5bf0d8bde16d9c16be"},
-    {file = "maturin-0.14.10-py3-none-win_amd64.whl", hash = "sha256:11b8550ceba5b81465a18d06f0d3a4cfc1cd6cbf68eda117c253bbf3324b1264"},
-    {file = "maturin-0.14.10-py3-none-win_arm64.whl", hash = "sha256:6cc9afb89f28bd591b62f8f3c29736c81c322cffe88f9ab8eb1749377bbc3521"},
-    {file = "maturin-0.14.10.tar.gz", hash = "sha256:895c48cbe56ae994c2a1eeeef19475ca4819aa4c6412af727a63a772e8ef2d87"},
-]
-
-[package.dependencies]
-tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
-
-[package.extras]
-patchelf = ["patchelf"]
-zig = ["ziglang (>=0.10.0,<0.11.0)"]
 
 [[package]]
 name = "msgspec"
@@ -1008,7 +975,7 @@ name = "sqlalchemy"
 version = "2.0.0rc2"
 description = "Database Abstraction Library"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "SQLAlchemy-2.0.0rc2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:19486279fe24297bf0743c1563735e7cab1f439f36acf165bd8e1be699fb3fcb"},
@@ -1154,18 +1121,6 @@ files = [
 doc = ["reno", "sphinx", "tornado (>=4.5)"]
 
 [[package]]
-name = "tomli"
-version = "2.0.1"
-description = "A lil' TOML parser"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
-    {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
-]
-
-[[package]]
 name = "typing-extensions"
 version = "4.4.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -1259,11 +1214,13 @@ docs = ["Sphinx (>=4.1.2,<4.2.0)", "sphinx-rtd-theme (>=0.5.2,<0.6.0)", "sphinxc
 test = ["Cython (>=0.29.32,<0.30.0)", "aiohttp", "flake8 (>=3.9.2,<3.10.0)", "mypy (>=0.800)", "psutil", "pyOpenSSL (>=22.0.0,<22.1.0)", "pycodestyle (>=2.7.0,<2.8.0)"]
 
 [extras]
+all = ["redis", "hiredis", "saq", "sentry-sdk", "sqlalchemy"]
 cache = ["redis", "hiredis"]
 sentry = ["sentry-sdk"]
-worker = ["saq"]
+sqlalchemy = ["sqlalchemy"]
+worker = ["saq", "hiredis"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "02b7b504018c2c2e6633f8028b22dc996e837ba7f1b2a6ae6b879382b9c9d2d0"
+content-hash = "ba44949147c159b66058c6bce3c3ad8753dec183e7ac82a7f9cd8fa55b9e4fd3"

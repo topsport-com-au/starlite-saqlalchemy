@@ -1,12 +1,16 @@
 """Tests for Service object patterns."""
+# pylint: disable=wrong-import-position,wrong-import-order
 from __future__ import annotations
+
+import pytest
+
+pytest.importorskip("sqlalchemy")
 
 from datetime import date
 from typing import TYPE_CHECKING, Any
 from unittest.mock import AsyncMock
 from uuid import uuid4
 
-import pytest
 from saq import Job
 
 from starlite_saqlalchemy import db, service, worker

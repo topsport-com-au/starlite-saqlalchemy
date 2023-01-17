@@ -4,13 +4,16 @@ import asyncio
 import logging
 
 import starlite
-from sqlalchemy import text
 
 from starlite_saqlalchemy import constants, settings
-from starlite_saqlalchemy.db import engine
 
 if constants.IS_REDIS_INSTALLED:
     from starlite_saqlalchemy import redis
+
+if constants.IS_SQLALCHEMY_INSTALLED:
+    from sqlalchemy import text
+
+    from starlite_saqlalchemy.db import engine  # pylint: disable=ungrouped-imports
 
 
 logger = logging.getLogger(__name__)
@@ -45,7 +48,7 @@ async def _redis_ready() -> None:
 
 async def before_startup_handler(_: starlite.Starlite) -> None:
     """Do things before the app starts up."""
-    if settings.app.CHECK_DB_READY:
+    if constants.IS_SQLALCHEMY_INSTALLED and settings.app.CHECK_DB_READY:
         await _db_ready()
     if constants.IS_REDIS_INSTALLED and settings.app.CHECK_REDIS_READY:
         await _redis_ready()

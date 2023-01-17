@@ -1,17 +1,14 @@
 """Config that can be shared between all test types."""
+# pylint: disable=import-outside-toplevel
 from __future__ import annotations
 
 import importlib
 import sys
-from importlib import reload
 from typing import TYPE_CHECKING, TypeVar
 from uuid import uuid4
 
 import pytest
 from asyncpg.pgproto import pgproto
-
-from starlite_saqlalchemy import constants, init_plugin, settings
-from tests.utils.domain import authors, books
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -21,20 +18,9 @@ if TYPE_CHECKING:
 
     from pytest import MonkeyPatch
 
+    from tests.utils.domain import authors, books
 
-@pytest.fixture(scope="session", autouse=True)
-def _reload_env() -> None:
-    """Reload needed modules for test env vars to be picked up.
-
-    This is needed because the pytest_starlite_saqlalchemy pytest is
-    loaded before other plugins, and so before pytest-dotenv which
-    inject environment variables for the test session. Reloading
-    settings and dependent modules will enforce pulling values from env
-    again.
-    """
-    reload(settings)
-    reload(constants)
-    reload(init_plugin)
+pytest_plugins = ("pytest_dotenv", "pytest_starlite_saqlalchemy.plugin")
 
 
 @pytest.fixture(name="raw_authors")
@@ -62,6 +48,8 @@ def fx_raw_authors() -> list[dict[str, Any]]:
 @pytest.fixture(name="authors")
 def fx_authors(raw_authors: list[dict[str, Any]]) -> list[authors.Author]:
     """Collection of parsed Author models."""
+    from tests.utils.domain import authors
+
     mapped_authors = [authors.ReadDTO(**raw).to_mapped() for raw in raw_authors]
     # convert these to pgproto UUIDs as that is what we get back from sqlalchemy
     for author in mapped_authors:
@@ -87,6 +75,8 @@ def fx_raw_books(raw_authors: list[dict[str, Any]]) -> list[dict[str, Any]]:
 @pytest.fixture(name="books")
 def fx_books(raw_books: list[dict[str, Any]]) -> list[books.Book]:
     """Collection of parsed Book models."""
+    from tests.utils.domain import books
+
     mapped_books = [books.ReadDTO(**raw).to_mapped() for raw in raw_books]
     # convert these to pgproto UUIDs as that is what we get back from sqlalchemy
     for book in mapped_books:
