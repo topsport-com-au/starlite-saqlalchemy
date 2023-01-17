@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.28.1 (2023-01-17)
+### Fix
+* PluginConfig.type_encoders forward ref. ([`65000ee`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/65000ee7d848f9ef8c8bc87149d24ff3fde5302d))
+
 ## v0.28.0 (2023-01-16)
 ### Feature
 * Run-app entrypoint ([`8ddd2f2`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/8ddd2f2a2a89acde5c434533f85c961ce01f03f1))
