@@ -1,8 +1,10 @@
 """Tests for sentry integration."""
+# pylint: disable=wrong-import-position,wrong-import-order
+import pytest
+
+pytest.importorskip("sentry_sdk")
 
 from typing import TYPE_CHECKING
-
-import pytest
 
 from starlite_saqlalchemy import settings
 from starlite_saqlalchemy.sentry import SamplingContext, sentry_traces_sampler

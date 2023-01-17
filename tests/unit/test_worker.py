@@ -1,6 +1,10 @@
 """Tests for the SAQ async worker functionality."""
+# pylint: disable=wrong-import-position
 from __future__ import annotations
 
+import pytest
+
+pytest.importorskip("saq")
 from asyncpg.pgproto import pgproto
 
 from starlite_saqlalchemy import worker

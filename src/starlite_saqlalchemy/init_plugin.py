@@ -95,7 +95,7 @@ class PluginConfig(BaseModel):
     Add the hook handler to
     [`AppConfig.after_exception`][starlite.config.app.AppConfig.after_exception].
     """
-    do_cache: bool = True
+    do_cache: bool = False
     """Configure redis cache backend.
 
     Add configuration for the redis-backed cache to
@@ -149,7 +149,7 @@ class PluginConfig(BaseModel):
     Allow the plugin to set the starlite `debug` parameter. Parameter set to value of
     [`AppConfig.debug`][starlite_saqlalchemy.settings.AppSettings.DEBUG].
     """
-    do_sqlalchemy_plugin: bool = True
+    do_sqlalchemy_plugin: bool = False
     """Configure SQLAlchemy plugin.
 
     Set the SQLAlchemy plugin on the application. Adds the plugin to
@@ -158,7 +158,7 @@ class PluginConfig(BaseModel):
     do_type_encoders: bool = True
     """Configure custom type encoders on the app."""
 
-    do_worker: bool = True
+    do_worker: bool = False
     """Configure the async worker on the application.
 
     This action instantiates a worker instance and sets handlers for

@@ -1,11 +1,15 @@
 """Test testing module."""
+# pylint: disable=wrong-import-position,wrong-import-order
 from __future__ import annotations
+
+import pytest
+
+pytest.importorskip("sqlalchemy")
 
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
 import httpx
-import pytest
 from starlite.status_codes import (
     HTTP_200_OK,
     HTTP_404_NOT_FOUND,

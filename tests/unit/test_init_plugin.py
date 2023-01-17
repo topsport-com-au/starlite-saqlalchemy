@@ -8,7 +8,14 @@ import pytest
 from starlite import Starlite
 from starlite.cache import SimpleCacheBackend
 
-from starlite_saqlalchemy import init_plugin, sentry, worker
+from starlite_saqlalchemy import init_plugin
+from starlite_saqlalchemy.constants import IS_SAQ_INSTALLED, IS_SENTRY_SDK_INSTALLED
+
+if IS_SENTRY_SDK_INSTALLED:
+    from starlite_saqlalchemy import sentry
+
+if IS_SAQ_INSTALLED:
+    from starlite_saqlalchemy import worker
 
 if TYPE_CHECKING:
     from typing import Any
@@ -55,12 +62,13 @@ def test_config_switches() -> None:
     assert not app.routes
 
 
+@pytest.mark.skipif(not IS_SAQ_INSTALLED, reason="saq is not installed")
 def test_do_worker_but_not_logging(monkeypatch: MonkeyPatch) -> None:
     """Tests branch where we can have the worker enabled, but logging
     disabled."""
     mock = MagicMock()
     monkeypatch.setattr(worker, "create_worker_instance", mock)
-    config = init_plugin.PluginConfig(do_logging=False)
+    config = init_plugin.PluginConfig(do_logging=False, do_worker=True)
     Starlite(route_handlers=[], on_app_init=[init_plugin.ConfigureApp(config=config)])
     mock.assert_called_once()
     call = mock.mock_calls[0]
@@ -83,6 +91,7 @@ def test_ensure_list(in_: Any, out: Any) -> None:
     assert init_plugin.ConfigureApp._ensure_list(in_) == out
 
 
+@pytest.mark.skipif(not IS_SENTRY_SDK_INSTALLED, reason="sentry_sdk is not installed")
 @pytest.mark.parametrize(
     ("env", "exp"), [("dev", True), ("prod", True), ("local", False), ("test", False)]
 )

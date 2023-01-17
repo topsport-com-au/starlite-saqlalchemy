@@ -1,10 +1,13 @@
 """Tests for the repository base class."""
+# pylint: disable=wrong-import-position,wrong-import-order
 from __future__ import annotations
+
+import pytest
+
+pytest.importorskip("sqlalchemy")
 
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
-
-import pytest
 
 from starlite_saqlalchemy.exceptions import NotFoundError
 from starlite_saqlalchemy.testing import GenericMockRepository
