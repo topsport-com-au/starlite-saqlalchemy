@@ -12,7 +12,7 @@ from structlog.contextvars import clear_contextvars
 from structlog.testing import CapturingLogger
 from uvicorn.importer import ImportFromStringError, import_from_string
 
-from starlite_saqlalchemy import settings
+from starlite_saqlalchemy import constants
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -79,7 +79,7 @@ def _patch_sqlalchemy_plugin(is_unit_test: bool, monkeypatch: MonkeyPatch) -> No
         )
 
 
-@pytest.fixture(autouse=settings.IS_SAQ_INSTALLED)
+@pytest.fixture(autouse=constants.IS_SAQ_INSTALLED)
 def _patch_worker(is_unit_test: bool, monkeypatch: MonkeyPatch) -> None:
     """We don't want the worker to start for unittests."""
     if is_unit_test:

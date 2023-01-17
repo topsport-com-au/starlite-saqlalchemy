@@ -3,11 +3,11 @@
 import pytest
 from starlite import Starlite
 
-from starlite_saqlalchemy import init_plugin, settings
+from starlite_saqlalchemy import constants, init_plugin
 from starlite_saqlalchemy.exceptions import MissingDependencyError
 
 SKIP = any(
-    [settings.IS_SAQ_INSTALLED, settings.IS_SENTRY_SDK_INSTALLED, settings.IS_REDIS_INSTALLED]
+    [constants.IS_SAQ_INSTALLED, constants.IS_SENTRY_SDK_INSTALLED, constants.IS_REDIS_INSTALLED]
 )
 
 

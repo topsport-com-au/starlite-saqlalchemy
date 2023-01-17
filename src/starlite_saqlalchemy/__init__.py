@@ -36,7 +36,6 @@ from . import (
     settings,
     sqlalchemy_plugin,
     type_encoders,
-    worker,
 )
 from .init_plugin import ConfigureApp, PluginConfig
 
@@ -57,7 +56,6 @@ __all__ = [
     "settings",
     "sqlalchemy_plugin",
     "type_encoders",
-    "worker",
 ]
 
 __version__ = "0.28.1"

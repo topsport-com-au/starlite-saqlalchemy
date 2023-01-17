@@ -50,7 +50,13 @@ from starlite_saqlalchemy import (
     settings,
     sqlalchemy_plugin,
 )
-from starlite_saqlalchemy.constants import IS_LOCAL_ENVIRONMENT, IS_TEST_ENVIRONMENT
+from starlite_saqlalchemy.constants import (
+    IS_LOCAL_ENVIRONMENT,
+    IS_REDIS_INSTALLED,
+    IS_SAQ_INSTALLED,
+    IS_SENTRY_SDK_INSTALLED,
+    IS_TEST_ENVIRONMENT,
+)
 from starlite_saqlalchemy.exceptions import (
     HealthCheckConfigurationError,
     MissingDependencyError,
@@ -236,7 +242,7 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_cache and app_config.cache_config == DEFAULT_CACHE_CONFIG:
-            if not settings.IS_REDIS_INSTALLED:
+            if not IS_REDIS_INSTALLED:
                 raise MissingDependencyError(module="redis", config="redis")
             from starlite_saqlalchemy import cache
 
@@ -345,7 +351,7 @@ class ConfigureApp:
             else not (IS_LOCAL_ENVIRONMENT or IS_TEST_ENVIRONMENT)
         )
         if do_sentry:
-            if not settings.IS_SENTRY_SDK_INSTALLED:
+            if not IS_SENTRY_SDK_INSTALLED:
                 raise MissingDependencyError(module="sentry_sdk", config="sentry")
             from starlite_saqlalchemy import sentry
 
@@ -382,7 +388,7 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_worker:
-            if not settings.IS_SAQ_INSTALLED:
+            if not IS_SAQ_INSTALLED:
                 raise MissingDependencyError(module="saq", config="worker")
             from starlite_saqlalchemy.worker import create_worker_instance
 

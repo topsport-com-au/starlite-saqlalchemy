@@ -3,12 +3,14 @@ from __future__ import annotations
 
 import importlib
 import sys
+from importlib import reload
 from typing import TYPE_CHECKING, TypeVar
 from uuid import uuid4
 
 import pytest
 from asyncpg.pgproto import pgproto
 
+from starlite_saqlalchemy import constants, init_plugin, settings
 from tests.utils.domain import authors, books
 
 if TYPE_CHECKING:
@@ -18,6 +20,21 @@ if TYPE_CHECKING:
     from typing import Any
 
     from pytest import MonkeyPatch
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _reload_env() -> None:
+    """Reload needed modules for test env vars to be picked up.
+
+    This is needed because the pytest_starlite_saqlalchemy pytest is
+    loaded before other plugins, and so before pytest-dotenv which
+    inject environment variables for the test session. Reloading
+    settings and dependent modules will enforce pulling values from env
+    again.
+    """
+    reload(settings)
+    reload(constants)
+    reload(init_plugin)
 
 
 @pytest.fixture(name="raw_authors")
