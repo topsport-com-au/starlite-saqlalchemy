@@ -20,5 +20,5 @@ def test_worker_decoder_handles_pydantic_models(authors: list[Author]) -> None:
     encoded = worker.encoder.encode(pydantic_model)
     assert (
         encoded
-        == b'{"id":"97108ac1-ffcb-411d-8b1e-d9183399f63b","created":"0001-01-01T00:00:00","updated":"0001-01-01T00:00:00","name":"Agatha Christie","dob":"1890-09-15"}'
+        == b'{"created":"0001-01-01T00:00:00","updated":"0001-01-01T00:00:00","id":"97108ac1-ffcb-411d-8b1e-d9183399f63b","name":"Agatha Christie","dob":"1890-09-15"}'
     )

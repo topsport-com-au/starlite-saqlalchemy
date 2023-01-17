@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped
 from starlite_saqlalchemy import db, dto, repository, service
 
 
-class Author(db.orm.Base):
+class Author(db.orm.Base, db.orm.CreatedUpdatedMixin):
     """The Author domain object."""
 
     name: Mapped[str]

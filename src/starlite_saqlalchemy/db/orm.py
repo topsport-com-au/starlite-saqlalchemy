@@ -12,6 +12,7 @@ from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
     Session,
+    declarative_mixin,
     declared_attr,
     mapped_column,
     registry,
@@ -47,7 +48,8 @@ def touch_updated_timestamp(session: Session, *_: Any) -> None:
             session.
     """
     for instance in session.dirty:
-        instance.updated = datetime.now()
+        if hasattr(instance, "updated"):
+            instance.updated = datetime.now()
 
 
 class Base(DeclarativeBase):
@@ -62,17 +64,24 @@ class Base(DeclarativeBase):
         default=uuid4, primary_key=True, info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)}
     )
     """Primary key column."""
-    created: Mapped[datetime] = mapped_column(
-        default=datetime.now, info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)}
-    )
-    """Date/time of instance creation."""
-    updated: Mapped[datetime] = mapped_column(
-        default=datetime.now, info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)}
-    )
-    """Date/time of instance update."""
 
     # noinspection PyMethodParameters
     @declared_attr.directive
     def __tablename__(cls) -> str:  # pylint: disable=no-self-argument
         """Infer table name from class name."""
         return cls.__name__.lower()
+
+
+@declarative_mixin
+class CreatedUpdatedMixin:
+    """Created/Updated At Fields Mixin."""
+
+    created: Mapped[datetime] = mapped_column(
+        default=datetime.now, info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)}
+    )
+
+    """Date/time of instance creation."""
+    updated: Mapped[datetime] = mapped_column(
+        default=datetime.now, info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)}
+    )
+    """Date/time of instance update."""
