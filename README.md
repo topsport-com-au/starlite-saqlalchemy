@@ -72,6 +72,9 @@ poetry add starlite-saqlalchemy[worker]
 poetry add starlite-saqlalchemy[cache]
 # Sentry integration for starlite
 poetry add starlite-saqlalchemy[sentry]
+
+# or to install them all:
+poetry add starlite-saqlalchemy[all]
 ```
 
 ## Example
