@@ -20,6 +20,8 @@ if TYPE_CHECKING:
 
     from tests.utils.domain import authors, books
 
+# Ensure that pytest_dotenv is loaded before
+# so pytest_starlite_saqlalchemy uses correct env values
 pytest_plugins = ("pytest_dotenv", "pytest_starlite_saqlalchemy.plugin")
 
 

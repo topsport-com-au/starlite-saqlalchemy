@@ -20,10 +20,10 @@ SKIP = any(
 @pytest.mark.parametrize(
     ("enabled_config", "error"),
     [
-        ("do_cache", r"^.*\"redis\" is not installed.*$"),
-        ("do_sentry", r"^.*\"sentry_sdk\" is not installed.*$"),
-        ("do_worker", r"^.*\"saq\" is not installed.*$"),
-        ("do_sqlalchemy_plugin", r"^.*\"sqlalchemy\" is not installed.*$"),
+        ("do_cache", r"^.*\'redis\' is not installed.*$"),
+        ("do_sentry", r"^.*\'sentry_sdk\' is not installed.*$"),
+        ("do_worker", r"^.*\'saq\' is not installed.*$"),
+        ("do_sqlalchemy_plugin", r"^.*\'sqlalchemy\' is not installed.*$"),
     ],
 )
 def test_extra_dependencies_not_installed(enabled_config: str, error: str) -> None:

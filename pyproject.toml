@@ -118,6 +118,7 @@ convention = "google"
 addopts = [
     "-ra",
     "--strict-config",
+    # Plugin are enabled in tests/conftest.py to control loading order.
     "-p",
     "no:pytest_starlite_saqlalchemy",
     "-p",
