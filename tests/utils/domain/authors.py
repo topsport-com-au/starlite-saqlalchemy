@@ -11,7 +11,7 @@ from starlite_saqlalchemy.repository.sqlalchemy import SQLAlchemyRepository
 from starlite_saqlalchemy.service.sqlalchemy import RepositoryService
 
 
-class Author(db.orm.Base):
+class Author(db.orm.Base, db.orm.CreatedUpdatedMixin):
     """The Author domain object."""
 
     name: Mapped[str]
