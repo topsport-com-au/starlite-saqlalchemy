@@ -1,4 +1,5 @@
 """Tests for application health check behavior."""
+# pylint: disable=ungrouped-imports
 from itertools import product
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock
@@ -17,9 +18,6 @@ from starlite_saqlalchemy.health import (
     HealthResource,
 )
 
-if IS_SQLALCHEMY_INSTALLED:
-    from starlite_saqlalchemy.sqlalchemy_plugin import SQLAlchemyHealthCheck
-
 if TYPE_CHECKING:
     from pytest import MonkeyPatch
     from starlite.testing import TestClient
@@ -28,6 +26,8 @@ if TYPE_CHECKING:
 health_checks: "list[AbstractHealthCheck]" = [AppHealthCheck()]
 
 if IS_SQLALCHEMY_INSTALLED:
+    from starlite_saqlalchemy.sqlalchemy_plugin import SQLAlchemyHealthCheck
+
     health_checks.append(SQLAlchemyHealthCheck())
 
 
