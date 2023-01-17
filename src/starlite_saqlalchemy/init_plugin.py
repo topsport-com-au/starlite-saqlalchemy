@@ -35,6 +35,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 from pydantic import BaseModel
 from starlite.app import DEFAULT_CACHE_CONFIG, DEFAULT_OPENAPI_CONFIG
 from starlite.plugins.sql_alchemy import SQLAlchemyPlugin
+from starlite.types import TypeEncodersMap  # noqa: TC002
 from structlog.types import Processor  # noqa: TC002
 
 from starlite_saqlalchemy import (
@@ -65,7 +66,6 @@ from starlite_saqlalchemy.worker import create_worker_instance
 
 if TYPE_CHECKING:
     from starlite.config.app import AppConfig
-    from starlite.types import TypeEncodersMap
 
 
 T = TypeVar("T")
@@ -292,13 +292,13 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_health_check:
-            healt_checks: list[AbstractHealthCheck] = []
+            health_checks: list[AbstractHealthCheck] = []
             for health_check in self.config.health_checks:
                 health_check_instance = health_check()
                 if not health_check_instance.name:
                     raise HealthCheckConfigurationError(f"{health_check}.name must be set.")
-                healt_checks.append(health_check_instance)
-            HealthController.health_checks = healt_checks
+                health_checks.append(health_check_instance)
+            HealthController.health_checks = health_checks
             app_config.route_handlers.append(HealthController)
 
     def configure_logging(self, app_config: AppConfig) -> None:

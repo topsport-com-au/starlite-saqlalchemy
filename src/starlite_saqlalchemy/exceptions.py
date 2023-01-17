@@ -1,4 +1,4 @@
-"""Definition of extra HTTP exceptions that aren't included in `Starlite`.
+"""Starlite-saqlalchemy exception types.
 
 Also, defines functions that translate service and repository exceptions
 into HTTP exceptions.
