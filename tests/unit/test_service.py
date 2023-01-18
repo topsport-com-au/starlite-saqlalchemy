@@ -20,7 +20,9 @@ from tests.utils import domain
 if TYPE_CHECKING:
     from pytest import MonkeyPatch
 
-    from starlite_saqlalchemy.testing import GenericMockRepository
+    from starlite_saqlalchemy.testing.generic_mock_repository import (
+        GenericMockRepository,
+    )
 
 
 @pytest.fixture(autouse=True)

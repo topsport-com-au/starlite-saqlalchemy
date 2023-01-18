@@ -18,6 +18,7 @@ from starlite.status_codes import (
 
 from starlite_saqlalchemy import testing
 from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyError
+from starlite_saqlalchemy.testing.generic_mock_repository import GenericMockRepository
 from tests.utils.domain.authors import Author
 from tests.utils.domain.authors import Service as AuthorService
 from tests.utils.domain.books import Book
@@ -31,7 +32,7 @@ if TYPE_CHECKING:
 
 async def test_repo_raises_conflict_if_add_with_id(
     authors: list[Author],
-    author_repository: testing.GenericMockRepository[Author],
+    author_repository: GenericMockRepository[Author],
 ) -> None:
     """Test mock repo raises conflict if add identified entity."""
     with pytest.raises(ConflictError):
@@ -40,14 +41,14 @@ async def test_repo_raises_conflict_if_add_with_id(
 
 def test_generic_mock_repository_parametrization() -> None:
     """Test that the mock repository handles multiple types."""
-    author_repo = testing.GenericMockRepository[Author]
-    book_repo = testing.GenericMockRepository[Book]
+    author_repo = GenericMockRepository[Author]
+    book_repo = GenericMockRepository[Book]
     assert author_repo.model_type is Author  # type:ignore[misc]
     assert book_repo.model_type is Book  # type:ignore[misc]
 
 
 def test_generic_mock_repository_seed_collection(
-    author_repository_type: type[testing.GenericMockRepository[Author]],
+    author_repository_type: type[GenericMockRepository[Author]],
 ) -> None:
     """Test seeding instances."""
     author_repository_type.seed_collection([Author(id="abc")])
@@ -55,7 +56,7 @@ def test_generic_mock_repository_seed_collection(
 
 
 def test_generic_mock_repository_clear_collection(
-    author_repository_type: type[testing.GenericMockRepository[Author]],
+    author_repository_type: type[GenericMockRepository[Author]],
 ) -> None:
     """Test clearing collection for type."""
     author_repository_type.clear_collection()
@@ -63,7 +64,7 @@ def test_generic_mock_repository_clear_collection(
 
 
 def test_generic_mock_repository_filter_collection_by_kwargs(
-    author_repository: testing.GenericMockRepository[Author],
+    author_repository: GenericMockRepository[Author],
 ) -> None:
     """Test filtering the repository collection by kwargs."""
     author_repository.filter_collection_by_kwargs(name="Leo Tolstoy")
@@ -72,7 +73,7 @@ def test_generic_mock_repository_filter_collection_by_kwargs(
 
 
 def test_generic_mock_repository_filter_collection_by_kwargs_and_semantics(
-    author_repository: testing.GenericMockRepository[Author],
+    author_repository: GenericMockRepository[Author],
 ) -> None:
     """Test that filtering by kwargs has `AND` semantics when multiple kwargs,
     not `OR`."""
@@ -81,7 +82,7 @@ def test_generic_mock_repository_filter_collection_by_kwargs_and_semantics(
 
 
 def test_generic_mock_repository_raises_repository_exception_if_named_attribute_doesnt_exist(
-    author_repository: testing.GenericMockRepository[Author],
+    author_repository: GenericMockRepository[Author],
 ) -> None:
     """Test that a repo exception is raised if a named attribute doesn't
     exist."""

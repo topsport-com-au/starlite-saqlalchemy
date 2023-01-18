@@ -18,7 +18,9 @@ if TYPE_CHECKING:
     from starlite import Starlite
     from starlite.types import HTTPResponseBodyEvent, HTTPResponseStartEvent, HTTPScope
 
-    from starlite_saqlalchemy.testing import GenericMockRepository
+    from starlite_saqlalchemy.testing.generic_mock_repository import (
+        GenericMockRepository,
+    )
     from tests.utils.domain.authors import Author
     from tests.utils.domain.books import Book
 
@@ -28,7 +30,9 @@ def fx_author_repository_type(
     authors: list[Author], monkeypatch: pytest.MonkeyPatch
 ) -> type[GenericMockRepository[Author]]:
     """Mock Author repository, pre-seeded with collection data."""
-    from starlite_saqlalchemy.testing import GenericMockRepository
+    from starlite_saqlalchemy.testing.generic_mock_repository import (
+        GenericMockRepository,
+    )
     from tests.utils.domain.authors import Author
     from tests.utils.domain.authors import Service as AuthorService
 
@@ -51,7 +55,9 @@ def fx_book_repository_type(
     books: list[Book], monkeypatch: pytest.MonkeyPatch
 ) -> type[GenericMockRepository[Book]]:
     """Mock Book repository, pre-seeded with collection data."""
-    from starlite_saqlalchemy.testing import GenericMockRepository
+    from starlite_saqlalchemy.testing.generic_mock_repository import (
+        GenericMockRepository,
+    )
     from tests.utils.domain.books import Book
     from tests.utils.domain.books import Service as BookService
 
