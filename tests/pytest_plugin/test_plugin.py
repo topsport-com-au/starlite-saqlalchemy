@@ -20,7 +20,7 @@ def test_pytest_addoption(pytester: Pytester) -> None:
             assert parser._ininames == ["test_app", "unit_test_pattern"]
         """
     )
-    result = pytester.runpytest()
+    result = pytester.runpytest_subprocess()
     result.assert_outcomes(passed=1)
 
 
@@ -49,7 +49,7 @@ def test_is_unit_test_true(pytester: Pytester) -> None:
             assert isinstance(Worker.stop, MagicMock)
         """
     )
-    result = pytester.runpytest()
+    result = pytester.runpytest_subprocess()
     result.assert_outcomes(passed=3)
 
 
@@ -78,7 +78,7 @@ def test_is_unit_test_false(pytester: Pytester) -> None:
             assert not isinstance(Worker.stop, MagicMock)
         """
     )
-    result = pytester.runpytest()
+    result = pytester.runpytest_subprocess()
     result.assert_outcomes(passed=3)
 
 
@@ -95,7 +95,7 @@ def test_patch_http_close(pytester: Pytester) -> None:
             assert not starlite_saqlalchemy.http.clients
         """
     )
-    result = pytester.runpytest()
+    result = pytester.runpytest_subprocess()
     result.assert_outcomes(passed=1)
 
 
@@ -127,9 +127,13 @@ def test_app_fixture_if_app_instance(pytester: Pytester) -> None:
     pytester.syspathinsert()
     pytester.makepyfile(
         test_app="""
-            from tests.utils.app import create_app
+            from starlite import Starlite, get
 
-            app = create_app()
+            @get("/wherever")
+            def whatever() -> None:
+                return None
+
+            app = Starlite(route_handlers=[whatever])
             """
     )
     pytester.makepyprojecttoml(
@@ -144,10 +148,10 @@ def test_app_fixture_if_app_instance(pytester: Pytester) -> None:
 
         def test_app(app):
             assert isinstance(app, Starlite)
-            assert "/authors" in app.route_handler_method_map
+            assert "/wherever" in app.route_handler_method_map
         """
     )
-    result = pytester.runpytest()
+    result = pytester.runpytest_subprocess()
     result.assert_outcomes(passed=1)
 
 
@@ -170,5 +174,5 @@ def test_app_fixture_if_test_app_path_does_not_exist(pytester: Pytester) -> None
             assert app.route_handler_method_map.keys() == {"/health"}
         """
     )
-    result = pytester.runpytest()
+    result = pytester.runpytest_subprocess()
     result.assert_outcomes(passed=1)
