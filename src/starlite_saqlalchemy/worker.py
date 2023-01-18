@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import asyncio
 import dataclasses
+import inspect
+import logging
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -10,11 +12,15 @@ import msgspec
 import saq
 from starlite.utils.serialization import default_serializer
 
-from starlite_saqlalchemy import redis, settings, type_encoders, utils
+from starlite_saqlalchemy import constants, redis, settings, type_encoders, utils
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable, Collection
     from signal import Signals
+
+    from saq.types import Context
+
+    from starlite_saqlalchemy.service import Service
 
 __all__ = [
     "JobConfig",
@@ -22,8 +28,12 @@ __all__ = [
     "Worker",
     "create_worker_instance",
     "default_job_config_dict",
+    "make_service_callback",
+    "enqueue_background_task_for_service",
     "queue",
 ]
+
+logger = logging.getLogger(__name__)
 
 encoder = msgspec.json.Encoder(
     enc_hook=partial(default_serializer, type_encoders=type_encoders.type_encoders_map)
@@ -147,3 +157,51 @@ def create_worker_instance(
         The worker instance, instantiated with `functions`.
     """
     return Worker(queue, functions, before_process=before_process, after_process=after_process)
+
+
+async def make_service_callback(
+    _ctx: Context, *, service_type_id: str, service_method_name: str, **kwargs: Any
+) -> None:
+    """Make an async service callback.
+
+    Args:
+        _ctx: the SAQ context
+        service_type_id: Value of `__id__` class var on service type.
+        service_method_name: Method to be called on the service object.
+        **kwargs: Unpacked into the service method call as keyword arguments.
+    """
+    service_type = constants.SERVICE_OBJECT_IDENTITY_MAP[service_type_id]
+    async with service_type.new() as service_object:
+        method = getattr(service_object, service_method_name)
+        await method(**kwargs)
+
+
+async def enqueue_background_task_for_service(
+    service_obj: Service, method_name: str, job_config: JobConfig | None = None, **kwargs: Any
+) -> None:
+    """Enqueue an async callback for the operation and data.
+
+    Args:
+        service_obj: The Service instance that is requesting the callback.
+        method_name: Method on the service object that should be called by the async worker.
+        job_config: Configuration object to control the job that is enqueued.
+        **kwargs: Arguments to be passed to the method when called. Must be JSON serializable.
+    """
+    module = inspect.getmodule(service_obj)
+    if module is None:  # pragma: no cover
+        logger.warning("Callback not enqueued, no module resolved for %s", service_obj)
+        return
+    job_config_dict: dict[str, Any]
+    if job_config is None:
+        job_config_dict = default_job_config_dict
+    else:
+        job_config_dict = utils.dataclass_as_dict_shallow(job_config, exclude_none=True)
+
+    kwargs["service_type_id"] = service_obj.__id__
+    kwargs["service_method_name"] = method_name
+    job = saq.Job(
+        function=make_service_callback.__qualname__,
+        kwargs=kwargs,
+        **job_config_dict,
+    )
+    await queue.enqueue(job)

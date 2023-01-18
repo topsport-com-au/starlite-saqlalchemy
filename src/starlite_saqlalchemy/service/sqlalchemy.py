@@ -27,6 +27,8 @@ RepoServiceT = TypeVar("RepoServiceT", bound="RepositoryService")
 class RepositoryService(Service[ModelT], Generic[ModelT]):
     """Service object that operates on a repository object."""
 
+    __id__ = "starlite_saqlalchemy.service.sqlalchemy.RepositoryService"
+
     repository_type: type[AbstractRepository[ModelT]]
 
     def __init__(self, **repo_kwargs: Any) -> None:

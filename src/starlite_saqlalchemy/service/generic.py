@@ -5,38 +5,23 @@ Service object is generic on the domain model type.
 from __future__ import annotations
 
 import contextlib
-import inspect
-import logging
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 
-from starlite_saqlalchemy import constants, utils
+from starlite_saqlalchemy import constants
 from starlite_saqlalchemy.exceptions import NotFoundError
-
-if constants.IS_SAQ_INSTALLED:
-    from starlite_saqlalchemy.worker import default_job_config_dict, queue  # isort:skip
-    from saq.job import Job
-
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-    from saq.types import Context
-
-    from starlite_saqlalchemy.worker import JobConfig
-
-
-logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 ServiceT = TypeVar("ServiceT", bound="Service")
-
-service_object_identity_map: dict[str, type[Service]] = {}
 
 
 class Service(Generic[T]):
     """Generic Service object."""
 
-    __id__: ClassVar[str]
+    __id__: ClassVar[str] = "starlite_saqlalchemy.service.generic.Service"
 
     def __init_subclass__(cls, *_: Any, **__: Any) -> None:
         """Map the service object to a unique identifier.
@@ -48,7 +33,12 @@ class Service(Generic[T]):
         path to the object.
         """
         cls.__id__ = f"{cls.__module__}.{cls.__name__}"
-        service_object_identity_map[cls.__id__] = cls
+        # error: Argument of type "Type[Self@Service[T@Service]]" cannot be assigned to parameter
+        #       "__value" of type "Type[Service[Any]]" in function "__setitem__"
+        #   "Type[Service[T@Service]]" is incompatible with "Type[Service[Any]]"
+        #   Type "Type[Self@Service[T@Service]]" cannot be assigned to type "Type[Service[Any]]"
+        #       (reportGeneralTypeIssues)
+        constants.SERVICE_OBJECT_IDENTITY_MAP[cls.__id__] = cls  # pyright:ignore
 
     # pylint:disable=unused-argument
 
@@ -120,35 +110,6 @@ class Service(Generic[T]):
         """
         raise NotFoundError
 
-    async def enqueue_background_task(
-        self, method_name: str, job_config: JobConfig | None = None, **kwargs: Any
-    ) -> None:
-        """Enqueue an async callback for the operation and data.
-
-        Args:
-            method_name: Method on the service object that should be called by the async worker.
-            job_config: Configuration object to control the job that is enqueued.
-            **kwargs: Arguments to be passed to the method when called. Must be JSON serializable.
-        """
-        module = inspect.getmodule(self)
-        if module is None:  # pragma: no cover
-            logger.warning("Callback not enqueued, no module resolved for %s", self)
-            return
-        job_config_dict: dict[str, Any]
-        if job_config is None:
-            job_config_dict = default_job_config_dict
-        else:
-            job_config_dict = utils.dataclass_as_dict_shallow(job_config, exclude_none=True)
-
-        kwargs["service_type_id"] = self.__id__
-        kwargs["service_method_name"] = method_name
-        job = Job(
-            function=make_service_callback.__qualname__,
-            kwargs=kwargs,
-            **job_config_dict,
-        )
-        await queue.enqueue(job)
-
     @classmethod
     @contextlib.asynccontextmanager
     async def new(cls: type[ServiceT]) -> AsyncIterator[ServiceT]:
@@ -158,20 +119,3 @@ class Service(Generic[T]):
             The service object instance.
         """
         yield cls()
-
-
-async def make_service_callback(
-    _ctx: Context, *, service_type_id: str, service_method_name: str, **kwargs: Any
-) -> None:
-    """Make an async service callback.
-
-    Args:
-        _ctx: the SAQ context
-        service_type_id: Value of `__id__` class var on service type.
-        service_method_name: Method to be called on the service object.
-        **kwargs: Unpacked into the service method call as keyword arguments.
-    """
-    service_type = service_object_identity_map[service_type_id]
-    async with service_type.new() as service_object:
-        method = getattr(service_object, service_method_name)
-        await method(**kwargs)

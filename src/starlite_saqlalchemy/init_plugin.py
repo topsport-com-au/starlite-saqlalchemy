@@ -65,7 +65,6 @@ from starlite_saqlalchemy.health import (
     AppHealthCheck,
     HealthController,
 )
-from starlite_saqlalchemy.service import make_service_callback
 from starlite_saqlalchemy.type_encoders import type_encoders_map
 
 if TYPE_CHECKING:
@@ -85,9 +84,7 @@ class PluginConfig(BaseModel):
     application.
     """
 
-    worker_functions: list[Callable[..., Any] | tuple[str, Callable[..., Any]]] = [
-        (make_service_callback.__qualname__, make_service_callback)
-    ]
+    worker_functions: list[Callable[..., Any] | tuple[str, Callable[..., Any]]] = []
     """Queue worker functions."""
     do_after_exception: bool = True
     """Configure after exception handler.
@@ -398,7 +395,14 @@ class ConfigureApp:
         if self.config.do_worker:
             if not IS_SAQ_INSTALLED:
                 raise MissingDependencyError(module="saq", config="worker")
-            from starlite_saqlalchemy.worker import create_worker_instance
+            from starlite_saqlalchemy.worker import (
+                create_worker_instance,
+                make_service_callback,
+            )
+
+            self.config.worker_functions.append(
+                (make_service_callback.__qualname__, make_service_callback)
+            )
 
             worker_kwargs: dict[str, Any] = {"functions": self.config.worker_functions}
             if self.config.do_logging:

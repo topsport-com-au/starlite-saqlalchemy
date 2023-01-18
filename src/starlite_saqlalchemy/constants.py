@@ -2,9 +2,16 @@
 from __future__ import annotations
 
 from importlib import import_module
+from typing import TYPE_CHECKING, Any
 
 from starlite_saqlalchemy.settings import app
 from starlite_saqlalchemy.utils import case_insensitive_string_compare
+
+if TYPE_CHECKING:
+    from collections.abc import MutableMapping
+
+    from starlite_saqlalchemy.service import Service
+
 
 IS_TEST_ENVIRONMENT = case_insensitive_string_compare(app.ENVIRONMENT, app.TEST_ENVIRONMENT_NAME)
 """Flag indicating if the application is running in a test environment."""
@@ -38,3 +45,6 @@ for package in ("redis", "saq", "sentry_sdk", "sqlalchemy"):
                 IS_SENTRY_SDK_INSTALLED = False
             case "sqlalchemy":  # pragma: no cover
                 IS_SQLALCHEMY_INSTALLED = False
+
+SERVICE_OBJECT_IDENTITY_MAP: MutableMapping[str, type[Service[Any]]] = {}
+"""Used by the worker to lookup methods for service object callbacks."""
