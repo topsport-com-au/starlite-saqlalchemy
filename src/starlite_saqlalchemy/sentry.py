@@ -37,7 +37,7 @@ def configure() -> None:
 
     See [SentrySettings][starlite_saqlalchemy.settings.SentrySettings].
     """
-    sentry_sdk.init(  # pragma: no cover
+    sentry_sdk.init(
         dsn=settings.sentry.DSN,
         environment=settings.app.ENVIRONMENT,
         release=settings.app.BUILD_NUMBER,
