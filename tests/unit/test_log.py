@@ -22,7 +22,6 @@ from starlite.utils.scope import set_starlite_scope_state
 from structlog import DropEvent
 
 from starlite_saqlalchemy import log, settings
-from starlite_saqlalchemy.constants import IS_SAQ_INSTALLED
 
 if TYPE_CHECKING:
     from typing import Any
@@ -325,7 +324,6 @@ async def test_before_process_calls_structlog_contextvars_clear_contextvars(
     clear_ctx_vars_mock.assert_called_once()
 
 
-@pytest.mark.skipif(not IS_SAQ_INSTALLED, reason="saq is not installed")
 async def test_after_process(job: Job, cap_logger: CapturingLogger) -> None:
     """Tests extraction of job data, and eventual log."""
     await log.worker.after_process({"job": job})
@@ -355,7 +353,6 @@ async def test_after_process(job: Job, cap_logger: CapturingLogger) -> None:
     ] == cap_logger.calls
 
 
-@pytest.mark.skipif(not IS_SAQ_INSTALLED, reason="saq is not installed")
 async def test_after_process_logs_at_error(job: Job, cap_logger: CapturingLogger) -> None:
     """Tests eventual log is at ERROR level if `job.error`."""
     job.error = "Yep, this is the traceback."
