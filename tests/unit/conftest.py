@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
+from starlite import get
 from starlite.datastructures import State
 from starlite.enums import ScopeType
 
@@ -20,10 +21,11 @@ if TYPE_CHECKING:
         GenericMockRepository,
     )
     from tests.utils.domain.authors import Author
+    from tests.utils.domain.authors import Service as AuthorService
     from tests.utils.domain.books import Book
 
 
-@pytest.fixture(name="author_repository_type", autouse=constants.IS_SQLALCHEMY_INSTALLED)
+@pytest.fixture(name="author_repository_type")
 def fx_author_repository_type(
     authors: list[Author], monkeypatch: pytest.MonkeyPatch
 ) -> type[GenericMockRepository[Author]]:
@@ -40,7 +42,7 @@ def fx_author_repository_type(
     return repo
 
 
-@pytest.fixture(name="author_repository", autouse=constants.IS_SQLALCHEMY_INSTALLED)
+@pytest.fixture(name="author_repository")
 def fx_author_repository(
     author_repository_type: type[GenericMockRepository[Author]],
 ) -> GenericMockRepository[Author]:
@@ -48,9 +50,16 @@ def fx_author_repository(
     return author_repository_type()
 
 
-@pytest.fixture(name="book_repository_type", autouse=constants.IS_SQLALCHEMY_INSTALLED)
+@pytest.fixture(name="author_service_type")
+def fx_author_service_type(_sqlalchemy_installed: None) -> type[AuthorService]:
+    from tests.utils.domain.authors import Service
+
+    return Service
+
+
+@pytest.fixture(name="book_repository_type")
 def fx_book_repository_type(
-    books: list[Book], monkeypatch: pytest.MonkeyPatch
+    books: list[Book], monkeypatch: pytest.MonkeyPatch, _sqlalchemy_installed: None
 ) -> type[GenericMockRepository[Book]]:
     """Mock Book repository, pre-seeded with collection data."""
     from starlite_saqlalchemy.testing.generic_mock_repository import (
@@ -69,7 +78,7 @@ def fx_book_repository_type(
     return BookRepository
 
 
-@pytest.fixture(name="book_repository", autouse=constants.IS_SQLALCHEMY_INSTALLED)
+@pytest.fixture(name="book_repository")
 def fx_book_repository(
     book_repository_type: type[GenericMockRepository[Book]],
 ) -> GenericMockRepository[Book]:
@@ -96,7 +105,10 @@ def http_response_body() -> HTTPResponseBodyEvent:
 @pytest.fixture()
 def http_scope(app: Starlite) -> HTTPScope:
     """Minimal ASGI HTTP connection scope."""
-    from ..utils import controllers
+
+    @get()
+    def handler() -> None:
+        ...
 
     return {
         "headers": [],
@@ -111,7 +123,7 @@ def http_scope(app: Starlite) -> HTTPScope:
         "query_string": b"",
         "raw_path": b"/wherever",
         "root_path": "/",
-        "route_handler": controllers.get_author,
+        "route_handler": handler,
         "scheme": "http",
         "server": None,
         "session": {},

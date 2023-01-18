@@ -1,15 +1,12 @@
 """Unit tests for the SQLAlchemy Repository implementation."""
-# pylint: disable=protected-access,redefined-outer-name,wrong-import-position,wrong-import-order
+# pylint: disable=protected-access,redefined-outer-name
 from __future__ import annotations
-
-import pytest
-
-pytest.importorskip("sqlalchemy")
 
 from datetime import datetime
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, call
 
+import pytest
 from sqlalchemy.exc import IntegrityError, InvalidRequestError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 

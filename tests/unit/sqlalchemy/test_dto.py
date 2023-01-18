@@ -1,14 +1,11 @@
 """Tests for the dto factory."""
-# pylint: disable=missing-class-docstring,invalid-name,wrong-import-position,wrong-import-order
-
-import pytest
-
-pytest.importorskip("sqlalchemy")
+# pylint: disable=missing-class-docstring,invalid-name
 
 from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING, Annotated, Any, ClassVar
 from uuid import UUID, uuid4
 
+import pytest
 from pydantic import BaseModel, Field, constr, validator
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import (

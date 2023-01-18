@@ -1,13 +1,10 @@
 """Tests for the SAQ async worker functionality."""
-# pylint: disable=wrong-import-position
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 from unittest.mock import AsyncMock
 
 import pytest
-
-pytest.importorskip("saq")
 from asyncpg.pgproto import pgproto
 from saq import Job
 
