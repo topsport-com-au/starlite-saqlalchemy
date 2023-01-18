@@ -10,11 +10,9 @@ from starlite.enums import ScopeType
 
 from starlite_saqlalchemy import constants
 
-if constants.IS_SAQ_INSTALLED:
-    from saq.job import Job
-
 if TYPE_CHECKING:
 
+    from saq.job import Job
     from starlite import Starlite
     from starlite.types import HTTPResponseBodyEvent, HTTPResponseStartEvent, HTTPScope
 
@@ -124,9 +122,14 @@ def http_scope(app: Starlite) -> HTTPScope:
     }
 
 
-@pytest.fixture(autouse=constants.IS_SAQ_INSTALLED)
+@pytest.fixture()
 def job() -> Job:
     """SAQ Job instance."""
+    if not constants.IS_SAQ_INSTALLED:
+        pytest.skip("SAQ not installed")
+
+    from saq.job import Job
+
     return Job(function="whatever", kwargs={"a": "b"})
 
 

@@ -1,4 +1,5 @@
 """Tests for init_plugin.py."""
+# pylint:disable=import-outside-toplevel
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -10,12 +11,6 @@ from starlite.cache import SimpleCacheBackend
 
 from starlite_saqlalchemy import init_plugin
 from starlite_saqlalchemy.constants import IS_SAQ_INSTALLED, IS_SENTRY_SDK_INSTALLED
-
-if IS_SENTRY_SDK_INSTALLED:
-    from starlite_saqlalchemy import sentry
-
-if IS_SAQ_INSTALLED:
-    from starlite_saqlalchemy import worker
 
 if TYPE_CHECKING:
     from typing import Any
@@ -66,6 +61,8 @@ def test_config_switches() -> None:
 def test_do_worker_but_not_logging(monkeypatch: MonkeyPatch) -> None:
     """Tests branch where we can have the worker enabled, but logging
     disabled."""
+    from starlite_saqlalchemy import worker
+
     mock = MagicMock()
     monkeypatch.setattr(worker, "create_worker_instance", mock)
     config = init_plugin.PluginConfig(do_logging=False, do_worker=True)
@@ -98,6 +95,8 @@ def test_ensure_list(in_: Any, out: Any) -> None:
 def test_sentry_environment_gate(env: str, exp: bool, monkeypatch: MonkeyPatch) -> None:
     """Test that the sentry integration is configured under different
     environment names."""
+    from starlite_saqlalchemy import sentry
+
     monkeypatch.setattr(init_plugin, "IS_LOCAL_ENVIRONMENT", env == "local")
     monkeypatch.setattr(init_plugin, "IS_TEST_ENVIRONMENT", env == "test")
     app = Starlite(route_handlers=[], on_app_init=[init_plugin.ConfigureApp()])
