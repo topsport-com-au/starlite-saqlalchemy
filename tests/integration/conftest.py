@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 import timeit
 from asyncio import AbstractEventLoop, get_event_loop_policy
+from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -27,8 +28,6 @@ if TYPE_CHECKING:
 
     from pytest_docker.plugin import Services  # type:ignore[import]
     from starlite import Starlite
-
-    from tests.utils.domain.authors import Author
 
 
 here = Path(__file__).parent
@@ -167,19 +166,25 @@ async def fx_engine(docker_ip: str) -> AsyncEngine:
 
 
 @pytest.fixture(autouse=True)
-async def _seed_db(engine: AsyncEngine, authors: list[Author]) -> AsyncIterator[None]:
+async def _seed_db(engine: AsyncEngine, raw_authors: list[dict[str, Any]]) -> AsyncIterator[None]:
     """Populate test database with.
 
     Args:
         engine: The SQLAlchemy engine instance.
     """
-    # get models into metadata
     metadata = db.orm.Base.registry.metadata
     author_table = metadata.tables["author"]
     async with engine.begin() as conn:
         await conn.run_sync(metadata.create_all)
+
+    # convert date/time strings to dt objects.
+    for raw_author in raw_authors:
+        raw_author["dob"] = datetime.strptime(raw_author["dob"], "%Y-%m-%d")
+        raw_author["created"] = datetime.strptime(raw_author["created"], "%Y-%m-%dT%H:%M:%S")
+        raw_author["updated"] = datetime.strptime(raw_author["updated"], "%Y-%m-%dT%H:%M:%S")
+
     async with engine.begin() as conn:
-        await conn.execute(author_table.insert(), [vars(item) for item in authors])
+        await conn.execute(author_table.insert(), raw_authors)
     yield
     async with engine.begin() as conn:
         await conn.run_sync(metadata.drop_all)

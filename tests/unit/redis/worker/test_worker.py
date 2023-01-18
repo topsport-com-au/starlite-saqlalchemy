@@ -6,10 +6,10 @@ from unittest.mock import AsyncMock
 
 import pytest
 from asyncpg.pgproto import pgproto
+from pydantic import BaseModel
 from saq import Job
 
 from starlite_saqlalchemy import service, worker
-from tests.utils.domain.authors import Author, ReadDTO
 
 if TYPE_CHECKING:
 
@@ -23,14 +23,17 @@ def test_worker_decoder_handles_pgproto_uuid() -> None:
     assert encoded == b'"0448bde2-7c69-4e6b-9c03-7b217e3b563d"'
 
 
-def test_worker_decoder_handles_pydantic_models(authors: list[Author]) -> None:
+def test_worker_decoder_handles_pydantic_models() -> None:
     """Test that the decoder we use for SAQ will encode a pydantic model."""
-    pydantic_model = ReadDTO.from_orm(authors[0])
+
+    class Model(BaseModel):
+        a: str
+        b: int
+        c: float
+
+    pydantic_model = Model(a="a", b=1, c=2.34)
     encoded = worker.encoder.encode(pydantic_model)
-    assert (
-        encoded
-        == b'{"id":"97108ac1-ffcb-411d-8b1e-d9183399f63b","created":"0001-01-01T00:00:00","updated":"0001-01-01T00:00:00","name":"Agatha Christie","dob":"1890-09-15"}'
-    )
+    assert encoded == b'{"a":"a","b":1,"c":2.34}'
 
 
 async def test_make_service_callback(

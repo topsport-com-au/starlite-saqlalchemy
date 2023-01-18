@@ -14,6 +14,7 @@ from starlite.status_codes import (
 )
 
 from starlite_saqlalchemy import testing
+from tests.utils.domain.authors import Service as AuthorService
 
 if TYPE_CHECKING:
     from typing import Any
@@ -22,7 +23,6 @@ if TYPE_CHECKING:
     from starlite import TestClient
 
     from tests.utils.domain.authors import Author
-    from tests.utils.domain.authors import Service as AuthorService
 
 
 @pytest.fixture(name="mock_response")
@@ -48,7 +48,6 @@ def fx_mock_client(
 
 @pytest.fixture(name="tester")
 def fx_tester(
-    author_service_type: type[AuthorService],
     authors: list[Author],
     raw_authors: list[dict[str, Any]],
     mock_client: TestClient,
@@ -62,7 +61,7 @@ def fx_tester(
         base_path="/authors",
         collection=authors[:1],
         raw_collection=raw_authors[:1],
-        service_type=author_service_type,
+        service_type=AuthorService,
         monkeypatch=monkeypatch,
     )
 
@@ -71,12 +70,11 @@ async def test_tester_get_collection_request_service_method_patch(
     tester: testing.ControllerTest, mock_response: MagicMock
 ) -> None:
     """Test that the "list" service method has been patched."""
-    from tests.utils.domain.authors import Service
 
     mock_response.json.return_value = tester.raw_collection
     tester.test_get_collection()
-    assert "<locals>._list" in str(Service.list)
-    assert await Service(session=None).list() == tester.collection
+    assert "<locals>._list" in str(AuthorService.list)
+    assert await AuthorService(session=None).list() == tester.collection
 
 
 def test_tester_get_collection_raises_assertion_error_on_status_code(
@@ -128,14 +126,11 @@ def test_tester_json_in_request_kwargs(
     assert "json" in call.kwargs
 
 
-@pytest.mark.usefixtures("_sqlalchemy_installed")
 async def test_tester_member_request_service_method_patch(tester: testing.ControllerTest) -> None:
     """Test that the appropriate service method gets patched."""
-    from tests.utils.domain.authors import Service
-
     tester.test_member_request("GET", "get", 200)
-    assert "<locals>._method" in str(Service.get)
-    assert await Service(session=None).get(123) == tester.collection[0]
+    assert "<locals>._method" in str(AuthorService.get)
+    assert await AuthorService(session=None).get(123) == tester.collection[0]
 
 
 @pytest.mark.parametrize("params", [{"a": "b"}, None])
