@@ -56,7 +56,7 @@ class AuthorizationError(StarliteSaqlalchemyClientError):
     """A user tried to do something they shouldn't have."""
 
 
-class MissingDependencyError(StarliteSaqlalchemyError):
+class MissingDependencyError(StarliteSaqlalchemyError, ValueError):
     """A required dependency is not installed."""
 
     def __init__(self, module: str, config: str | None = None) -> None:

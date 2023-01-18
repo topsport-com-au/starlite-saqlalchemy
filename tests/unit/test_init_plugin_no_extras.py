@@ -1,10 +1,9 @@
 """Tests for init_plugin.py when no extra dependencies are installed."""
 
 import pytest
-from starlite import Starlite
+from pydantic import ValidationError
 
 from starlite_saqlalchemy import constants, init_plugin
-from starlite_saqlalchemy.exceptions import MissingDependencyError
 
 SKIP = any(
     [
@@ -18,15 +17,15 @@ SKIP = any(
 
 @pytest.mark.skipif(SKIP, reason="test will only run if no extras are installed")
 @pytest.mark.parametrize(
-    ("enabled_config", "error"),
+    ("enabled_config", "error_pattern"),
     [
-        ("do_cache", r"^.*\'redis\' is not installed.*$"),
-        ("do_sentry", r"^.*\'sentry_sdk\' is not installed.*$"),
-        ("do_worker", r"^.*\'saq\' is not installed.*$"),
-        ("do_sqlalchemy_plugin", r"^.*\'sqlalchemy\' is not installed.*$"),
+        ("do_cache", r"\'redis\' is not installed."),
+        ("do_sentry", r"\'sentry_sdk\' is not installed."),
+        ("do_worker", r"\'saq\' is not installed."),
+        ("do_sqlalchemy_plugin", r"\'sqlalchemy\' is not installed."),
     ],
 )
-def test_extra_dependencies_not_installed(enabled_config: str, error: str) -> None:
+def test_extra_dependencies_not_installed(enabled_config: str, error_pattern: str) -> None:
     """Tests that the plugin test required dependencies for switches needing
     them."""
     kwargs = {
@@ -45,11 +44,5 @@ def test_extra_dependencies_not_installed(enabled_config: str, error: str) -> No
         "do_worker": False,
         **{enabled_config: True},
     }
-    config = init_plugin.PluginConfig(**kwargs)
-
-    with pytest.raises(MissingDependencyError, match=error):
-        Starlite(
-            route_handlers=[],
-            openapi_config=None,
-            on_app_init=[init_plugin.ConfigureApp(config=config)],
-        )
+    with pytest.raises(ValidationError, match=error_pattern):
+        init_plugin.PluginConfig(**kwargs)

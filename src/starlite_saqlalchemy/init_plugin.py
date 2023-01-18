@@ -33,7 +33,7 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence  # noqa: TC003
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, validator
 from starlite.app import DEFAULT_CACHE_CONFIG, DEFAULT_OPENAPI_CONFIG
 from starlite.types import TypeEncodersMap  # noqa: TC002
 from structlog.types import Processor  # noqa: TC002
@@ -92,7 +92,7 @@ class PluginConfig(BaseModel):
     Add the hook handler to
     [`AppConfig.after_exception`][starlite.config.app.AppConfig.after_exception].
     """
-    do_cache: bool = False
+    do_cache: bool = Field(default_factory=lambda: IS_REDIS_INSTALLED)
     """Configure redis cache backend.
 
     Add configuration for the redis-backed cache to
@@ -134,7 +134,10 @@ class PluginConfig(BaseModel):
     Set the OpenAPI config object to
     [`AppConfig.openapi_config`][starlite.config.app.AppConfig.openapi_config].
     """
-    do_sentry: bool | None = None
+    do_sentry: bool = Field(
+        default_factory=lambda: IS_SENTRY_SDK_INSTALLED
+        and not (IS_LOCAL_ENVIRONMENT or IS_TEST_ENVIRONMENT)
+    )
     """Configure sentry.
 
     Configure the application to initialize Sentry on startup. Adds a handler to
@@ -146,7 +149,7 @@ class PluginConfig(BaseModel):
     Allow the plugin to set the starlite `debug` parameter. Parameter set to value of
     [`AppConfig.debug`][starlite_saqlalchemy.settings.AppSettings.DEBUG].
     """
-    do_sqlalchemy_plugin: bool = False
+    do_sqlalchemy_plugin: bool = Field(default_factory=lambda: IS_SQLALCHEMY_INSTALLED)
     """Configure SQLAlchemy plugin.
 
     Set the SQLAlchemy plugin on the application. Adds the plugin to
@@ -155,7 +158,7 @@ class PluginConfig(BaseModel):
     do_type_encoders: bool = True
     """Configure custom type encoders on the app."""
 
-    do_worker: bool = False
+    do_worker: bool = Field(default_factory=lambda: IS_SAQ_INSTALLED)
     """Configure the async worker on the application.
 
     This action instantiates a worker instance and sets handlers for
@@ -170,6 +173,31 @@ class PluginConfig(BaseModel):
     type_encoders: TypeEncodersMap = type_encoders_map
     """Map of type to serializer callable."""
     health_checks: list[type[AbstractHealthCheck]] = [AppHealthCheck]
+    """Checks executed on calls to health route handler."""
+
+    @validator("do_cache")
+    def _validate_do_cache(cls, value: bool) -> bool:
+        if value is True and not IS_REDIS_INSTALLED:
+            raise MissingDependencyError(module="redis", config="redis")
+        return value
+
+    @validator("do_sentry")
+    def _validate_do_sentry(cls, value: bool) -> bool:
+        if value is True and not IS_SENTRY_SDK_INSTALLED:
+            raise MissingDependencyError(module="sentry_sdk", config="sentry")
+        return value
+
+    @validator("do_sqlalchemy_plugin")
+    def _validate_do_sqlalchemy_plugin(cls, value: bool) -> bool:
+        if value is True and not IS_SQLALCHEMY_INSTALLED:
+            raise MissingDependencyError(module="sqlalchemy", config="sqlalchemy_plugin")
+        return value
+
+    @validator("do_worker")
+    def _validate_do_worker(cls, value: bool) -> bool:
+        if value is True and not IS_SAQ_INSTALLED:
+            raise MissingDependencyError(module="saq", config="worker")
+        return value
 
 
 class ConfigureApp:
@@ -207,6 +235,7 @@ class ConfigureApp:
         self.configure_sqlalchemy_plugin(app_config)
         self.configure_type_encoders(app_config)
         self.configure_worker(app_config)
+        # health check is explicitly configured last
         self.configure_health_check(app_config)
 
         app_config.before_startup = lifespan.before_startup_handler
@@ -237,8 +266,6 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_cache and app_config.cache_config == DEFAULT_CACHE_CONFIG:
-            if not IS_REDIS_INSTALLED:
-                raise MissingDependencyError(module="redis", config="redis")
             from starlite_saqlalchemy import cache
 
             app_config.cache_config = cache.config
@@ -340,14 +367,7 @@ class ConfigureApp:
         Args:
             app_config: The Starlite application config object.
         """
-        do_sentry = (
-            self.config.do_sentry
-            if self.config.do_sentry is not None
-            else not (IS_LOCAL_ENVIRONMENT or IS_TEST_ENVIRONMENT)
-        )
-        if do_sentry:
-            if not IS_SENTRY_SDK_INSTALLED:
-                raise MissingDependencyError(module="sentry_sdk", config="sentry")
+        if self.config.do_sentry:
             from starlite_saqlalchemy import sentry
 
             app_config.on_startup.append(sentry.configure)
@@ -362,8 +382,6 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_sqlalchemy_plugin:
-            if not IS_SQLALCHEMY_INSTALLED:
-                raise MissingDependencyError(module="sqlalchemy")
             from starlite.plugins.sql_alchemy import SQLAlchemyPlugin
 
             from starlite_saqlalchemy.sqlalchemy_plugin import (
@@ -393,8 +411,6 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_worker:
-            if not IS_SAQ_INSTALLED:
-                raise MissingDependencyError(module="saq", config="worker")
             from starlite_saqlalchemy.worker import (
                 create_worker_instance,
                 make_service_callback,
