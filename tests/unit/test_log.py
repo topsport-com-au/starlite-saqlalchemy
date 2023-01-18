@@ -22,7 +22,6 @@ from starlite.utils.scope import set_starlite_scope_state
 from structlog import DropEvent
 
 from starlite_saqlalchemy import log, settings
-from starlite_saqlalchemy.constants import IS_SAQ_INSTALLED, IS_SQLALCHEMY_INSTALLED
 
 if TYPE_CHECKING:
     from typing import Any
@@ -87,7 +86,6 @@ async def test_middleware_calls_structlog_contextvars_clear_contextvars(
     app_mock.assert_called_once_with(1, 2, 3)
 
 
-@pytest.mark.skipif(not IS_SQLALCHEMY_INSTALLED, reason="SQLAlchemy is not installed")
 @pytest.mark.parametrize(
     ("pattern", "excluded", "included"),
     [
@@ -128,7 +126,6 @@ async def test_before_send_handler_exclude_paths(
         assert "http.response.start" in scope_state
 
 
-@pytest.mark.skipif(not IS_SQLALCHEMY_INSTALLED, reason="SQLAlchemy is not installed")
 @pytest.mark.parametrize(
     ("status", "level"),
     [
@@ -154,7 +151,6 @@ async def test_before_send_handler_http_response_start(
     assert http_scope["state"]["http.response.start"] == http_response_start
 
 
-@pytest.mark.skipif(not IS_SQLALCHEMY_INSTALLED, reason="SQLAlchemy is not installed")
 async def test_before_send_handler_http_response_body_with_more_body(
     before_send_handler: log.controller.BeforeSendHandler,
     cap_logger: CapturingLogger,
@@ -168,7 +164,6 @@ async def test_before_send_handler_http_response_body_with_more_body(
     assert [] == cap_logger.calls
 
 
-@pytest.mark.skipif(not IS_SQLALCHEMY_INSTALLED, reason="SQLAlchemy is not installed")
 async def test_before_send_handler_http_response_body_without_more_body(
     before_send_handler: log.controller.BeforeSendHandler,
     cap_logger: CapturingLogger,
@@ -193,7 +188,6 @@ async def test_before_send_handler_http_response_body_without_more_body(
     assert cap_logger.calls
 
 
-@pytest.mark.skipif(not IS_SQLALCHEMY_INSTALLED, reason="SQLAlchemy is not installed")
 async def test_before_send_handler_http_response_body_without_more_body_do_log_request_false(
     before_send_handler: log.controller.BeforeSendHandler,
     cap_logger: CapturingLogger,
@@ -220,7 +214,6 @@ async def test_before_send_handler_http_response_body_without_more_body_do_log_r
     assert cap_logger.calls
 
 
-@pytest.mark.skipif(not IS_SQLALCHEMY_INSTALLED, reason="SQLAlchemy is not installed")
 async def test_before_send_handler_does_nothing_with_other_message_types(
     before_send_handler: log.controller.BeforeSendHandler,
     cap_logger: CapturingLogger,
@@ -233,7 +226,6 @@ async def test_before_send_handler_does_nothing_with_other_message_types(
     assert [] == cap_logger.calls
 
 
-@pytest.mark.skipif(not IS_SQLALCHEMY_INSTALLED, reason="SQLAlchemy is not installed")
 async def test_before_send_handler_log_request(
     before_send_handler: log.controller.BeforeSendHandler,
     http_scope: HTTPScope,
@@ -250,7 +242,6 @@ async def test_before_send_handler_log_request(
     bind_mock.assert_called_once_with(request=ret_val)
 
 
-@pytest.mark.skipif(not IS_SQLALCHEMY_INSTALLED, reason="SQLAlchemy is not installed")
 async def test_before_send_handler_log_response(
     before_send_handler: log.controller.BeforeSendHandler,
     http_scope: HTTPScope,
@@ -267,7 +258,6 @@ async def test_before_send_handler_log_response(
     bind_mock.assert_called_once_with(response=ret_val)
 
 
-@pytest.mark.skipif(not IS_SQLALCHEMY_INSTALLED, reason="SQLAlchemy is not installed")
 @pytest.mark.parametrize("include", [True, False])
 async def test_before_send_handler_exclude_body_from_log(
     include: bool,
@@ -310,7 +300,6 @@ async def test_before_send_handler_extract_request_data(
     }
 
 
-@pytest.mark.skipif(not IS_SQLALCHEMY_INSTALLED, reason="SQLAlchemy is not installed")
 def test_before_send_handler_extract_response_data(
     before_send_handler: log.controller.BeforeSendHandler,
     http_response_start: HTTPResponseStartEvent,
@@ -335,7 +324,6 @@ async def test_before_process_calls_structlog_contextvars_clear_contextvars(
     clear_ctx_vars_mock.assert_called_once()
 
 
-@pytest.mark.skipif(not IS_SAQ_INSTALLED, reason="saq is not installed")
 async def test_after_process(job: Job, cap_logger: CapturingLogger) -> None:
     """Tests extraction of job data, and eventual log."""
     await log.worker.after_process({"job": job})
@@ -365,7 +353,6 @@ async def test_after_process(job: Job, cap_logger: CapturingLogger) -> None:
     ] == cap_logger.calls
 
 
-@pytest.mark.skipif(not IS_SAQ_INSTALLED, reason="saq is not installed")
 async def test_after_process_logs_at_error(job: Job, cap_logger: CapturingLogger) -> None:
     """Tests eventual log is at ERROR level if `job.error`."""
     job.error = "Yep, this is the traceback."
@@ -421,7 +408,6 @@ async def test_exception_in_before_send_handler(
     assert call.kwargs["exception"]
 
 
-@pytest.mark.skipif(not IS_SQLALCHEMY_INSTALLED, reason="SQLAlchemy is not installed")
 async def test_exception_in_before_send_handler_read_empty_body(
     client: TestClient[Starlite],
     cap_logger: CapturingLogger,

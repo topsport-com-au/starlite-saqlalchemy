@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, TypeVar
 from uuid import uuid4
 
 import pytest
-from asyncpg.pgproto import pgproto
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -17,8 +16,6 @@ if TYPE_CHECKING:
     from typing import Any
 
     from pytest import MonkeyPatch
-
-    from tests.utils.domain import authors, books
 
 # Ensure that pytest_dotenv is loaded before
 # so pytest_starlite_saqlalchemy uses correct env values
@@ -47,18 +44,6 @@ def fx_raw_authors() -> list[dict[str, Any]]:
     ]
 
 
-@pytest.fixture(name="authors")
-def fx_authors(raw_authors: list[dict[str, Any]]) -> list[authors.Author]:
-    """Collection of parsed Author models."""
-    from tests.utils.domain import authors
-
-    mapped_authors = [authors.ReadDTO(**raw).to_mapped() for raw in raw_authors]
-    # convert these to pgproto UUIDs as that is what we get back from sqlalchemy
-    for author in mapped_authors:
-        author.id = pgproto.UUID(str(author.id))
-    return mapped_authors
-
-
 @pytest.fixture(name="raw_books")
 def fx_raw_books(raw_authors: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Unstructured book representations."""
@@ -72,18 +57,6 @@ def fx_raw_books(raw_authors: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "updated": "0001-01-01T00:00:00",
         },
     ]
-
-
-@pytest.fixture(name="books")
-def fx_books(raw_books: list[dict[str, Any]]) -> list[books.Book]:
-    """Collection of parsed Book models."""
-    from tests.utils.domain import books
-
-    mapped_books = [books.ReadDTO(**raw).to_mapped() for raw in raw_books]
-    # convert these to pgproto UUIDs as that is what we get back from sqlalchemy
-    for book in mapped_books:
-        book.id = pgproto.UUID(str(book.id))
-    return mapped_books
 
 
 @pytest.fixture(name="create_module")

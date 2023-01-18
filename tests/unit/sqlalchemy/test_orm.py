@@ -1,8 +1,4 @@
 """Tests for application ORM configuration."""
-# pylint: disable=wrong-import-position,wrong-import-order
-import pytest
-
-pytest.importorskip("sqlalchemy")
 
 import datetime
 from unittest.mock import MagicMock
