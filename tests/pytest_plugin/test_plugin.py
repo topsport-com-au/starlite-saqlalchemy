@@ -122,7 +122,7 @@ def test_app_fixture_if_app_factory(pytester: Pytester) -> None:
 
 
 def test_app_fixture_if_app_instance(pytester: Pytester) -> None:
-    """Test that the app fixture returns the an instance if the path points to
+    """Test that the app fixture returns an instance if the path points to
     one."""
     pytester.syspathinsert()
     pytester.makepyfile(

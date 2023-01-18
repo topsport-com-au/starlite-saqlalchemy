@@ -60,7 +60,6 @@ For example:
 - `tox -e coverage` - unit test coverage report.
 - `tox -e mypy` - runs mypy static type checker on the source.
 - `tox -e pyright` - runs pyright static type checker on the source.
-- `tox -e refurb` - runs the [refurb](https://github.com/dosisod/refurb) tool over the source.
 - `tox -e integration` - runs the dockerized integration test suite.
 - `tox` - run everything, you maniac!
 
