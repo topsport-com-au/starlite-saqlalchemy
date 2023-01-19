@@ -1,3 +1,4 @@
+# pylint: disable=import-outside-toplevel
 """The application configuration plugin and config object.
 
 Example:
@@ -32,14 +33,12 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence  # noqa: TC003
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, validator
 from starlite.app import DEFAULT_CACHE_CONFIG, DEFAULT_OPENAPI_CONFIG
-from starlite.plugins.sql_alchemy import SQLAlchemyPlugin
 from starlite.types import TypeEncodersMap  # noqa: TC002
 from structlog.types import Processor  # noqa: TC002
 
 from starlite_saqlalchemy import (
-    cache,
     compression,
     dependencies,
     exceptions,
@@ -47,22 +46,26 @@ from starlite_saqlalchemy import (
     lifespan,
     log,
     openapi,
-    redis,
-    sentry,
     settings,
-    sqlalchemy_plugin,
 )
-from starlite_saqlalchemy.constants import IS_LOCAL_ENVIRONMENT, IS_TEST_ENVIRONMENT
-from starlite_saqlalchemy.exceptions import HealthCheckConfigurationError
+from starlite_saqlalchemy.constants import (
+    IS_LOCAL_ENVIRONMENT,
+    IS_REDIS_INSTALLED,
+    IS_SAQ_INSTALLED,
+    IS_SENTRY_SDK_INSTALLED,
+    IS_SQLALCHEMY_INSTALLED,
+    IS_TEST_ENVIRONMENT,
+)
+from starlite_saqlalchemy.exceptions import (
+    HealthCheckConfigurationError,
+    MissingDependencyError,
+)
 from starlite_saqlalchemy.health import (
     AbstractHealthCheck,
     AppHealthCheck,
     HealthController,
 )
-from starlite_saqlalchemy.service import make_service_callback
-from starlite_saqlalchemy.sqlalchemy_plugin import SQLAlchemyHealthCheck
 from starlite_saqlalchemy.type_encoders import type_encoders_map
-from starlite_saqlalchemy.worker import create_worker_instance
 
 if TYPE_CHECKING:
     from starlite.config.app import AppConfig
@@ -81,9 +84,7 @@ class PluginConfig(BaseModel):
     application.
     """
 
-    worker_functions: list[Callable[..., Any] | tuple[str, Callable[..., Any]]] = [
-        (make_service_callback.__qualname__, make_service_callback)
-    ]
+    worker_functions: list[Callable[..., Any] | tuple[str, Callable[..., Any]]] = []
     """Queue worker functions."""
     do_after_exception: bool = True
     """Configure after exception handler.
@@ -91,7 +92,7 @@ class PluginConfig(BaseModel):
     Add the hook handler to
     [`AppConfig.after_exception`][starlite.config.app.AppConfig.after_exception].
     """
-    do_cache: bool = True
+    do_cache: bool = Field(default_factory=lambda: IS_REDIS_INSTALLED)
     """Configure redis cache backend.
 
     Add configuration for the redis-backed cache to
@@ -133,7 +134,10 @@ class PluginConfig(BaseModel):
     Set the OpenAPI config object to
     [`AppConfig.openapi_config`][starlite.config.app.AppConfig.openapi_config].
     """
-    do_sentry: bool | None = None
+    do_sentry: bool = Field(
+        default_factory=lambda: IS_SENTRY_SDK_INSTALLED
+        and not (IS_LOCAL_ENVIRONMENT or IS_TEST_ENVIRONMENT)
+    )
     """Configure sentry.
 
     Configure the application to initialize Sentry on startup. Adds a handler to
@@ -145,7 +149,7 @@ class PluginConfig(BaseModel):
     Allow the plugin to set the starlite `debug` parameter. Parameter set to value of
     [`AppConfig.debug`][starlite_saqlalchemy.settings.AppSettings.DEBUG].
     """
-    do_sqlalchemy_plugin: bool = True
+    do_sqlalchemy_plugin: bool = Field(default_factory=lambda: IS_SQLALCHEMY_INSTALLED)
     """Configure SQLAlchemy plugin.
 
     Set the SQLAlchemy plugin on the application. Adds the plugin to
@@ -154,7 +158,7 @@ class PluginConfig(BaseModel):
     do_type_encoders: bool = True
     """Configure custom type encoders on the app."""
 
-    do_worker: bool = True
+    do_worker: bool = Field(default_factory=lambda: IS_SAQ_INSTALLED)
     """Configure the async worker on the application.
 
     This action instantiates a worker instance and sets handlers for
@@ -168,7 +172,32 @@ class PluginConfig(BaseModel):
     """Chain of structlog log processors."""
     type_encoders: TypeEncodersMap = type_encoders_map
     """Map of type to serializer callable."""
-    health_checks: Sequence[type[AbstractHealthCheck]] = [AppHealthCheck, SQLAlchemyHealthCheck]
+    health_checks: list[type[AbstractHealthCheck]] = [AppHealthCheck]
+    """Checks executed on calls to health route handler."""
+
+    @validator("do_cache")
+    def _validate_do_cache(cls, value: bool) -> bool:
+        if value is True and not IS_REDIS_INSTALLED:
+            raise MissingDependencyError(module="redis", config="redis")
+        return value
+
+    @validator("do_sentry")
+    def _validate_do_sentry(cls, value: bool) -> bool:
+        if value is True and not IS_SENTRY_SDK_INSTALLED:
+            raise MissingDependencyError(module="sentry_sdk", config="sentry")
+        return value
+
+    @validator("do_sqlalchemy_plugin")
+    def _validate_do_sqlalchemy_plugin(cls, value: bool) -> bool:
+        if value is True and not IS_SQLALCHEMY_INSTALLED:
+            raise MissingDependencyError(module="sqlalchemy", config="sqlalchemy_plugin")
+        return value
+
+    @validator("do_worker")
+    def _validate_do_worker(cls, value: bool) -> bool:
+        if value is True and not IS_SAQ_INSTALLED:
+            raise MissingDependencyError(module="saq", config="worker")
+        return value
 
 
 class ConfigureApp:
@@ -176,12 +205,12 @@ class ConfigureApp:
 
     __slots__ = ("config",)
 
-    def __init__(self, config: PluginConfig = PluginConfig()) -> None:
+    def __init__(self, config: PluginConfig | None = None) -> None:
         """
         Args:
             config: Plugin configuration object.
         """
-        self.config = config
+        self.config = config if config is not None else PluginConfig()
 
     def __call__(self, app_config: AppConfig) -> AppConfig:
         """Entrypoint to the app config plugin.
@@ -200,17 +229,29 @@ class ConfigureApp:
         self.configure_compression(app_config)
         self.configure_debug(app_config)
         self.configure_exception_handlers(app_config)
-        self.configure_health_check(app_config)
         self.configure_logging(app_config)
         self.configure_openapi(app_config)
         self.configure_sentry(app_config)
         self.configure_sqlalchemy_plugin(app_config)
         self.configure_type_encoders(app_config)
         self.configure_worker(app_config)
-
-        app_config.before_startup = lifespan.before_startup_handler
-        app_config.on_shutdown.extend([http.on_shutdown, redis.client.close])
+        # health check is explicitly configured last
+        self.configure_health_check(app_config)
+        self.set_lifecycle_handlers(app_config)
         return app_config
+
+    def set_lifecycle_handlers(self, app_config: AppConfig) -> None:
+        """Configure any necessary startup/shutdown behaviors.
+
+        Args:
+            app_config: The Starlite application config object.
+        """
+        app_config.before_startup = lifespan.before_startup_handler
+        app_config.on_shutdown.append(http.on_shutdown)
+        if IS_REDIS_INSTALLED:
+            from starlite_saqlalchemy import redis
+
+            app_config.on_shutdown.append(redis.client.close)
 
     def configure_after_exception(self, app_config: AppConfig) -> None:
         """Add the logging after exception hook handler.
@@ -232,6 +273,8 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_cache and app_config.cache_config == DEFAULT_CACHE_CONFIG:
+            from starlite_saqlalchemy import cache
+
             app_config.cache_config = cache.config
 
     def configure_collection_dependencies(self, app_config: AppConfig) -> None:
@@ -331,12 +374,9 @@ class ConfigureApp:
         Args:
             app_config: The Starlite application config object.
         """
-        do_sentry = (
-            self.config.do_sentry
-            if self.config.do_sentry is not None
-            else not (IS_LOCAL_ENVIRONMENT or IS_TEST_ENVIRONMENT)
-        )
-        if do_sentry:
+        if self.config.do_sentry:
+            from starlite_saqlalchemy import sentry
+
             app_config.on_startup.append(sentry.configure)
 
     def configure_sqlalchemy_plugin(self, app_config: AppConfig) -> None:
@@ -349,7 +389,15 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_sqlalchemy_plugin:
-            app_config.plugins.append(SQLAlchemyPlugin(config=sqlalchemy_plugin.config))
+            from starlite.plugins.sql_alchemy import SQLAlchemyPlugin
+
+            from starlite_saqlalchemy.sqlalchemy_plugin import (
+                SQLAlchemyHealthCheck,
+                config,
+            )
+
+            self.config.health_checks.append(SQLAlchemyHealthCheck)
+            app_config.plugins.append(SQLAlchemyPlugin(config))
 
     def configure_type_encoders(self, app_config: AppConfig) -> None:
         """Set mapping of type encoders on the application config.
@@ -370,6 +418,15 @@ class ConfigureApp:
             app_config: The Starlite application config object.
         """
         if self.config.do_worker:
+            from starlite_saqlalchemy.worker import (
+                create_worker_instance,
+                make_service_callback,
+            )
+
+            self.config.worker_functions.append(
+                (make_service_callback.__qualname__, make_service_callback)
+            )
+
             worker_kwargs: dict[str, Any] = {"functions": self.config.worker_functions}
             if self.config.do_logging:
                 worker_kwargs["before_process"] = log.worker.before_process

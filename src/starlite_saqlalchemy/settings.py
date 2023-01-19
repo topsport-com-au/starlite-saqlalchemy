@@ -38,7 +38,7 @@ class AppSettings(BaseSettings):
     TEST_ENVIRONMENT_NAME: str = "test"
     """Value of ENVIRONMENT used to determine if running tests.
 
-    This should be the value of `ENVIRONMENT` in `test.env`.
+    This should be the value of `ENVIRONMENT` in `tests.env`.
     """
     LOCAL_ENVIRONMENT_NAME: str = "local"
     """Value of ENVIRONMENT used to determine if running in local development

@@ -6,7 +6,9 @@ from typing import Annotated
 
 from sqlalchemy.orm import Mapped
 
-from starlite_saqlalchemy import db, dto, repository, service
+from starlite_saqlalchemy import db, dto
+from starlite_saqlalchemy.repository.sqlalchemy import SQLAlchemyRepository
+from starlite_saqlalchemy.service.sqlalchemy import RepositoryService
 
 
 class Author(db.orm.Base):
@@ -16,13 +18,13 @@ class Author(db.orm.Base):
     dob: Mapped[date]
 
 
-class Repository(repository.sqlalchemy.SQLAlchemyRepository[Author]):
+class Repository(SQLAlchemyRepository[Author]):
     """Author repository."""
 
     model_type = Author
 
 
-class Service(service.RepositoryService[Author]):
+class Service(RepositoryService[Author]):
     """Author service object."""
 
     repository_type = Repository

@@ -1,13 +1,9 @@
 """Test for the application cache configurations."""
-from typing import TYPE_CHECKING
-
+import pytest
 from starlite.config.cache import default_cache_key_builder
 from starlite.testing import RequestFactory
 
 from starlite_saqlalchemy import cache, settings
-
-if TYPE_CHECKING:
-    import pytest
 
 
 def test_cache_key_builder(monkeypatch: "pytest.MonkeyPatch") -> None:

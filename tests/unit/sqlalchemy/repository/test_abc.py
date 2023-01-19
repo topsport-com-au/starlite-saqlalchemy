@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from starlite_saqlalchemy.exceptions import NotFoundError
-from starlite_saqlalchemy.testing import GenericMockRepository
+from starlite_saqlalchemy.testing.generic_mock_repository import GenericMockRepository
 
 if TYPE_CHECKING:
     from pytest import MonkeyPatch

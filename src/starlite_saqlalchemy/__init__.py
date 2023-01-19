@@ -22,48 +22,35 @@ app = Starlite(route_handlers=[example_handler], on_app_init=[ConfigureApp()])
 # this is because pycharm wigs out when there is a module called `exceptions`:
 # noinspection PyCompatibility
 from . import (
-    cache,
     compression,
-    db,
     dependencies,
-    dto,
     exceptions,
     health,
     http,
     log,
     openapi,
-    redis,
     repository,
-    sentry,
     service,
     settings,
-    sqlalchemy_plugin,
     type_encoders,
-    worker,
 )
 from .init_plugin import ConfigureApp, PluginConfig
 
 __all__ = [
     "ConfigureApp",
     "PluginConfig",
-    "cache",
     "compression",
-    "db",
     "dependencies",
-    "dto",
     "exceptions",
     "health",
     "http",
     "log",
     "openapi",
-    "redis",
     "repository",
-    "sentry",
     "service",
     "settings",
-    "sqlalchemy_plugin",
     "type_encoders",
-    "worker",
 ]
+
 
 __version__ = "0.28.1"

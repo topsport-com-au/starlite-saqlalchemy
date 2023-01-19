@@ -7,8 +7,9 @@ from uuid import UUID
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from starlite_saqlalchemy import db, dto, service
+from starlite_saqlalchemy import db, dto
 from starlite_saqlalchemy.repository.sqlalchemy import SQLAlchemyRepository
+from starlite_saqlalchemy.service.sqlalchemy import RepositoryService
 from tests.utils.domain.authors import Author
 
 
@@ -28,7 +29,7 @@ class Repository(SQLAlchemyRepository[Book]):
     model_type = Book
 
 
-class Service(service.RepositoryService[Book]):
+class Service(RepositoryService[Book]):
     """Book service."""
 
     repository_type = Repository
