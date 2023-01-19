@@ -30,6 +30,8 @@ if TYPE_CHECKING:
 __all__ = (
     "AuthorizationError",
     "ConflictError",
+    "HealthCheckConfigurationError",
+    "MissingDependencyError",
     "NotFoundError",
     "StarliteSaqlalchemyError",
     "after_exception_hook_handler",
@@ -60,6 +62,12 @@ class MissingDependencyError(StarliteSaqlalchemyError, ValueError):
     """A required dependency is not installed."""
 
     def __init__(self, module: str, config: str | None = None) -> None:
+        """
+
+        Args:
+            module: name of the package that should be installed
+            config: name of the extra to install the package
+        """
         config = config if config else module
         super().__init__(
             f"You enabled {config} configuration but package {module!r} is not installed. "
