@@ -237,14 +237,21 @@ class ConfigureApp:
         self.configure_worker(app_config)
         # health check is explicitly configured last
         self.configure_health_check(app_config)
+        self.set_lifecycle_handlers(app_config)
+        return app_config
 
+    def set_lifecycle_handlers(self, app_config: AppConfig) -> None:
+        """Configure any necessary startup/shutdown behaviors.
+
+        Args:
+            app_config: The Starlite application config object.
+        """
         app_config.before_startup = lifespan.before_startup_handler
         app_config.on_shutdown.append(http.on_shutdown)
-        if self.config.do_cache:
+        if IS_REDIS_INSTALLED:
             from starlite_saqlalchemy import redis
 
             app_config.on_shutdown.append(redis.client.close)
-        return app_config
 
     def configure_after_exception(self, app_config: AppConfig) -> None:
         """Add the logging after exception hook handler.
