@@ -52,13 +52,12 @@ def touch_updated_timestamp(session: Session, *_: Any) -> None:
             instance.updated = datetime.now()
 
 
-class Base(DeclarativeBase):
-    """Base for all SQLAlchemy declarative models."""
+@declarative_mixin
+class CommonColumns:
+    """Common functionality shared between all declarative models."""
 
-    registry = registry(
-        metadata=MetaData(naming_convention=convention),
-        type_annotation_map={UUID: pg.UUID, dict: pg.JSONB},
-    )
+    __abstract__ = True
+    __name__: str
 
     id: Mapped[UUID] = mapped_column(
         default=uuid4, primary_key=True, info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)}
@@ -73,15 +72,34 @@ class Base(DeclarativeBase):
 
 
 @declarative_mixin
-class CreatedUpdatedMixin:
+class AuditColumns:
     """Created/Updated At Fields Mixin."""
+
+    __abstract__ = True
 
     created: Mapped[datetime] = mapped_column(
         default=datetime.now, info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)}
     )
-
     """Date/time of instance creation."""
     updated: Mapped[datetime] = mapped_column(
         default=datetime.now, info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)}
     )
-    """Date/time of instance update."""
+    """Date/time of instance last update."""
+
+
+registry_ = registry(
+    metadata=MetaData(naming_convention=convention),
+    type_annotation_map={UUID: pg.UUID, dict: pg.JSONB},
+)
+
+
+class Base(CommonColumns, DeclarativeBase):
+    """Base for all SQLAlchemy declarative models."""
+
+    registry = registry_
+
+
+class AuditBase(AuditColumns, CommonColumns, DeclarativeBase):
+    """Base for declarative models with audit columns."""
+
+    registry = registry_
