@@ -370,7 +370,7 @@ class ConfigureApp:
         if self.config.do_openapi and app_config.openapi_config == DEFAULT_OPENAPI_CONFIG:
             app_config.openapi_config = openapi.config
 
-    def configure_sentry(self, app_config: AppConfig) -> None:
+    def configure_sentry(self) -> None:
         """Add handler to configure Sentry integration.
 
         Args:
