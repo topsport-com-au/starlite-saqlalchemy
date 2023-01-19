@@ -14,7 +14,6 @@ from starlite_saqlalchemy.health import (
     HealthController,
     HealthResource,
 )
-from starlite_saqlalchemy.sqlalchemy_plugin import SQLAlchemyHealthCheck
 
 if TYPE_CHECKING:
     from pytest import MonkeyPatch
@@ -26,42 +25,41 @@ def test_health_check(client: "TestClient", monkeypatch: "MonkeyPatch") -> None:
 
     Checks that we call the repository method and the response content.
     """
-    repo_health_mock = AsyncMock(return_value=True)
-    monkeypatch.setattr(SQLAlchemyHealthCheck, "ready", repo_health_mock)
+    health_check = AppHealthCheck()
+    monkeypatch.setattr(HealthController, "health_checks", [health_check])
     resp = client.get(settings.api.HEALTH_PATH)
     assert resp.status_code == HTTP_200_OK
-    health = HealthResource(
-        app=settings.app,
-        health={SQLAlchemyHealthCheck.name: True, AppHealthCheck.name: True},
-    )
+    health = HealthResource(app=settings.app, health={health_check.name: True})
     assert resp.json() == health.dict()
-    repo_health_mock.assert_called_once()
 
 
-def test_health_check_false_response(client: "TestClient", monkeypatch: "MonkeyPatch") -> None:
+async def test_health_check_live() -> None:
+    """Test expected result of calling `live()` health check method."""
+    health_check = AppHealthCheck()
+    assert await health_check.live() is True
+
+
+def test_health_check_failed(client: "TestClient", monkeypatch: "MonkeyPatch") -> None:
     """Test health check response if check method returns `False`"""
-    repo_health_mock = AsyncMock(return_value=False)
-    monkeypatch.setattr(SQLAlchemyHealthCheck, "ready", repo_health_mock)
+    health_check = AppHealthCheck()
+    monkeypatch.setattr(HealthController, "health_checks", [health_check])
+    monkeypatch.setattr(health_check, "ready", AsyncMock(side_effect=RuntimeError))
     resp = client.get(settings.api.HEALTH_PATH)
     assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
-    health = HealthResource(
-        app=settings.app,
-        health={SQLAlchemyHealthCheck.name: False, AppHealthCheck.name: True},
-    )
-    assert resp.json() == health.dict()
-
-
-def test_health_check_exception_raised(client: "TestClient", monkeypatch: "MonkeyPatch") -> None:
-    """Test expected response from check if exception raised in handler."""
-    repo_health_mock = AsyncMock(side_effect=ConnectionError)
-    monkeypatch.setattr(SQLAlchemyHealthCheck, "ready", repo_health_mock)
-    resp = client.get(settings.api.HEALTH_PATH)
-    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
-    health = HealthResource(
-        app=settings.app,
-        health={SQLAlchemyHealthCheck.name: False, AppHealthCheck.name: True},
-    )
-    assert resp.json() == health.dict()
+    HealthResource(app=settings.app, health={health_check.name: True})
+    assert resp.json() == {
+        "app": {
+            "BUILD_NUMBER": "",
+            "CHECK_DB_READY": True,
+            "CHECK_REDIS_READY": True,
+            "DEBUG": False,
+            "ENVIRONMENT": "test",
+            "TEST_ENVIRONMENT_NAME": "test",
+            "LOCAL_ENVIRONMENT_NAME": "local",
+            "NAME": "my-starlite-app",
+        },
+        "health": {"app": False},
+    }
 
 
 def test_health_custom_health_check(client: "TestClient", monkeypatch: "MonkeyPatch") -> None:
@@ -76,16 +74,13 @@ def test_health_custom_health_check(client: "TestClient", monkeypatch: "MonkeyPa
             """Readiness check."""
             return False
 
-    HealthController.health_checks.append(MyHealthCheck())
-    repo_health_mock = AsyncMock(return_value=True)
-    monkeypatch.setattr(SQLAlchemyHealthCheck, "ready", repo_health_mock)
+    monkeypatch.setattr(HealthController, "health_checks", [AppHealthCheck(), MyHealthCheck()])
     resp = client.get(settings.api.HEALTH_PATH)
     assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
     health = HealthResource(
         app=settings.app,
         health={
             AppHealthCheck.name: True,
-            SQLAlchemyHealthCheck.name: True,
             MyHealthCheck.name: False,
         },
     )

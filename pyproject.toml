@@ -58,20 +58,29 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.10"
 asyncpg = "*"
-hiredis = "*"
 httpx = "*"
 msgspec = "*"
 pydantic = "*"
 python-dotenv = "*"
-redis = "*"
-saq = "^0.9.1"
-sentry-sdk = ">=1.13.0"
-sqlalchemy = "==2.0.0rc2"
 starlite = "^1.40.1"
-structlog = ">=22.2.0"
 tenacity = "*"
 uvicorn = "*"
 uvloop = "*"
+structlog = ">=22.2.0"
+
+# Optionals
+hiredis = { version = "*", optional = true }
+redis = { version = "*", optional = true }
+saq = { version = "^0.9.1", optional = true }
+sentry-sdk = { version = "*", optional = true }
+sqlalchemy = { version = "==2.0.0rc2", optional = true }
+
+[tool.poetry.extras]
+cache = ["redis", "hiredis"]
+worker = ["saq", "hiredis"]
+sentry = ["sentry-sdk"]
+sqlalchemy = ["sqlalchemy"]
+all = ["redis", "hiredis", "saq", "sentry-sdk", "sqlalchemy"]
 
 [tool.poetry.plugins."pytest11"]
 pytest_starlite_saqlalchemy = "pytest_starlite_saqlalchemy"
@@ -92,11 +101,18 @@ add-select = "D401,D404,D417"
 convention = "google"
 
 [tool.pytest.ini_options]
-addopts = ["-ra", "--strict-config"]
+addopts = [
+    "-ra",
+    "--strict-config",
+    # Plugin are enabled in tests/conftest.py to control loading order.
+    "-p",
+    "no:pytest_starlite_saqlalchemy",
+    "-p",
+    "no:pytest_dotenv",
+]
 asyncio_mode = "auto"
 env_files = ["tests.env"]
 testpaths = ["tests/unit"]
-test_app = "tests.utils.app:create_app"
 
 [tool.pylint.main]
 disable = [

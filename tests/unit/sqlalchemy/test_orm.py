@@ -1,4 +1,5 @@
 """Tests for application ORM configuration."""
+
 import datetime
 from unittest.mock import MagicMock
 

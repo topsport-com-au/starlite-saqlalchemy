@@ -48,7 +48,7 @@ class AbstractHealthCheck(ABC):
         Returns:
             True if the service is running, False otherwise
         """
-        return await self.ready()  # pragma: no cover
+        return await self.ready()
 
     @abstractmethod
     async def ready(self) -> bool:
@@ -57,6 +57,7 @@ class AbstractHealthCheck(ABC):
         Returns:
             True if the service is ready to serve requests, False otherwise
         """
+        return True
 
 
 class AppHealthCheck(AbstractHealthCheck):
@@ -66,7 +67,7 @@ class AppHealthCheck(AbstractHealthCheck):
 
     async def ready(self) -> bool:
         """Readiness check used when no other health check is available."""
-        return True
+        return await super().ready()
 
 
 class HealthResource(BaseModel):

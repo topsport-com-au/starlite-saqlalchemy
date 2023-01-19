@@ -197,7 +197,7 @@ class BeforeSendHandler:
                     value = await value
                 except RuntimeError:
                     if key != REQUEST_BODY_FIELD:
-                        raise
+                        raise  # pragma: no cover
                     value = None
             data[key] = value
         return data

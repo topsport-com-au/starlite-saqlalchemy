@@ -53,6 +53,30 @@ Configuration for a [Starlite](https://github.com/starlite-api/starlite) applica
 - SAQ async worker
 - Lots of features!
 
+## Installation
+
+This will install `starlite-saqlalchemy` with minimal dependencies.
+
+```console
+poetry add starlite-saqlalchemy
+```
+
+You can also install additional dependencies depending on the features you need:
+
+```console
+# Repository implementation, DTOs
+poetry add starlite-saqlalchemy[sqlalchemy]
+# Async worker using saq
+poetry add starlite-saqlalchemy[worker]
+# Redis cache backend
+poetry add starlite-saqlalchemy[cache]
+# Sentry integration for starlite
+poetry add starlite-saqlalchemy[sentry]
+
+# or to install them all:
+poetry add starlite-saqlalchemy[all]
+```
+
 ## Example
 
 ```python

@@ -1,5 +1,4 @@
 """Tests for sentry integration."""
-
 from typing import TYPE_CHECKING
 
 import pytest

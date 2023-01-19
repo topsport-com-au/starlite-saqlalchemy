@@ -56,6 +56,17 @@ class AuthorizationError(StarliteSaqlalchemyClientError):
     """A user tried to do something they shouldn't have."""
 
 
+class MissingDependencyError(StarliteSaqlalchemyError, ValueError):
+    """A required dependency is not installed."""
+
+    def __init__(self, module: str, config: str | None = None) -> None:
+        config = config if config else module
+        super().__init__(
+            f"You enabled {config} configuration but package {module!r} is not installed. "
+            f'You may need to run: "poetry install starlite-saqlalchemy[{config}]"'
+        )
+
+
 class HealthCheckConfigurationError(StarliteSaqlalchemyError):
     """An error occurred while registering an health check."""
 

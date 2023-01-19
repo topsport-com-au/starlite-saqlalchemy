@@ -2,6 +2,7 @@
 # pylint: disable=import-outside-toplevel
 from __future__ import annotations
 
+import os
 import re
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
@@ -11,6 +12,8 @@ from starlite import Starlite, TestClient
 from structlog.contextvars import clear_contextvars
 from structlog.testing import CapturingLogger
 from uvicorn.importer import ImportFromStringError, import_from_string
+
+from starlite_saqlalchemy import constants
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -35,7 +38,7 @@ def pytest_addoption(parser: Parser) -> None:
         "test_app",
         "Path to application instance, or callable that returns an application instance.",
         type="string",
-        default="app.main:create_app",
+        default=os.environ.get("TEST_APP", "app.main:create_app"),
     )
     parser.addini(
         "unit_test_pattern",
@@ -65,7 +68,7 @@ def _patch_http_close(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setattr(starlite_saqlalchemy.http, "clients", set())
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=constants.IS_SQLALCHEMY_INSTALLED)
 def _patch_sqlalchemy_plugin(is_unit_test: bool, monkeypatch: MonkeyPatch) -> None:
     if is_unit_test:
         from starlite_saqlalchemy import sqlalchemy_plugin
@@ -77,7 +80,7 @@ def _patch_sqlalchemy_plugin(is_unit_test: bool, monkeypatch: MonkeyPatch) -> No
         )
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=constants.IS_SAQ_INSTALLED)
 def _patch_worker(is_unit_test: bool, monkeypatch: MonkeyPatch) -> None:
     """We don't want the worker to start for unittests."""
     if is_unit_test:
@@ -94,7 +97,6 @@ def fx_app(pytestconfig: Config, monkeypatch: MonkeyPatch) -> Starlite:
         An application instance, configured via plugin.
     """
     test_app_str = pytestconfig.getini("test_app")
-
     try:
         app_or_callable = import_from_string(test_app_str)
     except (ImportFromStringError, ModuleNotFoundError):
