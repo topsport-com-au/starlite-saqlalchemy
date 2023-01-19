@@ -211,6 +211,9 @@ class ConfigureApp:
             config: Plugin configuration object.
         """
         self.config = config if config is not None else PluginConfig()
+        # We must configure sentry before app is instantiated
+        # because sentry integration replaces Starlite.__init__
+        self.configure_sentry()
 
     def __call__(self, app_config: AppConfig) -> AppConfig:
         """Entrypoint to the app config plugin.
@@ -231,7 +234,6 @@ class ConfigureApp:
         self.configure_exception_handlers(app_config)
         self.configure_logging(app_config)
         self.configure_openapi(app_config)
-        self.configure_sentry(app_config)
         self.configure_sqlalchemy_plugin(app_config)
         self.configure_type_encoders(app_config)
         self.configure_worker(app_config)
@@ -368,7 +370,7 @@ class ConfigureApp:
         if self.config.do_openapi and app_config.openapi_config == DEFAULT_OPENAPI_CONFIG:
             app_config.openapi_config = openapi.config
 
-    def configure_sentry(self, app_config: AppConfig) -> None:
+    def configure_sentry(self) -> None:
         """Add handler to configure Sentry integration.
 
         Args:
@@ -377,7 +379,7 @@ class ConfigureApp:
         if self.config.do_sentry:
             from starlite_saqlalchemy import sentry
 
-            app_config.on_startup.append(sentry.configure)
+            sentry.configure()
 
     def configure_sqlalchemy_plugin(self, app_config: AppConfig) -> None:
         """Configure `SQLAlchemy` for the application.

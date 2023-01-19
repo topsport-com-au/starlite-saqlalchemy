@@ -1,4 +1,7 @@
 """Tests for init_plugin.py when no extra dependencies are installed."""
+# pylint:disable=duplicate-code
+
+from __future__ import annotations
 
 import pytest
 from pydantic import ValidationError
