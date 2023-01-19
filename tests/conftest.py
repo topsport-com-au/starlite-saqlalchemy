@@ -1,5 +1,4 @@
 """Config that can be shared between all test types."""
-# pylint: disable=import-outside-toplevel
 from __future__ import annotations
 
 import importlib

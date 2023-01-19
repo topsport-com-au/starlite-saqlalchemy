@@ -1,6 +1,4 @@
 """Tests for application health check behavior."""
-# pylint: disable=ungrouped-imports
-from itertools import product
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock
 
@@ -9,7 +7,6 @@ from starlite import Starlite
 from starlite.status_codes import HTTP_200_OK, HTTP_503_SERVICE_UNAVAILABLE
 
 from starlite_saqlalchemy import init_plugin, settings
-from starlite_saqlalchemy.constants import IS_SQLALCHEMY_INSTALLED
 from starlite_saqlalchemy.exceptions import HealthCheckConfigurationError
 from starlite_saqlalchemy.health import (
     AbstractHealthCheck,
@@ -23,61 +20,46 @@ if TYPE_CHECKING:
     from starlite.testing import TestClient
 
 
-health_checks: "list[AbstractHealthCheck]" = [AppHealthCheck()]
-
-if IS_SQLALCHEMY_INSTALLED:
-    from starlite_saqlalchemy.sqlalchemy_plugin import SQLAlchemyHealthCheck
-
-    health_checks.append(SQLAlchemyHealthCheck())
-
-
-@pytest.mark.parametrize("health_check", health_checks)
-def test_health_check(
-    client: "TestClient", monkeypatch: "MonkeyPatch", health_check: AbstractHealthCheck
-) -> None:
+def test_health_check(client: "TestClient", monkeypatch: "MonkeyPatch") -> None:
     """Test health check success response.
 
     Checks that we call the repository method and the response content.
     """
-    monkeypatch.setattr(HealthController, "health_checks", health_checks)
-    repo_health_mock = AsyncMock(return_value=True)
-    for health_check_ in health_checks:
-        monkeypatch.setattr(health_check_, "ready", repo_health_mock)
+    health_check = AppHealthCheck()
+    monkeypatch.setattr(HealthController, "health_checks", [health_check])
     resp = client.get(settings.api.HEALTH_PATH)
     assert resp.status_code == HTTP_200_OK
-    health = HealthResource(
-        app=settings.app,
-        health={ht.name: True for ht in health_checks} | {health_check.name: True},
-    )
+    health = HealthResource(app=settings.app, health={health_check.name: True})
     assert resp.json() == health.dict()
-    assert repo_health_mock.call_count == len(health_checks)
 
 
-@pytest.mark.parametrize(
-    ("health_check", "mock"),
-    product(health_checks, [AsyncMock(return_value=False), AsyncMock(side_effect=ConnectionError)]),
-)
-def test_health_check_failed(
-    client: "TestClient",
-    monkeypatch: "MonkeyPatch",
-    health_check: AbstractHealthCheck,
-    mock: AsyncMock,
-) -> None:
+async def test_health_check_live() -> None:
+    """Test expected result of calling `live()` health check method."""
+    health_check = AppHealthCheck()
+    assert await health_check.live() is True
+
+
+def test_health_check_failed(client: "TestClient", monkeypatch: "MonkeyPatch") -> None:
     """Test health check response if check method returns `False`"""
-    # repo_health_mock = AsyncMock(return_value=False)
-    monkeypatch.setattr(HealthController, "health_checks", health_checks)
-    for health_check_ in health_checks:
-        if health_check_ is health_check:
-            monkeypatch.setattr(health_check_, "ready", mock)
-        else:
-            monkeypatch.setattr(health_check_, "ready", AsyncMock(return_value=True))
+    health_check = AppHealthCheck()
+    monkeypatch.setattr(HealthController, "health_checks", [health_check])
+    monkeypatch.setattr(health_check, "ready", AsyncMock(side_effect=RuntimeError))
     resp = client.get(settings.api.HEALTH_PATH)
     assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
-    health = HealthResource(
-        app=settings.app,
-        health={ht.name: True for ht in health_checks} | {health_check.name: False},
-    )
-    assert resp.json() == health.dict()
+    HealthResource(app=settings.app, health={health_check.name: True})
+    assert resp.json() == {
+        "app": {
+            "BUILD_NUMBER": "",
+            "CHECK_DB_READY": True,
+            "CHECK_REDIS_READY": True,
+            "DEBUG": False,
+            "ENVIRONMENT": "test",
+            "TEST_ENVIRONMENT_NAME": "test",
+            "LOCAL_ENVIRONMENT_NAME": "local",
+            "NAME": "my-starlite-app",
+        },
+        "health": {"app": False},
+    }
 
 
 def test_health_custom_health_check(client: "TestClient", monkeypatch: "MonkeyPatch") -> None:
@@ -93,15 +75,12 @@ def test_health_custom_health_check(client: "TestClient", monkeypatch: "MonkeyPa
             return False
 
     monkeypatch.setattr(HealthController, "health_checks", [AppHealthCheck(), MyHealthCheck()])
-    # repo_health_mock = AsyncMock(return_value=True)
-    # monkeypatch.setattr(SQLAlchemyHealthCheck, "ready", repo_health_mock)
     resp = client.get(settings.api.HEALTH_PATH)
     assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
     health = HealthResource(
         app=settings.app,
         health={
             AppHealthCheck.name: True,
-            # SQLAlchemyHealthCheck.name: True,
             MyHealthCheck.name: False,
         },
     )

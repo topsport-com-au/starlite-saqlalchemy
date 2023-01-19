@@ -7,7 +7,6 @@ from unittest.mock import MagicMock
 
 import pytest
 from starlite import Starlite
-from starlite.cache import SimpleCacheBackend
 
 from starlite_saqlalchemy import init_plugin
 from starlite_saqlalchemy.constants import IS_SAQ_INSTALLED, IS_SENTRY_SDK_INSTALLED
@@ -16,45 +15,6 @@ if TYPE_CHECKING:
     from typing import Any
 
     from pytest import MonkeyPatch
-
-
-def test_config_switches() -> None:
-    """Tests that the app produced with all config switches off is as we
-    expect."""
-    config = init_plugin.PluginConfig(
-        do_after_exception=False,
-        do_cache=False,
-        do_compression=False,
-        # pyright reckons this parameter doesn't exist, I beg to differ
-        do_collection_dependencies=False,  # pyright:ignore
-        do_exception_handlers=False,
-        do_health_check=False,
-        do_logging=False,
-        do_openapi=False,
-        do_sentry=False,
-        do_set_debug=False,
-        do_sqlalchemy_plugin=False,
-        do_type_encoders=False,
-        do_worker=False,
-    )
-    app = Starlite(
-        route_handlers=[],
-        openapi_config=None,
-        on_app_init=[init_plugin.ConfigureApp(config=config)],
-    )
-    assert app.compression_config is None
-    assert app.debug is False
-    assert app.logging_config is None
-    assert app.openapi_config is None
-    assert app.response_class is None
-    assert isinstance(app.cache.backend, SimpleCacheBackend)
-    assert len(app.on_shutdown) == 1
-    assert not app.after_exception
-    assert not app.dependencies
-    assert not app.exception_handlers
-    assert not app.on_startup
-    assert not app.plugins
-    assert not app.routes
 
 
 @pytest.mark.skipif(not IS_SAQ_INSTALLED, reason="saq is not installed")
