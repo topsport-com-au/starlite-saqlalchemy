@@ -87,10 +87,8 @@ class AuditColumns:
     """Date/time of instance last update."""
 
 
-registry_ = registry(
-    metadata=MetaData(naming_convention=convention),
-    type_annotation_map={UUID: pg.UUID, dict: pg.JSONB},
-)
+meta = MetaData(naming_convention=convention)
+registry_ = registry(metadata=meta, type_annotation_map={UUID: pg.UUID, dict: pg.JSONB})
 
 
 class Base(CommonColumns, DeclarativeBase):
