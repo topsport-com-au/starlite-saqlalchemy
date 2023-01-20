@@ -17,7 +17,6 @@ if TYPE_CHECKING:
     from pytest import MonkeyPatch
     from starlite.testing import TestClient
 
-    from starlite_saqlalchemy.db import orm
     from starlite_saqlalchemy.service import Service
 
 
@@ -28,7 +27,7 @@ class ControllerTest:
         self,
         client: TestClient,
         base_path: str,
-        collection: Sequence[orm.Base],
+        collection: Sequence[Any],
         raw_collection: Sequence[dict[str, Any]],
         service_type: type[Service],
         monkeypatch: MonkeyPatch,

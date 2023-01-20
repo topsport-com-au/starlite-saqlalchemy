@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import pytest
 
+from starlite_saqlalchemy.db import orm
 from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyError
 from starlite_saqlalchemy.testing.generic_mock_repository import GenericMockRepository
 from tests.utils.domain.authors import Author
@@ -67,3 +68,54 @@ def test_generic_mock_repository_raises_repository_exception_if_named_attribute_
     exist."""
     with pytest.raises(StarliteSaqlalchemyError):
         author_repository.filter_collection_by_kwargs(cricket="ball")
+
+
+async def test_sets_created_updated_on_add() -> None:
+    """Test that the repository updates the 'created' and 'updated' timestamps
+    if necessary."""
+
+    class Model(orm.AuditBase):
+        """Inheriting from AuditBase gives the model 'created' and 'updated'
+        columns."""
+
+        ...
+
+    instance = Model()
+    assert "created" not in vars(instance)
+    assert "updated" not in vars(instance)
+
+    instance = await GenericMockRepository[Model]().add(instance)
+    assert "created" in vars(instance)
+    assert "updated" in vars(instance)
+
+
+async def test_sets_updated_on_update(author_repository: GenericMockRepository[Author]) -> None:
+    """Test that the repository updates the 'updated' timestamp if
+    necessary."""
+
+    instance = list(author_repository.collection.values())[0]
+    original_updated = instance.updated
+    instance = await author_repository.update(instance)
+    assert instance.updated > original_updated
+
+
+async def test_does_not_set_created_updated() -> None:
+    """Test that the repository does not update the 'updated' timestamps when
+    appropriate."""
+
+    class Model(orm.Base):
+        """Inheriting from Base means the model has no created/updated
+        timestamp columns."""
+
+        ...
+
+    instance = Model()
+    repo = GenericMockRepository[Model]()
+    assert "created" not in vars(instance)
+    assert "updated" not in vars(instance)
+    instance = await repo.add(instance)
+    assert "created" not in vars(instance)
+    assert "updated" not in vars(instance)
+    instance = await repo.update(instance)
+    assert "created" not in vars(instance)
+    assert "updated" not in vars(instance)
