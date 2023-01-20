@@ -10,6 +10,8 @@ from starlite_saqlalchemy.constants import IS_SQLALCHEMY_INSTALLED
 if TYPE_CHECKING:
     from typing import Any
 
+    from pytest import MonkeyPatch
+
     from starlite_saqlalchemy.testing.generic_mock_repository import (
         GenericMockRepository,
     )
@@ -18,6 +20,27 @@ if TYPE_CHECKING:
 
 if not IS_SQLALCHEMY_INSTALLED:
     collect_ignore_glob = ["*"]
+
+
+@pytest.fixture(autouse=True)
+def _patch_bases(monkeypatch: MonkeyPatch) -> None:
+    """Ensure new registry state for every test.
+
+    This prevents errors such as "Table '...' is already defined for
+    this MetaData instance...
+    """
+    from sqlalchemy.orm import DeclarativeBase
+
+    from starlite_saqlalchemy.db import orm
+
+    class NewBase(orm.CommonColumns, DeclarativeBase):
+        ...
+
+    class NewAuditBase(orm.AuditColumns, orm.CommonColumns, DeclarativeBase):
+        ...
+
+    monkeypatch.setattr(orm, "Base", NewBase)
+    monkeypatch.setattr(orm, "AuditBase", NewAuditBase)
 
 
 @pytest.fixture(name="authors")

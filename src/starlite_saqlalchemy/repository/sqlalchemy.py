@@ -32,7 +32,7 @@ __all__ = [
 ]
 
 T = TypeVar("T")
-ModelT = TypeVar("ModelT", bound="orm.Base")
+ModelT = TypeVar("ModelT", bound="orm.Base | orm.AuditBase")
 SQLARepoT = TypeVar("SQLARepoT", bound="SQLAlchemyRepository")
 
 

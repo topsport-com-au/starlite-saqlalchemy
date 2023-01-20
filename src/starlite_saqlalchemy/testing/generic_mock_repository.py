@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
     from starlite_saqlalchemy.repository.types import FilterTypes
 
-ModelT = TypeVar("ModelT", bound=orm.Base)
+ModelT = TypeVar("ModelT", bound=orm.Base | orm.AuditBase)
 MockRepoT = TypeVar("MockRepoT", bound="GenericMockRepository")
 
 
@@ -62,7 +62,9 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         if allow_id is False and self.get_id_attribute_value(data) is not None:
             raise ConflictError("`add()` received identified item.")
         now = datetime.now()
-        data.updated = data.created = now
+        if hasattr(data, "updated") and hasattr(data, "created"):
+            # maybe the @declarative_mixin decorator doesn't play nice with pyright?
+            data.updated = data.created = now  # pyright: ignore
         if allow_id is False:
             id_ = self._id_factory()
             self.set_id_attribute_value(id_, data)
@@ -127,7 +129,9 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """
         item = self._find_or_raise_not_found(self.get_id_attribute_value(data))
         # should never be modifiable
-        data.updated = datetime.now()
+        if hasattr(data, "updated"):
+            # maybe the @declarative_mixin decorator doesn't play nice with pyright?
+            data.updated = datetime.now()  # pyright: ignore
         for key, val in data.__dict__.items():
             if key.startswith("_"):
                 continue

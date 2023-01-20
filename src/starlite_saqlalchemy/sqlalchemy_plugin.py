@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 __all__ = ["SQLAlchemyHealthCheck", "config", "plugin"]
 
 
-async def before_send_handler(message: "Message", _: "State", scope: "Scope") -> None:
+async def before_send_handler(message: Message, _: State, scope: Scope) -> None:
     """Inspect status of response and commit, or rolls back.
 
     Args:
@@ -61,8 +61,8 @@ class SQLAlchemyHealthCheck(AbstractHealthCheck):
         Returns:
             `True` if healthy.
         """
-        async with self.session_maker() as session:
-            return (  # type:ignore[no-any-return]  # pragma: no cover
+        async with self.session_maker() as session:  # pragma: no cover
+            return (  # type:ignore[no-any-return]
                 await session.execute(text("SELECT 1"))
             ).scalar_one() == 1
 
