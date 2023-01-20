@@ -2,6 +2,18 @@
 
 <!--next-version-placeholder-->
 
+## v0.29.0 (2023-01-20)
+### Feature
+* Optional audit columns on base class ([#264](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/264)) ([`5f4e883`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5f4e88342e3778b9bf4aa665fb9bef87fc251782))
+* Optional dependencies ([#213](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/213)) ([`efe26d6`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/efe26d6228d708e7cd00031326637c536fe3f13f))
+
+### Fix
+* **sentry:** Configure sentry before app instantiation ([#258](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/258)) ([`45982b4`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/45982b49c649dd7c2c7b532d50dcc1d8a128422d))
+
+### Breaking
+* optional audit columns on base class ([#264](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/264)) ([`5f4e883`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5f4e88342e3778b9bf4aa665fb9bef87fc251782))
+* optional dependencies ([#213](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/213)) ([`efe26d6`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/efe26d6228d708e7cd00031326637c536fe3f13f))
+
 ## v0.28.1 (2023-01-17)
 ### Fix
 * PluginConfig.type_encoders forward ref. ([`65000ee`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/65000ee7d848f9ef8c8bc87149d24ff3fde5302d))
