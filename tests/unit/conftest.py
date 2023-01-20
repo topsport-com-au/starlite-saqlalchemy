@@ -1,5 +1,4 @@
 """Unit test specific config."""
-# pylint: disable=import-outside-toplevel
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -9,11 +8,8 @@ from starlite import get
 from starlite.datastructures import State
 from starlite.enums import ScopeType
 
-from starlite_saqlalchemy import constants
-
 if TYPE_CHECKING:
 
-    from saq.job import Job
     from starlite import Starlite
     from starlite.types import HTTPResponseBodyEvent, HTTPResponseStartEvent, HTTPScope
 
@@ -64,17 +60,6 @@ def http_scope(app: Starlite) -> HTTPScope:
         "method": "GET",
         "type": ScopeType.HTTP,
     }
-
-
-@pytest.fixture()
-def job() -> Job:
-    """SAQ Job instance."""
-    if not constants.IS_SAQ_INSTALLED:
-        pytest.skip("SAQ not installed")
-
-    from saq.job import Job
-
-    return Job(function="whatever", kwargs={"a": "b"})
 
 
 @pytest.fixture()
