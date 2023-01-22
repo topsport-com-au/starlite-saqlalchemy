@@ -277,6 +277,11 @@ class WorkerSettings(BaseSettings):
         env_file = ".env"
         env_prefix = "WORKER_"
 
+    CONCURRENCY: int = 10
+    """The number of concurrent jobs allowed to execute per worker..
+
+    Default is set to 10.
+    """
     JOB_TIMEOUT: int = 10
     """Max time a job can run for, in seconds.
 

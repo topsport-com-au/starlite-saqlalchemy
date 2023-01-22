@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from starlite_saqlalchemy.service import Service
 
 __all__ = [
+    "CronJob",
     "JobConfig",
     "Queue",
     "Worker",
@@ -138,25 +139,48 @@ class JobConfig:
     """
 
 
+class CronJob(saq.CronJob):
+    """Cron Job."""
+
+
 default_job_config_dict = utils.dataclass_as_dict_shallow(JobConfig(), exclude_none=True)
 
 
 def create_worker_instance(
     functions: Collection[Callable[..., Any] | tuple[str, Callable]],
+    cron_jobs: Collection[saq.CronJob] = (),
+    concurrency: int | None = None,
+    startup: Callable[[dict[str, Any]], Awaitable[Any]] | None = None,
+    shutdown: Callable[[dict[str, Any]], Awaitable[Any]] | None = None,
     before_process: Callable[[dict[str, Any]], Awaitable[Any]] | None = None,
     after_process: Callable[[dict[str, Any]], Awaitable[Any]] | None = None,
 ) -> Worker:
-    """
+    """Create a worker instance.
 
     Args:
         functions: Functions to be called via the async workers.
+        cron_jobs: Cron configuration to schedule at startup.
+        concurrency: The number of jobs allowed to execute simultaneously per worker.
+        startup: Async function called on worker startup.
+        shutdown: Async function called on worker shutdown.
         before_process: Async function called before a job processes.
         after_process: Async function called after a job processes.
 
     Returns:
         The worker instance, instantiated with `functions`.
     """
-    return Worker(queue, functions, before_process=before_process, after_process=after_process)
+    if concurrency is None:
+        concurrency = settings.worker.CONCURRENCY
+    return Worker(
+        queue,
+        functions=functions,
+        cron_jobs=cron_jobs,
+        startup=startup,
+        concurrency=concurrency,
+        shutdown=shutdown,
+        before_process=before_process,
+        after_process=after_process,
+    )
 
 
 async def make_service_callback(
