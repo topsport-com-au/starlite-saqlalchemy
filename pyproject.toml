@@ -74,13 +74,14 @@ redis = { version = "*", optional = true }
 saq = { version = "^0.9.1", optional = true }
 sentry-sdk = { version = "*", optional = true }
 sqlalchemy = { version = "==2.0.0rc3", optional = true }
+greenlet = {version = "*", platform = "darwin", optional = true }
 
 [tool.poetry.extras]
 cache = ["redis", "hiredis"]
 worker = ["saq", "hiredis"]
 sentry = ["sentry-sdk"]
-sqlalchemy = ["sqlalchemy"]
-all = ["redis", "hiredis", "saq", "sentry-sdk", "sqlalchemy"]
+sqlalchemy = ["sqlalchemy","greenlet"]
+all = ["redis", "hiredis", "saq", "sentry-sdk", "sqlalchemy","greenlet"]
 
 [tool.poetry.plugins."pytest11"]
 pytest_starlite_saqlalchemy = "pytest_starlite_saqlalchemy"
