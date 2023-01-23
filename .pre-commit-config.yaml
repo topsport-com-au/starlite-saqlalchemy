@@ -57,12 +57,12 @@ repos:
           [--disable=MD013, --disable=MD033, --disable=MD050, --disable=MD052]
         exclude: "CHANGELOG.md"
   - repo: https://github.com/PyCQA/docformatter
-    rev: v1.5.1
+    rev: v1.6.0.rc1
     hooks:
       - id: docformatter
         args: [--in-place]
   - repo: https://github.com/PyCQA/pydocstyle
-    rev: 6.2.3
+    rev: 6.3.0
     hooks:
       - id: pydocstyle
         exclude: "test*|examples*"
