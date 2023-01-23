@@ -24,7 +24,6 @@ pytest_plugins = ("pytest_dotenv", "pytest_starlite_saqlalchemy.plugin")
 @pytest.fixture(name="raw_authors")
 def fx_raw_authors() -> list[dict[str, Any]]:
     """Unstructured author representations."""
-
     return [
         {
             "id": "97108ac1-ffcb-411d-8b1e-d9183399f63b",
@@ -61,7 +60,6 @@ def fx_raw_books(raw_authors: list[dict[str, Any]]) -> list[dict[str, Any]]:
 @pytest.fixture(name="create_module")
 def fx_create_module(tmp_path: Path, monkeypatch: MonkeyPatch) -> Callable[[str], ModuleType]:
     """Utility fixture for dynamic module creation."""
-
     def wrapped(source: str) -> ModuleType:
         """
 

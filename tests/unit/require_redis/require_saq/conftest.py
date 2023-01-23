@@ -16,7 +16,6 @@ if not IS_SAQ_INSTALLED:
 @pytest.fixture()
 def job() -> Job:
     """SAQ Job instance."""
-
     from saq.job import Job
 
     return Job(function="whatever", kwargs={"a": "b"})

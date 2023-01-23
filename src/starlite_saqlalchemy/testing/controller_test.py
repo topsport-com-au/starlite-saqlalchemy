@@ -60,7 +60,6 @@ class ControllerTest:
 
     def test_get_collection(self, with_filters: bool = False) -> None:
         """Test collection endpoint get request."""
-
         async def _list(*_: Any, **__: Any) -> list[Any]:
             return list(self.collection)
 

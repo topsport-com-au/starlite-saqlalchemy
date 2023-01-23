@@ -33,7 +33,6 @@ def http_response_body() -> HTTPResponseBodyEvent:
 @pytest.fixture()
 def http_scope(app: Starlite) -> HTTPScope:
     """Minimal ASGI HTTP connection scope."""
-
     @get()
     def handler() -> None:
         ...

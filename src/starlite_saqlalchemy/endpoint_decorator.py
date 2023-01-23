@@ -42,7 +42,6 @@ def endpoint(cls_: Any = None, base_url: Any = None) -> Any:
 
     ```
     """
-
     def wrap(cls: Any) -> Any:
         return _process_class(cls, base_url)
 

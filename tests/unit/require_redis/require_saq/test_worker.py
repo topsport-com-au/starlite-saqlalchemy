@@ -25,7 +25,6 @@ def test_worker_decoder_handles_pgproto_uuid() -> None:
 
 def test_worker_decoder_handles_pydantic_models() -> None:
     """Test that the decoder we use for SAQ will encode a pydantic model."""
-
     class Model(BaseModel):
         a: str
         b: int

@@ -64,7 +64,6 @@ def test_health_check_failed(client: "TestClient", monkeypatch: "MonkeyPatch") -
 
 def test_health_custom_health_check(client: "TestClient", monkeypatch: "MonkeyPatch") -> None:
     """Test registering custom health checks."""
-
     class MyHealthCheck(AbstractHealthCheck):
         """Custom health check."""
 

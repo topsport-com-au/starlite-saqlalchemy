@@ -28,7 +28,6 @@ if TYPE_CHECKING:
 @pytest.fixture()
 def mock_repo() -> SQLAlchemyRepository:
     """SQLAlchemy repository with a mock model type."""
-
     class Repo(SQLAlchemyRepository[MagicMock]):
         """Repo with mocked out stuff."""
 
