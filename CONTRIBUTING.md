@@ -15,7 +15,7 @@ First install the library and dependencies:
 
 Then install test dependencies into local env for benefit of IDE:
 
-`poetry run pip install -r dev.requirements.txt`
+`poetry run pip install -r requirements.dev.txt`
 
 We use `pre-commit` and `tox` for code quality and testing.
 
@@ -57,11 +57,14 @@ For example:
 
 - `tox -e py310` - run the unittests on python 3.10.<sup>[1](#tox1)</sup>
 - `tox -e py311` - run the unittests on python 3.11.<sup>[1](#tox1)</sup>
+- `tox -e pytest-plugin` - run tests for the pytest plugin.
 - `tox -e coverage` - unit test coverage report.
+- `tox -e pylint` - run pylint on the source.
 - `tox -e mypy` - runs mypy static type checker on the source.
 - `tox -e pyright` - runs pyright static type checker on the source.
 - `tox -e integration` - runs the dockerized integration test suite.
-- `tox` - run everything, you maniac!
+- `tox -e no-extras` - tests the application with no extra dependencies.
+- `tox` - run everything.
 
 <a name="tox1">1</a>. Must have the Python versions installed.
 [pyenv](https://github.com/pyenv/pyenv) is a useful tool for maintaining multiple python versions on
@@ -73,8 +76,33 @@ that you need to recreate an tox environment use the `-r` flag, e.g., `tox -e my
 
 ## CI
 
-We run pre-commit and all of the above tox environments in CI (except for `refurb`), so if they are
-passing locally, you should be all good when your PR is made.
+We run pre-commit and all of the above tox environments in CI so if they pass locally, you should
+be all good when your PR is made.
+
+## Test suite structure
+
+The layout of the test suite is to support easily grouping tests by their required dependencies.
+This allows for whole branches of the test suite to be skipped at collection time if their required
+dependency doesn't exist in the test environment.
+
+For example, if the tests are being executed in an environment that doesn't include SQLAlchemy,
+pytest won't collect any of the tests under the `tests/unit/require_sqlalchemy` namespace.
+
+If some piece of functionality requires a specific extra dependency, then put the tests for it under
+the `require_<dependency>` namespace.
+
+If some piece of functionality should behave the same, irrespective of available dependencies,
+those tests should be in the top-level of the tests/unit suite.
+
+The actual environments that we run tests within are configured in tox, most notable is `no-extras`
+env, which tests the app under minimal dependency conditions. We can add new tox environments to
+test different combinations of available dependencies as we need.
+
+If you want to have all the tests run, have tox, python 3.10 and 3.11 available and run `$ tox`.
+This runs all the tests exactly as CI does.
+
+If you are just iterating, run pytest at the command line and it will run the tests dependent
+on the extras available in your local environment.
 
 ## Conventional Commits
 
