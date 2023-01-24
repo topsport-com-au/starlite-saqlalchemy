@@ -102,7 +102,7 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """
         return self._find_or_raise_not_found(id_)
 
-    async def list(self, *filters: "FilterTypes", **kwargs: Any) -> list[ModelT]:
+    async def list(self, *filters: "FilterTypes", **kwargs: Any) -> tuple[list[ModelT], int]:
         """Get a list of instances, optionally filtered.
 
         Args:
@@ -112,7 +112,19 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             The list of instances, after filtering applied.
         """
-        return list(self.collection.values())
+        return list(self.collection.values()), len(list(self.collection.values()))
+
+    async def count(self, select_: Any | None = None) -> int:
+        """Get a list of instances, optionally filtered.
+
+        Args:
+            *filters: Types for specific filtering operations.
+            **kwargs: Instance attribute value filters.
+
+        Returns:
+            The list of instances, after filtering applied.
+        """
+        return len(list(self.collection.values()))
 
     async def update(self, data: ModelT) -> ModelT:
         """Update instance with the attribute values present on `data`.
