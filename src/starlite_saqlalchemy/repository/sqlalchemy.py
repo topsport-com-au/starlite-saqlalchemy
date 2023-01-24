@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 
 from sqlalchemy import select, text
+from sqlalchemy.sql import func as sql_func
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyError
@@ -202,6 +203,24 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             await self.session.refresh(instance)
             self.session.expunge(instance)
             return instance
+
+    async def count(self, select_: Select[tuple[ModelT]] | None = None) -> int:
+        """Count records returned by query.
+
+        Args:
+            select_ (Select | None): Optional SQL statement to generate a count statement. Defaults to [self._select]
+
+        Returns:
+            int: _description_
+        """
+        if select_ is None:
+            select_ = self._select
+        count_statement = select_.with_only_columns(
+            sql_func.count(),
+            maintain_column_froms=True,
+        ).order_by(None)
+        results = await self.session.execute(count_statement)
+        return results.scalar_one()  # type: ignore
 
     def filter_collection_by_kwargs(self, **kwargs: Any) -> None:
         """Filter the collection by kwargs.
