@@ -5,8 +5,8 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 
 from sqlalchemy import select, text
-from sqlalchemy.sql import func as sql_func
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.sql import func as sql_func
 
 from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyError
 from starlite_saqlalchemy.repository.abc import AbstractRepository

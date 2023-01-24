@@ -56,7 +56,6 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
     async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:
         """Get the count of records returned by a query.  Optionally filtered.
 
-
         Args:
             *filters: Types for specific filtering operations.
             **kwargs: Instance attribute value filters.
