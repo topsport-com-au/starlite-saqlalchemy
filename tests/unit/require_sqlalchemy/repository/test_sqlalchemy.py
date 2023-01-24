@@ -119,6 +119,19 @@ async def test_sqlalchemy_repo_list_with_pagination(
     mock_repo._select.limit().offset.assert_called_once_with(3)  # type:ignore[call-arg]
 
 
+async def test_sqlalchemy_repo_count(
+    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
+) -> None:
+    """Test count operation with pagination."""
+    mock_instances = [MagicMock(), MagicMock()]
+    result_mock = MagicMock()
+    result_mock.scalars = MagicMock(len(mock_instances))
+    execute_mock = AsyncMock(return_value=result_mock)
+    monkeypatch.setattr(mock_repo, "_execute", execute_mock)
+    instance_count = await mock_repo.count()
+    assert instance_count == len(mock_instances)
+
+
 async def test_sqlalchemy_repo_list_with_before_after_filter(
     mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
 ) -> None:
