@@ -53,7 +53,7 @@ class Service(Generic[T]):
         """
         return data
 
-    async def list(self, **kwargs: Any) -> list[T]:
+    async def list(self, **kwargs: Any) -> tuple[list[T], int]:
         """Return view of the collection of `T`.
 
         Args:
@@ -62,7 +62,7 @@ class Service(Generic[T]):
         Returns:
             The list of instances retrieved from the repository.
         """
-        return []
+        return [], 0
 
     async def update(self, id_: Any, data: T) -> T:
         """Update existing instance of `T` with `data`.

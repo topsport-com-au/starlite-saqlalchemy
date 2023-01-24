@@ -60,6 +60,9 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
             *filters: Types for specific filtering operations.
             **kwargs: Instance attribute value filters.
 
+        Args:
+            select_: Optional statement to use for counting.
+
         Returns:
             The count of instances
         """
