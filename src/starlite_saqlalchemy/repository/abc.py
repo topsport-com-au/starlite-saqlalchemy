@@ -56,6 +56,9 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
     async def count(self, select_: Any | None = None) -> int:
         """Get the count of records returned by a query.
 
+        Args:
+            select_: Optional statement to use for counting.
+
         Returns:
             The count of instances
         """
