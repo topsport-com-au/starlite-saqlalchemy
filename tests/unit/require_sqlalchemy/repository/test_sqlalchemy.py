@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import TYPE_CHECKING
+from unittest import mock
 from unittest.mock import AsyncMock, MagicMock, call
 
 import pytest
@@ -97,10 +98,15 @@ async def test_sqlalchemy_repo_list(
     mock_instances = [MagicMock(), MagicMock()]
     result_mock = MagicMock()
     result_mock.scalars = MagicMock(return_value=mock_instances)
+    count_mock = MagicMock()
+    count_mock.return_value = 2
     execute_mock = AsyncMock(return_value=result_mock)
+    execute_count_mock = AsyncMock(return_value=count_mock)
+    monkeypatch.setattr(mock_repo, "count", execute_count_mock)
     monkeypatch.setattr(mock_repo, "_execute", execute_mock)
-    instances = await mock_repo.list()
+    instances, count = await mock_repo.list()
     assert instances == mock_instances
+    assert count == count_mock
     mock_repo.session.expunge.assert_has_calls(*mock_instances)
     mock_repo.session.commit.assert_not_called()
 
@@ -123,13 +129,15 @@ async def test_sqlalchemy_repo_count(
     mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
 ) -> None:
     """Test count operation with pagination."""
-    mock_instances = [MagicMock(), MagicMock()]
     result_mock = MagicMock()
-    result_mock.scalars = MagicMock(len(mock_instances))
+    count_mock = MagicMock()
     execute_mock = AsyncMock(return_value=result_mock)
+    execute_count_mock = AsyncMock(return_value=count_mock)
+    monkeypatch.setattr(mock_repo, "count", execute_count_mock)
     monkeypatch.setattr(mock_repo, "_execute", execute_mock)
-    instance_count = await mock_repo.count()
-    assert instance_count == len(mock_instances)
+    mock_repo.count.return_value = 1
+    count = await mock_repo.count()
+    assert count == 1
 
 
 async def test_sqlalchemy_repo_list_with_before_after_filter(
