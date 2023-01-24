@@ -139,7 +139,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """
         count_query = self._select
         for filter_ in filters:
-            match filter_:  # noqa: E999
+            match filter_:
                 case LimitOffset(limit, offset):
                     self._apply_limit_offset_pagination(limit, offset)
                     # we do not apply this filter to the count since we need the total rows
