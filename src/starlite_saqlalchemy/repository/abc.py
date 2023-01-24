@@ -53,6 +53,19 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """
 
     @abstractmethod
+    async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:
+        """Get the count of records returned by a query.  Optionally filtered.
+
+
+        Args:
+            *filters: Types for specific filtering operations.
+            **kwargs: Instance attribute value filters.
+
+        Returns:
+            The count of instances
+        """
+
+    @abstractmethod
     async def get(self, id_: Any) -> T:
         """Get instance identified by `id_`.
 
