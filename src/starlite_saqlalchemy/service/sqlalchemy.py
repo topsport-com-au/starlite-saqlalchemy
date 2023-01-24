@@ -50,7 +50,7 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         """
         return await self.repository.add(data)
 
-    async def list(self, *filters: "FilterTypes", **kwargs: Any) -> list[ModelT]:
+    async def list(self, *filters: "FilterTypes", **kwargs: Any) -> tuple[list[ModelT], int]:
         """Wrap repository scalars operation.
 
         Args:
@@ -122,24 +122,3 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         """
         async with async_session_factory() as session:
             yield cls(session=session)
-
-
-class PaginatedRepositoryService(RepositoryService):
-    """Paginated Service object that operates on a repository object."""
-
-    __id__ = "starlite_saqlalchemy.service.sqlalchemy.PaginatedRepositoryService"
-
-    async def list(self, *filters: "FilterTypes", **kwargs: Any) -> tuple[list[ModelT], int]:
-        """Wrap repository scalars operation.
-
-        Args:
-            *filters: Collection route filters.
-            **kwargs: Keyword arguments for attribute based filtering.
-
-        Returns:
-            The list of instances retrieved from the repository.
-        """
-        return (
-            await self.repository.list(*filters, **kwargs),
-            await self.repository.count(*filters, **kwargs),
-        )
