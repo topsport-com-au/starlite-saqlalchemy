@@ -1,4 +1,8 @@
 """Application startup script."""
+from __future__ import annotations
+
+from typing import Literal, TypeVar
+
 import uvicorn
 
 from starlite_saqlalchemy import settings
@@ -22,17 +26,33 @@ def determine_reload_dirs(should_reload: bool) -> list[str] | None:
     return settings.server.RELOAD_DIRS if should_reload else None
 
 
-def run_app() -> None:
+T = TypeVar("T")
+
+
+def run_app(
+    app: str | None = None,
+    factory: bool | None = None,
+    host: str | None = None,
+    loop: Literal["none", "auto", "asyncio", "uvloop"] | None = None,
+    port: int | None = None,
+    reload: bool | None = None,
+    reload_dirs: list[str] | None = None,
+    timeout_keep_alive: int | None = None,
+) -> None:
     """Run the application with config via environment."""
-    should_reload = determine_should_reload()
-    reload_dirs = determine_reload_dirs(should_reload)
+    should_reload = _not_none(reload, determine_should_reload())
+    reload_dirs = _not_none(reload_dirs, determine_reload_dirs(should_reload))
     uvicorn.run(
-        app=settings.server.APP_LOC,
-        factory=settings.server.APP_LOC_IS_FACTORY,
-        host=settings.server.HOST,
-        loop="auto",
-        port=settings.server.PORT,
+        app=_not_none(app, settings.server.APP_LOC),
+        factory=_not_none(factory, settings.server.APP_LOC_IS_FACTORY),
+        host=_not_none(host, settings.server.HOST),
+        loop=_not_none(loop, "auto"),
+        port=_not_none(port, settings.server.PORT),
         reload=should_reload,
         reload_dirs=reload_dirs,
-        timeout_keep_alive=settings.server.KEEPALIVE,
+        timeout_keep_alive=_not_none(timeout_keep_alive, settings.server.KEEPALIVE),
     )
+
+
+def _not_none(maybe_none: T | None, fallback: T) -> T:
+    return maybe_none if maybe_none is not None else fallback

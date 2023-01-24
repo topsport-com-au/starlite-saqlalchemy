@@ -69,6 +69,7 @@ uvloop = "*"
 structlog = ">=22.2.0"
 
 # Optionals
+click = "*"
 hiredis = { version = "*", optional = true }
 redis = { version = "*", optional = true }
 saq = { version = "^0.9.1", optional = true }
@@ -77,16 +78,18 @@ sqlalchemy = { version = "==2.0.0rc3", optional = true }
 
 [tool.poetry.extras]
 cache = ["redis", "hiredis"]
+cli = ["click"]
 worker = ["saq", "hiredis"]
 sentry = ["sentry-sdk"]
 sqlalchemy = ["sqlalchemy"]
-all = ["redis", "hiredis", "saq", "sentry-sdk", "sqlalchemy"]
+all = ["click", "hiredis", "redis", "saq", "sentry-sdk", "sqlalchemy"]
 
 [tool.poetry.plugins."pytest11"]
 pytest_starlite_saqlalchemy = "pytest_starlite_saqlalchemy"
 
 [tool.poetry.plugins."console_scripts"]
 run-app = "starlite_saqlalchemy.scripts:run_app"
+ssql = "starlite_saqlalchemy.cli:entry_point"
 
 [tool.poetry.urls]
 GitHub = "https://github.com/topsport-com-au"
