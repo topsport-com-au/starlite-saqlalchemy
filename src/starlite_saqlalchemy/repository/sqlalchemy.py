@@ -127,7 +127,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             self.session.expunge(instance)
             return instance
 
-    async def list(self, *filters: FilterTypes, **kwargs: Any) -> list[ModelT]:
+    async def list(self, *filters: FilterTypes, **kwargs: Any) -> tuple[list[ModelT], int]:
         """Get a list of instances, optionally filtered.
 
         Args:
@@ -137,24 +137,30 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             The list of instances, after filtering applied.
         """
+        count_query = self._select
         for filter_ in filters:
-            match filter_:
+            match filter_:  # noqa: E999
                 case LimitOffset(limit, offset):
                     self._apply_limit_offset_pagination(limit, offset)
+                    # we do not apply this filter to the count since we need the total rows
                 case BeforeAfter(field_name, before, after):
                     self._filter_on_datetime_field(field_name, before, after)
+                    count_query = self._select
                 case CollectionFilter(field_name, values):
                     self._filter_in_collection(field_name, values)
+                    count_query = self._select
                 case _:
                     raise StarliteSaqlalchemyError(f"Unexpected filter: {filter}")
         self._filter_select_by_kwargs(**kwargs)
+        count_query = self._select
 
         with wrap_sqlalchemy_exception():
             result = await self._execute()
+            count = await self.count(count_query)
             instances = list(result.scalars())
             for instance in instances:
                 self.session.expunge(instance)
-            return instances
+            return instances, count
 
     async def update(self, data: ModelT) -> ModelT:
         """Update instance with the attribute values present on `data`.
