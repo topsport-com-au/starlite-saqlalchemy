@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import TYPE_CHECKING
-from unittest import mock
 from unittest.mock import AsyncMock, MagicMock, call
 
 import pytest
