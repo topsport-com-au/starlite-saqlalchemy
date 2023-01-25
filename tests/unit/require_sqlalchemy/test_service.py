@@ -36,15 +36,15 @@ async def test_service_create() -> None:
 
 async def test_service_list() -> None:
     """Test repository list action."""
-    items, count = await domain.authors.Service().list()
-    assert isinstance(items, list)
-    assert count == 2
+    items = await domain.authors.Service().list()
+    assert isinstance(items, tuple)
+    assert len(items) == 2
 
 
 async def test_service_update() -> None:
     """Test repository update action."""
     service_obj = domain.authors.Service()
-    authors, _ = await service_obj.list()
+    authors = await service_obj.list()
     author = authors[0]
     assert author.name == "Agatha Christie"
     author.name = "different"
@@ -55,7 +55,7 @@ async def test_service_update() -> None:
 async def test_service_upsert_update() -> None:
     """Test repository upsert action for update."""
     service_obj = domain.authors.Service()
-    authors, _ = await service_obj.list()
+    authors = await service_obj.list()
     author = authors[0]
     assert author.name == "Agatha Christie"
     author.name = "different"
@@ -75,7 +75,7 @@ async def test_service_upsert_create() -> None:
 async def test_service_get() -> None:
     """Test repository get action."""
     service_obj = domain.authors.Service()
-    authors, _ = await service_obj.list()
+    authors = await service_obj.list()
     author = authors[0]
     retrieved = await service_obj.get(author.id)
     assert author is retrieved
@@ -84,7 +84,7 @@ async def test_service_get() -> None:
 async def test_service_delete() -> None:
     """Test repository delete action."""
     service_obj = domain.authors.Service()
-    authors, _ = await service_obj.list()
+    authors = await service_obj.list()
     author = authors[0]
     deleted = await service_obj.delete(author.id)
     assert author is deleted
@@ -100,8 +100,10 @@ async def test_service_method_default_behavior() -> None:
     """Test default behavior of base service methods."""
     service_obj = service.Service[object]()
     data = object()
+    assert await service_obj.count() == 0
     assert await service_obj.create(data) is data
-    assert await service_obj.list() == ([], 0)
+    assert await service_obj.list() == []
+    assert await service_obj.list_and_count() == ([], 0)
     assert await service_obj.update("abc", data) is data
     assert await service_obj.upsert("abc", data) is data
     with pytest.raises(NotFoundError):

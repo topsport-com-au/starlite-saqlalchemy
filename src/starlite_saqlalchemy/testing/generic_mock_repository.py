@@ -13,7 +13,7 @@ from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyEr
 from starlite_saqlalchemy.repository.abc import AbstractRepository
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Hashable, Iterable, MutableMapping
+    from collections.abc import Callable, Hashable, Iterable, MutableMapping, Sequence
     from typing import Any
 
     from starlite_saqlalchemy.repository.types import FilterTypes
@@ -71,6 +71,18 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         self.collection[data.id] = data
         return data
 
+    async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:
+        """
+
+        Args:
+            *filters: Types for specific filtering operations.
+            **kwargs: Instance attribute value filters.
+
+        Returns:
+            Count of instances in collection, ignoring pagination.
+        """
+        return len(await self.list(*filters, **kwargs))
+
     async def delete(self, id_: Any) -> ModelT:
         """Delete instance identified by `id_`.
 
@@ -102,7 +114,7 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """
         return self._find_or_raise_not_found(id_)
 
-    async def list(self, *filters: "FilterTypes", **kwargs: Any) -> tuple[list[ModelT], int]:
+    async def list(self, *filters: FilterTypes, **kwargs: Any) -> Sequence[ModelT]:
         """Get a list of instances, optionally filtered.
 
         Args:
@@ -112,19 +124,21 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             The list of instances, after filtering applied.
         """
-        return list(self.collection.values()), len(list(self.collection.values()))
+        return tuple(self.collection.values())
 
-    async def count(self, select_: Any | None = None) -> int:
-        """Get a list of instances, optionally filtered.
+    async def list_and_count(
+        self, *filters: FilterTypes, **kwargs: Any
+    ) -> tuple[Sequence[ModelT], int]:
+        """
 
         Args:
             *filters: Types for specific filtering operations.
             **kwargs: Instance attribute value filters.
 
         Returns:
-            The list of instances, after filtering applied.
+            Count of records returned by query, ignoring pagination.
         """
-        return len(list(self.collection.values()))
+        return await self.list(*filters, **kwargs), await self.count(*filters, **kwargs)
 
     async def update(self, data: ModelT) -> ModelT:
         """Update instance with the attribute values present on `data`.
@@ -172,7 +186,12 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
             return await self.update(data)
         return await self.add(data, allow_id=True)
 
-    def filter_collection_by_kwargs(self, **kwargs: Any) -> None:
+    def filter_collection_by_kwargs(  # type:ignore[override]
+        self,
+        collection: MutableMapping[Hashable, ModelT],
+        /,
+        **kwargs: Any,
+    ) -> None:
         """Filter the collection by kwargs.
 
         Args:
