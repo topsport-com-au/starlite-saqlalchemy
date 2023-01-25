@@ -166,7 +166,7 @@ async def fx_engine(docker_ip: str) -> AsyncEngine:
 
 
 @pytest.fixture(autouse=True)
-async def _seed_db(engine: AsyncEngine, raw_authors: list[dict[str, Any]]) -> AsyncIterator[None]:
+async def _seed_db(engine: AsyncEngine, raw_authors: list[dict[str, Any]]) -> None:
     """Populate test database with.
 
     Args:
@@ -175,6 +175,7 @@ async def _seed_db(engine: AsyncEngine, raw_authors: list[dict[str, Any]]) -> As
     metadata = db.orm.Base.registry.metadata
     author_table = metadata.tables["author"]
     async with engine.begin() as conn:
+        await conn.run_sync(metadata.drop_all)
         await conn.run_sync(metadata.create_all)
 
     # convert date/time strings to dt objects.
@@ -185,9 +186,6 @@ async def _seed_db(engine: AsyncEngine, raw_authors: list[dict[str, Any]]) -> As
 
     async with engine.begin() as conn:
         await conn.execute(author_table.insert(), raw_authors)
-    yield
-    async with engine.begin() as conn:
-        await conn.run_sync(metadata.drop_all)
 
 
 @pytest.fixture(autouse=True)
