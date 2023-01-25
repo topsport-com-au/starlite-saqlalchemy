@@ -67,7 +67,6 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """
         Args:
             session: Session managing the unit-of-work for the operation.
-            select_: To facilitate customization of the underlying select query.
         """
         super().__init__(**kwargs)
         self.session = session
