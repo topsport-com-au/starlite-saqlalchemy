@@ -311,6 +311,10 @@ class WorkerSettings(BaseSettings):
     - This always includes jitter, where the final retry delay is a random number between 0 and the calculated retry delay.
     - If retry_backoff is set to a number, that number is the maximum retry delay, in seconds."
     """
+    CONCURRENCY: int = 10
+    """The number of concurrent jobs allowed to execute per worker.
+    Default is set to 10.
+    """
 
 
 # `.parse_obj()` thing is a workaround for pyright and pydantic interplay, see:
