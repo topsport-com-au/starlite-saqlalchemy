@@ -4,7 +4,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, cast
 
-from sqlalchemy import over, select, text
+from sqlalchemy import over, select, text, insert
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.sql import func as sql_func
 
@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from sqlalchemy import Select
     from sqlalchemy.engine import Result
     from sqlalchemy.ext.asyncio import AsyncSession
+    from sqlalchemy.sql.base import ExecutableOption
 
     from starlite_saqlalchemy.db import orm
     from starlite_saqlalchemy.repository.types import FilterTypes
@@ -68,6 +69,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Args:
             session: Session managing the unit-of-work for the operation.
         """
+        self.default_options: list["ExecutableOption"] = kwargs.pop("options", [])
         super().__init__(**kwargs)
         self.session = session
 
@@ -87,7 +89,27 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             self.session.expunge(instance)
             return instance
 
-    async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:
+    async def add_many(self, data: list[ModelT | dict[str, Any]]) -> list[ModelT]:
+        """Add Many `data` to the collection.
+
+        Args:
+            data: list of Instances to be added to the collection.
+
+        Returns:
+            The added instances.
+        """
+        with wrap_sqlalchemy_exception():
+            data = [v.dict() if isinstance(v, self.model_type) else v for v in data]
+            instances = await self._execute(
+                insert(self.model_type).values(data).returning(self.model_type)
+            )
+            for instance in instances:
+                self.session.expunge(instance)
+            return instances
+
+    async def count(
+        self, *filters: FilterTypes, options: list[ExecutableOption] | None = None, **kwargs: Any
+    ) -> int:
         """
 
         Args:
@@ -97,7 +119,10 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             Count of records returned by query, ignoring pagination.
         """
-        select_ = select(sql_func.count(self.model_type.id))  # type:ignore[attr-defined]
+        options = options if options else self.default_options
+        select_ = select(sql_func.count(self.model_type.id)).options(
+            *options
+        )  # type:ignore[attr-defined]
         for filter_ in filters:
             match filter_:
                 case LimitOffset(_, _):
@@ -133,7 +158,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             self.session.expunge(instance)
             return instance
 
-    async def get(self, id_: Any) -> ModelT:
+    async def get(self, id_: Any, options: list[ExecutableOption] | None = None) -> ModelT:
         """Get instance identified by `id_`.
 
         Args:
@@ -145,7 +170,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Raises:
             RepositoryNotFoundException: If no instance found identified by `id_`.
         """
-        select_ = self._create_select_for_model()
+        select_ = self._create_select_for_model(options=options)
         with wrap_sqlalchemy_exception():
             select_ = self._filter_select_by_kwargs(select_, **{self.id_attribute: id_})
             instance = (await self._execute(select_)).scalar_one_or_none()
@@ -153,7 +178,32 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             self.session.expunge(instance)
             return instance
 
-    async def list(self, *filters: FilterTypes, **kwargs: Any) -> abc.Sequence[ModelT]:
+    async def get_one_or_none(
+        self, *filters: FilterTypes, options: list[ExecutableOption] | None = None, **kwargs: Any
+    ) -> ModelT | None:
+        """Get an object instance, optionally filtered.
+
+        Args:
+            *filters: Types for specific filtering operations.
+            **kwargs: Instance attribute value filters.
+
+        Returns:
+            The list of instances, after filtering applied.
+        """
+        select_ = self._create_select_for_model(options=options)
+        select_ = self._filter_for_list(*filters, select_=select_)
+        select_ = self._filter_select_by_kwargs(select_, **kwargs)
+
+        with wrap_sqlalchemy_exception():
+            result = await self._execute(select_)
+            instances = list(result.scalars())
+            for instance in instances:
+                self.session.expunge(instance)
+            return instances[0] if len(instances) > 0 else None
+
+    async def list(
+        self, *filters: FilterTypes, options: list[ExecutableOption] | None = None, **kwargs: Any
+    ) -> abc.Sequence[ModelT]:
         """Get a list of instances, optionally filtered.
 
         Args:
@@ -163,7 +213,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             The list of instances, after filtering applied.
         """
-        select_ = self._create_select_for_model()
+        select_ = self._create_select_for_model(options=options)
         select_ = self._filter_for_list(*filters, select_=select_)
         select_ = self._filter_select_by_kwargs(select_, **kwargs)
 
@@ -175,7 +225,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             return instances
 
     async def list_and_count(
-        self, *filters: FilterTypes, **kwargs: Any
+        self, *filters: FilterTypes, options: list[ExecutableOption] | None = None, **kwargs: Any
     ) -> tuple[abc.Sequence[ModelT], int]:
         """
 
@@ -186,10 +236,11 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             Count of records returned by query, ignoring pagination.
         """
+        options = options if options else self.default_options
         select_ = select(
             self.model_type,
             over(sql_func.count(self.model_type.id)),  # type:ignore[attr-defined]
-        )
+        ).options(*options)
         select_ = self._filter_for_list(*filters, select_=select_)
         select_ = self._filter_select_by_kwargs(select_, **kwargs)
         with wrap_sqlalchemy_exception():
@@ -272,7 +323,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """Perform a health check on the database.
 
         Args:
-            session: through which we runa check statement
+            session: through which we run a check statement
 
         Returns:
             `True` if healthy.
@@ -312,8 +363,9 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             case _:
                 raise ValueError("Unexpected value for `strategy`, must be `'add'` or `'merge'`")
 
-    def _create_select_for_model(self) -> Select[tuple[ModelT]]:
-        return select(self.model_type)
+    def _create_select_for_model(self, **kwargs: Any) -> Select[tuple[ModelT]]:
+        options = kwargs.get("options", self.default_options)
+        return select(self.model_type).options(*options)
 
     async def _execute(self, select_: Select[RowT]) -> Result[RowT]:
         return cast("Result[RowT]", await self.session.execute(select_))
