@@ -69,7 +69,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Args:
             session: Session managing the unit-of-work for the operation.
         """
-        self.default_options: list["ExecutableOption"] = kwargs.pop("options", [])
+        self.default_options: list[ExecutableOption] = kwargs.pop("options", [])
         super().__init__(**kwargs)
         self.session = session
 
