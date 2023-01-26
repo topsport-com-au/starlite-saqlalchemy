@@ -7,7 +7,7 @@ import inspect
 import logging
 from functools import partial
 from typing import TYPE_CHECKING, Any
-
+from redis.asyncio import Redis
 import msgspec
 import saq
 from starlite.utils.serialization import default_serializer
@@ -35,9 +35,21 @@ __all__ = [
 
 logger = logging.getLogger(__name__)
 
-encoder = msgspec.json.Encoder(
+encoder = msgspec.msgpack.Encoder(
     enc_hook=partial(default_serializer, type_encoders=type_encoders.type_encoders_map)
 )
+
+redis_client: Redis[bytes] = Redis.from_url(
+    settings.redis.URL,
+    decode_responses=False,
+    socket_connect_timeout=settings.redis.SOCKET_CONNECT_TIMEOUT,
+    health_check_interval=settings.redis.HEALTH_CHECK_INTERVAL,
+    socket_keepalive=settings.redis.SOCKET_KEEPALIVE,
+)
+"""Async [`Redis`][redis.Redis] instance.
+Configure via [CacheSettings][starlite_saqlalchemy.settings.RedisSettings].
+This has the addition of setting the default encoder and decoder to msgpack for redis connectivity.
+"""
 
 
 class Queue(saq.Queue):
@@ -50,7 +62,7 @@ class Queue(saq.Queue):
 
         Names the queue per the application slug - namespaces SAQ's redis keys to the app.
 
-        Configures `msgspec` for JSON serialization/deserialization if not
+        Configures `msgspec` for MessagePack serialization/deserialization if not
         otherwise configured.
 
         Args:
@@ -59,7 +71,7 @@ class Queue(saq.Queue):
         """
         kwargs.setdefault("name", "background-worker")
         kwargs.setdefault("dump", encoder.encode)
-        kwargs.setdefault("load", msgspec.json.decode)
+        kwargs.setdefault("load", msgspec.msgpack.decode)
         super().__init__(*args, **kwargs)
 
     def namespace(self, key: str) -> str:
@@ -143,6 +155,10 @@ default_job_config_dict = utils.dataclass_as_dict_shallow(JobConfig(), exclude_n
 
 def create_worker_instance(
     functions: Collection[Callable[..., Any] | tuple[str, Callable]],
+    cron_jobs: Collection[saq.CronJob] = (),
+    concurrency: int | None = None,
+    startup: Callable[[dict[str, Any]], Awaitable[Any]] | None = None,
+    shutdown: Callable[[dict[str, Any]], Awaitable[Any]] | None = None,
     before_process: Callable[[dict[str, Any]], Awaitable[Any]] | None = None,
     after_process: Callable[[dict[str, Any]], Awaitable[Any]] | None = None,
 ) -> Worker:
@@ -150,13 +166,28 @@ def create_worker_instance(
 
     Args:
         functions: Functions to be called via the async workers.
+        cron_jobs: Cron configuration to schedule at startup.
+        concurrency: The number of jobs allowed to execute simultaneously per worker.
+        startup: Async function called on worker startup.
+        shutdown: Async function called on worker shutdown.
         before_process: Async function called before a job processes.
         after_process: Async function called after a job processes.
 
     Returns:
         The worker instance, instantiated with `functions`.
     """
-    return Worker(queue, functions, before_process=before_process, after_process=after_process)
+    if concurrency is None:
+        concurrency = settings.worker.CONCURRENCY
+    return Worker(
+        queue,
+        functions=functions,
+        cron_jobs=cron_jobs,
+        startup=startup,
+        concurrency=concurrency,
+        shutdown=shutdown,
+        before_process=before_process,
+        after_process=after_process,
+    )
 
 
 async def make_service_callback(
