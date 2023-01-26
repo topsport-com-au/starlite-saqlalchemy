@@ -93,7 +93,12 @@ class HealthController(Controller):
     exception_handlers = {HealthCheckFailure: health_failure_exception_handler}
     health_checks: list[AbstractHealthCheck] = []
 
-    @get(path=settings.api.HEALTH_PATH, tags=["Misc"], raises=[HealthCheckFailure])
+    @get(
+        path=settings.api.HEALTH_PATH,
+        tags=["Misc"],
+        raises=[HealthCheckFailure],
+        name="HealthCheck",
+    )
     async def health_check(self) -> HealthResource:
         """Run registered health checks."""
         health: dict[str, bool] = {}
