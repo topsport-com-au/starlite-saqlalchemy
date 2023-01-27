@@ -64,6 +64,17 @@ class Service(Generic[T]):
         """
         return data
 
+    async def create_many(self, data: list[T]) -> Sequence[T]:
+        """Create many instances of `T`.
+
+        Args:
+            data: Representation to be created.
+
+        Returns:
+            Representation of created instance.
+        """
+        return data
+
     async def list(self, **kwargs: Any) -> Sequence[T]:
         """Return view of the collection of `T`.
 

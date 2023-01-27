@@ -60,6 +60,17 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         """
         return await self.repository.add(data)
 
+    async def create_many(self, data: list[ModelT]) -> Sequence[ModelT]:
+        """Wrap repository bulk instance creation.
+
+        Args:
+            data: Representations to be created.
+
+        Returns:
+            Representation of created instances.
+        """
+        return await self.repository.add_many(data)
+
     async def list(self, *filters: FilterTypes, **kwargs: Any) -> Sequence[ModelT]:
         """Wrap repository scalars operation.
 

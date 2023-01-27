@@ -42,6 +42,17 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """
 
     @abstractmethod
+    async def add_many(self, data: list[T]) -> list[T]:
+        """Add multiple `data` to the collection.
+
+        Args:
+            data: Instances to be added to the collection.
+
+        Returns:
+            The added instances.
+        """
+
+    @abstractmethod
     async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:
         """Get the count of records returned by a query.
 
