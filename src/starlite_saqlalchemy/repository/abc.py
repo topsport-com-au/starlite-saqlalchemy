@@ -42,7 +42,7 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """
 
     @abstractmethod
-    async def add_many(self, data: list[T]) ->  Sequence[T]:
+    async def add_many(self, data: list[T]) -> Sequence[T]:
         """Add multiple `data` to the collection.
 
         Args:
@@ -90,6 +90,18 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
 
         Raises:
             RepositoryNotFoundException: If no instance found identified by `id_`.
+        """
+
+    @abstractmethod
+    async def get_one_or_none(self, *filters: FilterTypes, **kwargs: Any) -> T | None:
+        """Get an instance if it exists or None.
+
+        Args:
+            *filters: Types for specific filtering operations.
+            **kwargs: Instance attribute value filters.
+
+        Returns:
+            The list of instances, after filtering applied.
         """
 
     @abstractmethod
