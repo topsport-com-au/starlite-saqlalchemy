@@ -89,7 +89,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             self.session.expunge(instance)
             return instance
 
-    async def add_many(self, data: list[ModelT | dict[str, Any]]) -> list[ModelT]:
+    async def add_many(self, data: list[ModelT]) -> abc.Sequence[ModelT]:
         """Add Many `data` to the collection.
 
         Args:
