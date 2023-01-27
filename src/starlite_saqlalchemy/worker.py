@@ -7,9 +7,10 @@ import inspect
 import logging
 from functools import partial
 from typing import TYPE_CHECKING, Any
-from redis.asyncio import Redis
+
 import msgspec
 import saq
+from redis.asyncio import Redis
 from starlite.utils.serialization import default_serializer
 
 from starlite_saqlalchemy import constants, redis, settings, type_encoders, utils
@@ -47,6 +48,7 @@ redis_client: Redis[bytes] = Redis.from_url(
     socket_keepalive=settings.redis.SOCKET_KEEPALIVE,
 )
 """Async [`Redis`][redis.Redis] instance.
+
 Configure via [CacheSettings][starlite_saqlalchemy.settings.RedisSettings].
 This has the addition of setting the default encoder and decoder to msgpack for redis connectivity.
 """

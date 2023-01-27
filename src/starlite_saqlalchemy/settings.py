@@ -212,7 +212,8 @@ class RedisSettings(BaseSettings):
     URL: AnyUrl = parse_obj_as(AnyUrl, "redis://localhost:6379/0")
     """A Redis connection URL."""
     SOCKET_CONNECT_TIMEOUT: int = 5
-    """Length of time to wait (in seconds) for a connection to become active."""
+    """Length of time to wait (in seconds) for a connection to become
+    active."""
     HEALTH_CHECK_INTERVAL: int = 5
     """Length of time to wait (in seconds) before testing connection health."""
     SOCKET_KEEPALIVE: int = 5
@@ -313,6 +314,7 @@ class WorkerSettings(BaseSettings):
     """
     CONCURRENCY: int = 10
     """The number of concurrent jobs allowed to execute per worker.
+
     Default is set to 10.
     """
 

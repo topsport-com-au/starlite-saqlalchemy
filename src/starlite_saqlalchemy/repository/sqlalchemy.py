@@ -4,7 +4,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, cast
 
-from sqlalchemy import over, select, text, insert
+from sqlalchemy import insert, over, select, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.sql import func as sql_func
 
