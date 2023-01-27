@@ -72,7 +72,7 @@ hiredis = {version = "*", optional = true}
 redis = {version = "*", optional = true}
 saq = {version = "^0.9.1", optional = true}
 sentry-sdk = {version = "*", optional = true}
-sqlalchemy = {version = "==2.0.0rc3", optional = true}
+sqlalchemy = {version = ">=2.0.0", optional = true}
 
 [tool.poetry.extras]
 all = ["redis", "hiredis", "saq", "sentry-sdk", "sqlalchemy"]
