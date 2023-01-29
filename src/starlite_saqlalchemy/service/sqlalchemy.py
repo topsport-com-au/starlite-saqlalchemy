@@ -42,7 +42,8 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
     async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:
         """
         Args:
-            **kwargs: key value pairs of filter types.
+            *filters: Collection route filters.
+            **kwargs: Keyword arguments for attribute based filtering.
 
         Returns:
            A count of the collection, filtered, but ignoring pagination.
@@ -77,7 +78,8 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
     ) -> tuple[Sequence[ModelT], int]:
         """
         Args:
-            **kwargs: Keyword arguments for filtering.
+            *filters: Collection route filters.
+            **kwargs: Keyword arguments for attribute based filtering.
 
         Returns:
             List of instances and count of total collection, ignoring pagination.
