@@ -15,7 +15,7 @@ from starlite_saqlalchemy.repository.sqlalchemy import ModelT
 from .generic import Service
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
+    from collections.abc import AsyncIterator, Sequence
 
     from starlite_saqlalchemy.repository.abc import AbstractRepository
     from starlite_saqlalchemy.repository.types import FilterTypes
@@ -39,6 +39,17 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         """
         self.repository = self.repository_type(**repo_kwargs)
 
+    async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:
+        """
+        Args:
+            *filters: Collection route filters.
+            **kwargs: Keyword arguments for attribute based filtering.
+
+        Returns:
+           A count of the collection, filtered, but ignoring pagination.
+        """
+        return await self.repository.count(*filters, **kwargs)
+
     async def create(self, data: ModelT) -> ModelT:
         """Wrap repository instance creation.
 
@@ -50,7 +61,7 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         """
         return await self.repository.add(data)
 
-    async def list(self, *filters: "FilterTypes", **kwargs: Any) -> list[ModelT]:
+    async def list(self, *filters: FilterTypes, **kwargs: Any) -> Sequence[ModelT]:
         """Wrap repository scalars operation.
 
         Args:
@@ -61,6 +72,19 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
             The list of instances retrieved from the repository.
         """
         return await self.repository.list(*filters, **kwargs)
+
+    async def list_and_count(
+        self, *filters: FilterTypes, **kwargs: Any
+    ) -> tuple[Sequence[ModelT], int]:
+        """
+        Args:
+            *filters: Collection route filters.
+            **kwargs: Keyword arguments for attribute based filtering.
+
+        Returns:
+            List of instances and count of total collection, ignoring pagination.
+        """
+        return await self.repository.list_and_count(*filters, **kwargs)
 
     async def update(self, id_: Any, data: ModelT) -> ModelT:
         """Wrap repository update operation.

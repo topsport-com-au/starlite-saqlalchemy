@@ -4,6 +4,7 @@ Service object is generic on the domain model type.
 """
 from __future__ import annotations
 
+import asyncio
 import contextlib
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 
@@ -11,7 +12,7 @@ from starlite_saqlalchemy import constants
 from starlite_saqlalchemy.exceptions import NotFoundError
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
+    from collections.abc import AsyncIterator, Sequence
 
 
 T = TypeVar("T")
@@ -42,6 +43,16 @@ class Service(Generic[T]):
 
     # pylint:disable=unused-argument
 
+    async def count(self, **kwargs: Any) -> int:
+        """
+        Args:
+            **kwargs: key value pairs of filter types.
+
+        Returns:
+           A count of the collection, filtered, but ignoring pagination.
+        """
+        return 0
+
     async def create(self, data: T) -> T:
         """Create an instance of `T`.
 
@@ -53,7 +64,7 @@ class Service(Generic[T]):
         """
         return data
 
-    async def list(self, **kwargs: Any) -> list[T]:
+    async def list(self, **kwargs: Any) -> Sequence[T]:
         """Return view of the collection of `T`.
 
         Args:
@@ -63,6 +74,17 @@ class Service(Generic[T]):
             The list of instances retrieved from the repository.
         """
         return []
+
+    async def list_and_count(self, **kwargs: Any) -> tuple[Sequence[T], int]:
+        """
+        Args:
+            **kwargs: Keyword arguments for filtering.
+
+        Returns:
+            List of instances and count of total collection, ignoring pagination.
+        """
+        collection, count = await asyncio.gather(self.list(**kwargs), self.count(**kwargs))
+        return collection, count
 
     async def update(self, id_: Any, data: T) -> T:
         """Update existing instance of `T` with `data`.

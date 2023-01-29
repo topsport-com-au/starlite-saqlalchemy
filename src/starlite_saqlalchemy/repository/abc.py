@@ -7,11 +7,14 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 from starlite_saqlalchemy.exceptions import NotFoundError
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from .types import FilterTypes
 
 __all__ = ["AbstractRepository"]
 
 T = TypeVar("T")
+CollectionT = TypeVar("CollectionT")
 RepoT = TypeVar("RepoT", bound="AbstractRepository")
 
 
@@ -36,6 +39,18 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
 
         Returns:
             The added instance.
+        """
+
+    @abstractmethod
+    async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:
+        """Get the count of records returned by a query.
+
+        Args:
+            *filters: Types for specific filtering operations.
+            **kwargs: Instance attribute value filters.
+
+        Returns:
+            The count of instances
         """
 
     @abstractmethod
@@ -67,7 +82,7 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """
 
     @abstractmethod
-    async def list(self, *filters: FilterTypes, **kwargs: Any) -> list[T]:
+    async def list(self, *filters: FilterTypes, **kwargs: Any) -> Sequence[T]:
         """Get a list of instances, optionally filtered.
 
         Args:
@@ -76,6 +91,18 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
 
         Returns:
             The list of instances, after filtering applied.
+        """
+
+    @abstractmethod
+    async def list_and_count(self, *filters: FilterTypes, **kwargs: Any) -> tuple[Sequence[T], int]:
+        """
+
+        Args:
+            *filters: Types for specific filtering operations.
+            **kwargs: Instance attribute value filters.
+
+        Returns:
+            Count of records returned by query, ignoring pagination.
         """
 
     @abstractmethod
@@ -113,12 +140,13 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def filter_collection_by_kwargs(self, **kwargs: Any) -> None:
+    def filter_collection_by_kwargs(self, collection: CollectionT, /, **kwargs: Any) -> CollectionT:
         """Filter the collection by kwargs.
 
         Has `AND` semantics where multiple kwargs name/value pairs are provided.
 
         Args:
+            collection: the collection to be filtered
             **kwargs: key/value pairs such that objects remaining in the collection after filtering
                 have the property that their attribute named `key` has value equal to `value`.
 

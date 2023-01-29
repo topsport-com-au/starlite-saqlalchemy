@@ -34,7 +34,10 @@ def mock_repo() -> SQLAlchemyRepository:
 
         model_type = MagicMock()  # pyright:ignore[reportGeneralTypeIssues]
 
-    return Repo(session=AsyncMock(spec=AsyncSession), select_=MagicMock())
+        def _create_select_for_model(self) -> MagicMock:
+            return MagicMock()
+
+    return Repo(session=AsyncMock(spec=AsyncSession))
 
 
 def test_wrap_sqlalchemy_integrity_error() -> None:
@@ -112,11 +115,28 @@ async def test_sqlalchemy_repo_list_with_pagination(
     result_mock = MagicMock()
     execute_mock = AsyncMock(return_value=result_mock)
     monkeypatch.setattr(mock_repo, "_execute", execute_mock)
-    mock_repo._select.limit.return_value = mock_repo._select
-    mock_repo._select.offset.return_value = mock_repo._select
+    select_ = MagicMock()
+    select_.limit.return_value = select_
+    select_.offset.return_value = select_
+    monkeypatch.setattr(mock_repo, "_create_select_for_model", lambda: select_)
     await mock_repo.list(LimitOffset(2, 3))
-    mock_repo._select.limit.assert_called_once_with(2)
-    mock_repo._select.limit().offset.assert_called_once_with(3)  # type:ignore[call-arg]
+    select_.limit.assert_called_once_with(2)
+    select_.limit().offset.assert_called_once_with(3)
+
+
+async def test_sqlalchemy_repo_count(
+    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
+) -> None:
+    """Test count operation with pagination."""
+    result_mock = MagicMock()
+    count_mock = MagicMock()
+    execute_mock = AsyncMock(return_value=result_mock)
+    execute_count_mock = AsyncMock(return_value=count_mock)
+    monkeypatch.setattr(mock_repo, "count", execute_count_mock)
+    monkeypatch.setattr(mock_repo, "_execute", execute_mock)
+    mock_repo.count.return_value = 1
+    count = await mock_repo.count()
+    assert count == 1
 
 
 async def test_sqlalchemy_repo_list_with_before_after_filter(
@@ -130,10 +150,12 @@ async def test_sqlalchemy_repo_list_with_before_after_filter(
     result_mock = MagicMock()
     execute_mock = AsyncMock(return_value=result_mock)
     monkeypatch.setattr(mock_repo, "_execute", execute_mock)
-    mock_repo._select.where.return_value = mock_repo._select
+    select_ = MagicMock()
+    select_.where.return_value = select_
+    monkeypatch.setattr(mock_repo, "_create_select_for_model", lambda: select_)
     await mock_repo.list(BeforeAfter(field_name, datetime.max, datetime.min))
-    assert mock_repo._select.where.call_count == 2
-    assert mock_repo._select.where.has_calls([call("gt"), call("lt")])
+    assert select_.where.call_count == 2
+    assert select_.where.has_calls([call("gt"), call("lt")])
 
 
 async def test_sqlalchemy_repo_list_with_collection_filter(
@@ -144,10 +166,12 @@ async def test_sqlalchemy_repo_list_with_collection_filter(
     result_mock = MagicMock()
     execute_mock = AsyncMock(return_value=result_mock)
     monkeypatch.setattr(mock_repo, "_execute", execute_mock)
-    mock_repo._select.where.return_value = mock_repo._select
+    select_ = MagicMock()
+    select_.where.return_value = select_
+    monkeypatch.setattr(mock_repo, "_create_select_for_model", lambda: select_)
     values = [1, 2, 3]
     await mock_repo.list(CollectionFilter(field_name, values))
-    mock_repo._select.where.assert_called_once()
+    select_.where.assert_called_once()
     getattr(mock_repo.model_type, field_name).in_.assert_called_once_with(values)
 
 
@@ -200,14 +224,16 @@ async def test_attach_to_session_unexpected_strategy_raises_valueerror(
 
 async def test_execute(mock_repo: SQLAlchemyRepository) -> None:
     """Simple test of the abstraction over `AsyncSession.execute()`"""
-    await mock_repo._execute()
-    mock_repo.session.execute.assert_called_once_with(mock_repo._select)
+    select_ = mock_repo._create_select_for_model()
+    await mock_repo._execute(select_)
+    mock_repo.session.execute.assert_called_once_with(select_)
 
 
 def test_filter_in_collection_noop_if_collection_empty(mock_repo: SQLAlchemyRepository) -> None:
     """Ensures we don't filter on an empty collection."""
-    mock_repo._filter_in_collection("id", [])
-    mock_repo._select.where.assert_not_called()
+    select_ = mock_repo._create_select_for_model()
+    mock_repo._filter_in_collection("id", [], select_=select_)
+    select_.where.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -225,13 +251,16 @@ def test__filter_on_datetime_field(
     field_mock = MagicMock()
     field_mock.__gt__ = field_mock.__lt__ = lambda self, other: True
     mock_repo.model_type.updated = field_mock
-    mock_repo._filter_on_datetime_field("updated", before, after)
+    mock_repo._filter_on_datetime_field(
+        "updated", before, after, select_=mock_repo._create_select_for_model()
+    )
 
 
 def test_filter_collection_by_kwargs(mock_repo: SQLAlchemyRepository) -> None:
     """Test `filter_by()` called with kwargs."""
-    mock_repo.filter_collection_by_kwargs(a=1, b=2)
-    mock_repo._select.filter_by.assert_called_once_with(a=1, b=2)
+    select_ = mock_repo._create_select_for_model()
+    mock_repo.filter_collection_by_kwargs(select_, a=1, b=2)
+    select_.filter_by.assert_called_once_with(a=1, b=2)
 
 
 def test_filter_collection_by_kwargs_raises_repository_exception_for_attribute_error(
@@ -239,8 +268,9 @@ def test_filter_collection_by_kwargs_raises_repository_exception_for_attribute_e
 ) -> None:
     """Test that we raise a repository exception if an attribute name is
     incorrect."""
-    mock_repo._select.filter_by = MagicMock(  # type:ignore[assignment]
+    select_ = mock_repo._create_select_for_model()
+    select_.filter_by = MagicMock(  # type:ignore[assignment]
         side_effect=InvalidRequestError,
     )
     with pytest.raises(StarliteSaqlalchemyError):
-        mock_repo.filter_collection_by_kwargs(a=1)
+        mock_repo.filter_collection_by_kwargs(select_, a=1)
