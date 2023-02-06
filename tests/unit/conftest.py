@@ -9,7 +9,6 @@ from starlite.datastructures import State
 from starlite.enums import ScopeType
 
 if TYPE_CHECKING:
-
     from starlite import Starlite
     from starlite.types import HTTPResponseBodyEvent, HTTPResponseStartEvent, HTTPScope
 
@@ -33,7 +32,6 @@ def http_response_body() -> HTTPResponseBodyEvent:
 @pytest.fixture()
 def http_scope(app: Starlite) -> HTTPScope:
     """Minimal ASGI HTTP connection scope."""
-
     @get()
     def handler() -> None:
         ...

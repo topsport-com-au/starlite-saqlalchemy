@@ -69,7 +69,6 @@ def test_write_dto_for_model_field_scalar_default(
 
 def test_write_dto_for_model_field_factory_default() -> None:
     """Test write purposed DTO includes the default factory."""
-
     class Model(orm.Base):
         field: Mapped[UUID] = mapped_column(default=uuid4)
 
@@ -80,7 +79,6 @@ def test_write_dto_for_model_field_factory_default() -> None:
 
 def test_read_dto_for_model_field_factory_default() -> None:
     """Test read purposed DTO excludes the default factory."""
-
     class Model(orm.Base):
         field: Mapped[UUID] = mapped_column(default=uuid4)
 
@@ -105,7 +103,6 @@ def test_read_dto_for_model_field_unsupported_default() -> None:
 @pytest.mark.parametrize("purpose", [dto.Purpose.WRITE, dto.Purpose.READ])
 def test_dto_for_private_model_field(purpose: dto.Purpose) -> None:
     """Ensure that fields markets as PRIVATE are excluded from DTO."""
-
     class Model(orm.Base):
         field: Mapped[datetime] = mapped_column(
             default=datetime.now(),
@@ -119,7 +116,6 @@ def test_dto_for_private_model_field(purpose: dto.Purpose) -> None:
 @pytest.mark.parametrize("purpose", [dto.Purpose.WRITE, dto.Purpose.READ])
 def test_dto_for_non_mapped_model_field(purpose: dto.Purpose) -> None:
     """Ensure that we exclude unmapped fields from DTOs."""
-
     class Model(orm.Base):
         field: ClassVar[datetime]
 
@@ -161,7 +157,6 @@ def test_subclassed_dto() -> None:
     both statically, and dynamically (with the `check_fields=False`
     flag).
     """
-
     class AuthorDTO(dto.FromMapped[Annotated[Author, "write"]]):
         name: constr(to_upper=True)  # pyright:ignore
 
@@ -184,7 +179,6 @@ def test_subclassed_dto() -> None:
 
 def test_dto_attrib_validator() -> None:
     """Test arbitrary single arg callables as validators."""
-
     validator_called = False
 
     def validate_datetime(val: datetime) -> datetime:
@@ -204,7 +198,6 @@ def test_dto_attrib_validator() -> None:
 
 def test_dto_attrib_pydantic_type() -> None:
     """Test declare pydantic type on `dto.DTOField`."""
-
     class Model(orm.Base):
         field: Mapped[str] = mapped_column(
             info={settings.api.DTO_INFO_KEY: dto.DTOField(pydantic_type=constr(to_upper=True))}
@@ -216,7 +209,6 @@ def test_dto_attrib_pydantic_type() -> None:
 
 def test_dto_mapped_as_dataclass_model_type() -> None:
     """Test declare pydantic type on `dto.DTOField`."""
-
     class Model(orm.Base, MappedAsDataclass):
         clz_var: ClassVar[str]
         field: Mapped[str]
@@ -241,7 +233,6 @@ def test_invalid_from_mapped_annotation() -> None:
 
 def test_to_mapped_model_with_collection_relationship() -> None:
     """Test building a DTO with collection relationship, and parsing data."""
-
     class A(orm.Base):
         b_id: Mapped[int] = mapped_column(ForeignKey("b.id"))
 
@@ -257,7 +248,6 @@ def test_to_mapped_model_with_collection_relationship() -> None:
 
 def test_to_mapped_model_with_scalar_relationship() -> None:
     """Test building DTO with Scalar relationship, and parsing data."""
-
     class A(orm.Base):
         ...
 
@@ -273,7 +263,6 @@ def test_to_mapped_model_with_scalar_relationship() -> None:
 
 def test_dto_field_pydantic_field() -> None:
     """Test specifying DTOField.pydantic_field."""
-
     class A(orm.Base):
         val: Mapped[int] = mapped_column(info=dto.field(pydantic_field=Field(le=1)))
 
@@ -284,7 +273,6 @@ def test_dto_field_pydantic_field() -> None:
 
 def test_dto_mapped_union() -> None:
     """Test where a column type declared as e.g., `Mapped[str | None]`."""
-
     class A(orm.Base):
         val: Mapped[str | None]
 
@@ -297,7 +285,6 @@ def test_dto_mapped_union() -> None:
 
 def test_dto_mapped_union_relationship() -> None:
     """Test where a related type declared as e.g., `Mapped[A | None]`."""
-
     class A(orm.Base):
         val: Mapped[str | None]
 

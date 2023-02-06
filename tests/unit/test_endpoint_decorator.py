@@ -8,7 +8,6 @@ from starlite_saqlalchemy import endpoint_decorator
 
 def test_endpoint_decorator() -> None:
     """Test for basic functionality."""
-
     @endpoint_decorator.endpoint(base_url="/something")
     class Endpoint:
         """Endpoints for something."""

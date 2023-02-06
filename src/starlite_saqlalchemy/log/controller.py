@@ -1,6 +1,7 @@
 """Logging config for the application.
 
-Ensures that the app, sqlalchemy, saq and uvicorn loggers all log through the queue listener.
+Ensures that the app, sqlalchemy, saq and uvicorn loggers all log
+through the queue listener.
 
 Adds a filter for health check route logs.
 """
@@ -62,7 +63,6 @@ def middleware_factory(app: ASGIApp) -> ASGIApp:
     Returns:
         A new ASGI app that cleans the structlog contextvars.
     """
-
     async def middleware(scope: Scope, receive: Receive, send: Send) -> None:
         """Clean up structlog contextvars.
 

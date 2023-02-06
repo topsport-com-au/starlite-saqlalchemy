@@ -125,7 +125,6 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         Raises:
             RepositoryException: if a named attribute doesn't exist on `self.model_type`.
         """
-
     @staticmethod
     def check_not_found(item_or_none: T | None) -> T:
         """Raise `RepositoryNotFoundException` if `item_or_none` is `None`.
