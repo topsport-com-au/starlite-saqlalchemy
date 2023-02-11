@@ -170,6 +170,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Raises:
             RepositoryNotFoundException: If no instance found identified by `id_`.
         """
+        options = options if options else self.default_options
         select_ = self._create_select_for_model(options=options)
         with wrap_sqlalchemy_exception():
             select_ = self._filter_select_by_kwargs(select_, **{self.id_attribute: id_})
@@ -190,6 +191,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             The list of instances, after filtering applied.
         """
+        options = options if options else self.default_options
         select_ = self._create_select_for_model(options=options)
         select_ = self._filter_for_list(*filters, select_=select_)
         select_ = self._filter_select_by_kwargs(select_, **kwargs)
@@ -213,6 +215,8 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             The list of instances, after filtering applied.
         """
+        options = options if options else self.default_options
+        
         select_ = self._create_select_for_model(options=options)
         select_ = self._filter_for_list(*filters, select_=select_)
         select_ = self._filter_select_by_kwargs(select_, **kwargs)
