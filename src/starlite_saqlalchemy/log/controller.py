@@ -148,9 +148,9 @@ class BeforeSendHandler:
             except Exception as exc:  # pylint: disable=broad-except
                 # just in-case something in the context causes the error
                 structlog.contextvars.clear_contextvars()
-                await LOGGER.aerror("Error in logging before-send handler!", exc_info=exc)
+                await LOGGER.aerror("Error in logging before-send handler!", exc)
 
-    async def log_request(self, scope: "Scope") -> None:
+    async def log_request(self, scope: Scope) -> None:
         """Handle extracting the request data and logging the message.
 
         Args:
@@ -162,7 +162,7 @@ class BeforeSendHandler:
         extracted_data = await self.extract_request_data(request=scope["app"].request_class(scope))
         structlog.contextvars.bind_contextvars(request=extracted_data)
 
-    async def log_response(self, scope: "Scope") -> None:
+    async def log_response(self, scope: Scope) -> None:
         """Handle extracting the response data and logging the message.
 
         Args:
