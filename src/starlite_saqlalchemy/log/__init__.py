@@ -47,7 +47,7 @@ stdlib_processors = [
 if IS_LOCAL_ENVIRONMENT:  # pragma: no cover
     LoggerFactory: Any = structlog.WriteLoggerFactory
     console_processor = structlog.dev.ConsoleRenderer(
-        colors=True, exception_formatter="structlog.dev.plain_traceback"
+        colors=True, exception_formatter=structlog.dev.plain_traceback
     )
     default_processors.extend([console_processor])
     stdlib_processors.append(console_processor)
