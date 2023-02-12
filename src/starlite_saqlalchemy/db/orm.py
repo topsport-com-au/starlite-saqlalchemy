@@ -8,8 +8,8 @@ from uuid import UUID, uuid4
 from sqlalchemy import MetaData, String
 from sqlalchemy.dialects import postgresql as pg
 from sqlalchemy.event import listens_for
+from sqlalchemy.orm import DeclarativeBase as _DeclarativeBase
 from sqlalchemy.orm import (
-    DeclarativeBase,
     Mapped,
     Session,
     declarative_mixin,
@@ -104,6 +104,25 @@ class SlugColumns:
 
 meta = MetaData(naming_convention=convention)
 registry_ = registry(metadata=meta, type_annotation_map={UUID: pg.UUID, dict: pg.JSONB})
+
+
+class DeclarativeBase(_DeclarativeBase):
+    """Declarative base."""
+
+    @classmethod
+    def from_dict(cls: type[DeclarativeBase], **kwargs: Any) -> DeclarativeBase:
+        """Return ORM Object from Dictionary."""
+        obj_in = {}
+        if cls.__table__ is not None:
+            for column in cls.__table__.columns:
+                if column.name in kwargs:
+                    obj_in.update({column.name: kwargs.get(column.name)})
+        return cls(**obj_in)
+
+    def dict(self) -> dict[str, Any]:
+        """Return a dict representation of a model."""
+        if self.__table__ is not None:  # noqa: RET503
+            return {field.name: getattr(self, field.name) for field in self.__table__.columns}
 
 
 class Base(CommonColumns, DeclarativeBase):
