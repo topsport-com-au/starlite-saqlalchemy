@@ -1,0 +1,16 @@
+ruff
+black
+pylint
+mypy
+asyncpg-stubs
+black
+blacken-docs
+pre-commit
+pylint
+pylint-pydantic 
+slotscheck
+types-click
+types-passlib
+types-python-jose
+types-pyyaml
+types-redis
