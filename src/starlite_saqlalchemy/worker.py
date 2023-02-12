@@ -5,9 +5,11 @@ import asyncio
 import dataclasses
 import inspect
 import logging
-from functools import partial
-from typing import TYPE_CHECKING, Any
+from collections import abc
+from functools import partial, wraps
+from typing import TYPE_CHECKING, Any, Final
 
+import anyio
 import msgspec
 import saq
 from redis.asyncio import Redis
@@ -27,11 +29,16 @@ __all__ = [
     "JobConfig",
     "Queue",
     "Worker",
+    "Job",
+    "CronJob",
+    "WorkerFunction",
     "create_worker_instance",
     "default_job_config_dict",
     "make_service_callback",
     "enqueue_background_task_for_service",
     "queue",
+    "monitored_job",
+    "PeriodicHeartbeat",
 ]
 
 logger = logging.getLogger(__name__)
@@ -52,6 +59,10 @@ redis_client: Redis[bytes] = Redis.from_url(
 Configure via [CacheSettings][starlite_saqlalchemy.settings.RedisSettings].
 This has the addition of setting the default encoder and decoder to msgpack for redis connectivity.
 """
+
+WorkerFunction = abc.Callable[..., abc.Awaitable[Any]]
+Job = saq.Job
+CronJob = saq.CronJob
 
 
 class Queue(saq.Queue):
@@ -155,7 +166,7 @@ class JobConfig:
 default_job_config_dict = utils.dataclass_as_dict_shallow(JobConfig(), exclude_none=True)
 
 
-def create_worker_instance(
+def create_worker_instance(  # noqa: PLR0913
     functions: Collection[Callable[..., Any] | tuple[str, Callable]],
     cron_jobs: Collection[saq.CronJob] = (),
     concurrency: int | None = None,
@@ -164,7 +175,7 @@ def create_worker_instance(
     before_process: Callable[[dict[str, Any]], Awaitable[Any]] | None = None,
     after_process: Callable[[dict[str, Any]], Awaitable[Any]] | None = None,
 ) -> Worker:
-    """
+    """Create worker instance.
 
     Args:
         functions: Functions to be called via the async workers.
@@ -238,3 +249,86 @@ async def enqueue_background_task_for_service(
         **job_config_dict,
     )
     await queue.enqueue(job)
+
+
+TEN: Final = 10
+
+
+class PeriodicHeartbeat:
+    """Class to manage agent Heartbeats while the agent is running Posts a message to a redis key with a limited TTL."""
+
+    def __init__(self, job: Job) -> None:
+        """Initialize heartbeat.
+
+        Args:
+            job (Job): _description_
+        """
+        self._running: bool = True
+        self.job = job
+        self.heartbeat_enabled: bool = bool(
+            job.timeout and job.timeout > 0 and job.heartbeat and job.heartbeat > 0
+        )
+        if self.heartbeat_enabled and job.heartbeat <= TEN:
+            self.heartbeat = 1
+        elif self.heartbeat_enabled and job.heartbeat > TEN:
+            self.heartbeat = 5
+        else:
+            self.heartbeat = 0
+
+    async def start(self, func: Awaitable) -> Any:
+        """Start Heartbeat."""
+        if self.heartbeat_enabled:
+            logger.debug(
+                "❤️  starting heartbeat service for %s. Ticking every %s seconds",
+                self.job.id,
+                self.heartbeat,
+            )
+        async with anyio.create_task_group() as tg:
+            tg.start_soon(self._periodically_publish)
+            executed_func = await func
+            await tg.cancel_scope.cancel()
+            return executed_func
+
+    async def stop(self) -> None:
+        """Stop heartbeat service."""
+        if self.heartbeat_enabled:
+            logger.debug("❤️  stopping heartbeat service for %s", self.job.id)
+        if self._running:
+            self._running = False
+
+    async def _periodically_publish(self) -> None:
+        """Periodically publish heartbeat message."""
+        while self._running and self.heartbeat_enabled:
+            logger.debug(
+                "❤️  ticking heartbeat for %s, and sleeping for %s seconds",
+                self.job.id,
+                self.heartbeat,
+            )
+            await self.job.update()
+            await anyio.sleep(self.heartbeat)
+
+
+# decorator to perform a heartbeat in the background while a function is running
+def monitored_job(func: Any):  # type: ignore
+    """Monitor job.
+
+    Decorator to specify a function as a monitored job.
+
+    Args:
+        func (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
+    @wraps(func)
+    async def with_heartbeat(*args, **kwargs):  # type: ignore
+        context = args[0]
+        job = context["job"]
+        heartbeat = PeriodicHeartbeat(job)
+        try:
+            await heartbeat.start(func(*args, **kwargs))
+        finally:
+            await heartbeat.stop()
+
+    return with_heartbeat
