@@ -119,6 +119,7 @@ class BeforeSendHandler:
             obfuscate_cookies=settings.log.OBFUSCATE_COOKIES,
             obfuscate_headers=settings.log.OBFUSCATE_HEADERS,
         )
+        self.logger = LOGGER
 
     async def __call__(self, message: Message, _: State, scope: Scope) -> None:
         """Receives ASGI response messages and scope, and logs per
