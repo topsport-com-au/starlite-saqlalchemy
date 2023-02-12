@@ -44,7 +44,8 @@ class Service(Generic[T]):
     # pylint:disable=unused-argument
 
     async def count(self, **kwargs: Any) -> int:
-        """
+        """Count of rows returned by query.
+
         Args:
             **kwargs: key value pairs of filter types.
 
@@ -87,7 +88,8 @@ class Service(Generic[T]):
         return []
 
     async def list_and_count(self, **kwargs: Any) -> tuple[Sequence[T], int]:
-        """
+        """List and count records.
+
         Args:
             **kwargs: Keyword arguments for filtering.
 
@@ -121,8 +123,8 @@ class Service(Generic[T]):
         """
         return data
 
-    async def get(self, id_: Any) -> T:
-        """Retrieve a representation of `T` with that is identified by `id_`
+    async def get_by_id(self, id_: Any) -> T:
+        """Retrieve a representation of `T` with that is identified by `id_`.
 
         Args:
             id_: Identifier of instance to be retrieved.

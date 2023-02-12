@@ -10,7 +10,7 @@ import contextlib
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from starlite_saqlalchemy.db import async_session_factory
-from starlite_saqlalchemy.repository.sqlalchemy import ModelT
+from starlite_saqlalchemy.repository.sqlalchemy import ModelT, SlugModelT
 
 from .generic import Service
 
@@ -40,7 +40,8 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         self.repository = self.repository_type(**repo_kwargs)
 
     async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:
-        """
+        """Count of records returned by query.
+
         Args:
             **kwargs: key value pairs of filter types.
 
@@ -86,7 +87,8 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
     async def list_and_count(
         self, *filters: FilterTypes, **kwargs: Any
     ) -> tuple[Sequence[ModelT], int]:
-        """
+        """List of records and total count returned by query.
+
         Args:
             **kwargs: Keyword arguments for filtering.
 
@@ -121,7 +123,7 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         self.repository.set_id_attribute_value(id_, data)
         return await self.repository.upsert(data)
 
-    async def get(self, id_: Any) -> ModelT:
+    async def get_by_id(self, id_: Any) -> ModelT:
         """Wrap repository scalar operation.
 
         Args:
@@ -155,3 +157,21 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         """
         async with async_session_factory() as session:
             yield cls(session=session)
+
+
+class SlugRepositoryService(RepositoryService[SlugModelT]):
+    """Methods for models with a slug field."""
+
+    __id__ = "starlite_saqlalchemy.service.sqlalchemy.SlugRepositoryService"
+    repository_type: type[AbstractRepository[SlugModelT]]
+
+    async def get_by_id(self, id_: Any) -> ModelT:
+        """Wrap repository scalar operation.
+
+        Args:
+            id_: Identifier of instance to be retrieved.
+
+        Returns:
+            Representation of instance with identifier `id_`.
+        """
+        return await self.repository.get_by_slug(id_)

@@ -12,7 +12,6 @@ from starlite_saqlalchemy.exceptions import NotFoundError
 from tests.utils import domain
 
 if TYPE_CHECKING:
-
     from starlite_saqlalchemy.testing.generic_mock_repository import (
         GenericMockRepository,
     )
@@ -107,6 +106,6 @@ async def test_service_method_default_behavior() -> None:
     assert await service_obj.update("abc", data) is data
     assert await service_obj.upsert("abc", data) is data
     with pytest.raises(NotFoundError):
-        await service_obj.get("abc")
+        await service_obj.get_by_id("abc")
     with pytest.raises(NotFoundError):
         await service_obj.delete("abc")

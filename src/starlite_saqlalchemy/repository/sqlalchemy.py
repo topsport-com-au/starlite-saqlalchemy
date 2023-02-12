@@ -13,7 +13,10 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.sql import func as sql_func
 
 from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyError
-from starlite_saqlalchemy.repository.abc import AbstractRepository
+from starlite_saqlalchemy.repository.abc import (
+    AbstractRepository,
+    AbstractSlugRepository,
+)
 from starlite_saqlalchemy.repository.filters import (
     BeforeAfter,
     CollectionFilter,
@@ -163,7 +166,9 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             self.session.expunge(instance)
             return instance
 
-    async def get_by_id(self, id_: Any, options: list[ExecutableOption] | None = None) -> ModelT:
+    async def get_by_id(
+        self, id_: Any, options: list[ExecutableOption] | None = None, **kwargs: Any
+    ) -> ModelT:
         """Get instance identified by `id_`.
 
         Args:
@@ -428,11 +433,13 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         return select_
 
 
-class SQLAlchemyRepositorySlugMixin(SQLAlchemyRepository[SlugModelT]):
+class SQLAlchemyRepositorySlugMixin(
+    SQLAlchemyRepository[SlugModelT], AbstractSlugRepository[SlugModelT], Generic[SlugModelT]
+):
     """Slug Repository Protocol."""
 
     async def get_by_slug(
-        self, slug: str, options: list[ExecutableOption] | None = None
+        self, slug: str, options: list[ExecutableOption] | None = None, **kwargs: Any
     ) -> SlugModelT | None:
         """Select record by slug value."""
         return await self.get_one_or_none(slug=slug, options=options)

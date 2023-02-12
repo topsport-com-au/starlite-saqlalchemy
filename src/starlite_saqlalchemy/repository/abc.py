@@ -79,7 +79,7 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """
 
     @abstractmethod
-    async def get_by_id(self, id_: Any) -> T:
+    async def get_by_id(self, id_: Any, **kwargs: Any) -> T:
         """Get instance identified by `id_`.
 
         Args:
@@ -216,3 +216,21 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """
         setattr(item, cls.id_attribute, id_)
         return item
+
+
+class AbstractSlugRepository(AbstractRepository[T]):
+    """Interface for persistent data interaction."""
+
+    @abstractmethod
+    async def get_by_slug(self, slug: str, **kwargs: Any) -> T | None:
+        """Get instance identified by `slug`.
+
+        Args:
+            slug: Identifier of the instance to be retrieved.
+
+        Returns:
+            The retrieved instance.
+
+        Raises:
+            RepositoryNotFoundException: If no instance found identified by `slug`.
+        """
