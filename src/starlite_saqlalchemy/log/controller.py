@@ -119,7 +119,6 @@ class BeforeSendHandler:
             obfuscate_cookies=settings.log.OBFUSCATE_COOKIES,
             obfuscate_headers=settings.log.OBFUSCATE_HEADERS,
         )
-        self.logger = LOGGER
 
     async def __call__(self, message: Message, _: State, scope: Scope) -> None:
         """Receives ASGI response messages and scope, and logs per
@@ -146,10 +145,13 @@ class BeforeSendHandler:
                 if self.do_log_response:
                     await self.log_response(scope)
                 await LOGGER.alog(scope["state"]["log_level"], settings.log.HTTP_EVENT)
+            # RuntimeError: Expected ASGI message 'http.response.body', but got 'http.response.start'.
+            except StopIteration:
+                pass
             except Exception as exc:  # pylint: disable=broad-except
                 # just in-case something in the context causes the error
                 structlog.contextvars.clear_contextvars()
-                await LOGGER.aerror("Error in logging before-send handler!", exc)
+                await LOGGER.aerror("Error in logging before-send handler!", exc_info=exc)
 
     async def log_request(self, scope: Scope) -> None:
         """Handle extracting the request data and logging the message.
