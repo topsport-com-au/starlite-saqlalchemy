@@ -15,6 +15,7 @@ from starlite.exceptions import (
     PermissionDeniedException,
 )
 from starlite.middleware.exceptions.debug_response import create_debug_response
+from starlite.status_codes import HTTP_409_CONFLICT, HTTP_500_INTERNAL_SERVER_ERROR
 from starlite.utils.exception import create_exception_response
 from structlog.contextvars import bind_contextvars
 
@@ -62,11 +63,11 @@ class MissingDependencyError(StarliteSaqlalchemyError, ValueError):
     """A required dependency is not installed."""
 
     def __init__(self, module: str, config: str | None = None) -> None:
-        """
+        """Missing Dependency Error.
 
         Args:
-            module: name of the package that should be installed
-            config: name of the extra to install the package
+        module: name of the package that should be installed
+        config: name of the extra to install the package.
         """
         config = config if config else module
         super().__init__(
@@ -82,12 +83,11 @@ class HealthCheckConfigurationError(StarliteSaqlalchemyError):
 class _HTTPConflictException(HTTPException):
     """Request conflict with the current state of the target resource."""
 
-    status_code = 409
+    status_code = HTTP_409_CONFLICT
 
 
 async def after_exception_hook_handler(exc: Exception, _scope: Scope, _state: State) -> None:
-    """Binds `exc_info` key with exception instance as value to structlog
-    context vars.
+    """Binds `exc_info` key with exception instance as value to structlog context vars.
 
     This must be a coroutine so that it is not wrapped in a thread where we'll lose context.
 
@@ -96,9 +96,9 @@ async def after_exception_hook_handler(exc: Exception, _scope: Scope, _state: St
         _scope: scope of the request
         _state: application state
     """
-    if isinstance(exc, StarliteSaqlalchemyError):
+    if isinstance(exc, StarliteSaqlalchemyClientError):
         return
-    if isinstance(exc, HTTPException) and exc.status_code < 500:
+    if isinstance(exc, HTTPException) and exc.status_code < HTTP_500_INTERNAL_SERVER_ERROR:
         return
     bind_contextvars(exc_info=sys.exc_info())
 

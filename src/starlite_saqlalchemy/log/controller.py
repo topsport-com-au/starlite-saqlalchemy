@@ -14,6 +14,11 @@ from typing import TYPE_CHECKING
 import structlog
 from starlite.constants import SCOPE_STATE_RESPONSE_COMPRESSED
 from starlite.enums import ScopeType
+from starlite.status_codes import (
+    HTTP_200_OK,
+    HTTP_300_MULTIPLE_CHOICES,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+)
 from starlite.utils.extractors import ConnectionDataExtractor, ResponseDataExtractor
 from starlite.utils.scope import get_starlite_scope_state
 
@@ -47,7 +52,11 @@ def drop_health_logs(_: WrappedLogger, __: str, event_dict: EventDict) -> EventD
     """
     is_http_log = event_dict["event"] == settings.log.HTTP_EVENT
     is_health_log = event_dict.get("request", {}).get("path") == settings.api.HEALTH_PATH
-    is_success_status = 200 <= event_dict.get("response", {}).get("status_code", 0) < 300
+    is_success_status = (
+        HTTP_200_OK
+        <= event_dict.get("response", {}).get("status_code", 0)
+        < HTTP_300_MULTIPLE_CHOICES
+    )
     if is_http_log and is_health_log and is_success_status:
         raise structlog.DropEvent
     return event_dict
@@ -121,8 +130,7 @@ class BeforeSendHandler:
         )
 
     async def __call__(self, message: Message, _: State, scope: Scope) -> None:
-        """Receives ASGI response messages and scope, and logs per
-        configuration.
+        """Receives ASGI response messages and scope, and logs per configuration.
 
         Args:
             message: ASGI response event.
@@ -133,7 +141,9 @@ class BeforeSendHandler:
 
         if message["type"] == HTTP_RESPONSE_START:
             scope["state"]["log_level"] = (
-                logging.ERROR if message["status"] >= 500 else logging.INFO
+                logging.ERROR
+                if message["status"] >= HTTP_500_INTERNAL_SERVER_ERROR
+                else logging.INFO
             )
             scope["state"][HTTP_RESPONSE_START] = message
         # ignore intermediate content of streaming responses for now.
@@ -146,8 +156,6 @@ class BeforeSendHandler:
                     await self.log_response(scope)
                 await LOGGER.alog(scope["state"]["log_level"], settings.log.HTTP_EVENT)
             # RuntimeError: Expected ASGI message 'http.response.body', but got 'http.response.start'.
-            except StopIteration:
-                pass
             except Exception as exc:  # pylint: disable=broad-except
                 # just in-case something in the context causes the error
                 structlog.contextvars.clear_contextvars()
