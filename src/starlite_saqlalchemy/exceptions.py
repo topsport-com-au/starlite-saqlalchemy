@@ -96,7 +96,7 @@ async def after_exception_hook_handler(exc: Exception, _scope: Scope, _state: St
         _scope: scope of the request
         _state: application state
     """
-    if isinstance(exc, StarliteSaqlalchemyClientError):
+    if isinstance(exc, StarliteSaqlalchemyError):
         return
     if isinstance(exc, HTTPException) and exc.status_code < 500:
         return
