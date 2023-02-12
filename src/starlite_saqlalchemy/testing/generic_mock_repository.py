@@ -100,7 +100,7 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         finally:
             del self.collection[id_]
 
-    async def get(self, id_: Any) -> ModelT:
+    async def get_by_id(self, id_: Any) -> ModelT:
         """Get instance identified by `id_`.
 
         Args:

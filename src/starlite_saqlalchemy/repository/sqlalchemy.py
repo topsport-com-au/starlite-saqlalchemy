@@ -1,6 +1,10 @@
 """SQLAlchemy-based implementation of the repository protocol."""
 from __future__ import annotations
 
+import random
+import re
+import string
+import unicodedata
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, cast
 
@@ -34,7 +38,8 @@ __all__ = [
 ]
 
 T = TypeVar("T")
-ModelT = TypeVar("ModelT", bound="orm.Base | orm.AuditBase")
+ModelT = TypeVar("ModelT", bound="orm.Base | orm.AuditBase | orm.SlugBase")
+SlugModelT = TypeVar("SlugModelT", bound="orm.SlugBase")
 RowT = TypeVar("RowT", bound=tuple[Any, ...])
 SQLARepoT = TypeVar("SQLARepoT", bound="SQLAlchemyRepository")
 SelectT = TypeVar("SelectT", bound="Select[Any]")
@@ -100,9 +105,9 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """
         with wrap_sqlalchemy_exception():
             data = [v.dict() if isinstance(v, self.model_type) else v for v in data]
-            instances = await self._execute(
+            instances: list[ModelT] = await self._execute(
                 insert(self.model_type).values(data).returning(self.model_type)
-            )
+            )  # type: ignore
             for instance in instances:
                 self.session.expunge(instance)
             return instances
@@ -152,13 +157,13 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             RepositoryNotFoundException: If no instance found identified by `id_`.
         """
         with wrap_sqlalchemy_exception():
-            instance = await self.get(id_)
+            instance = await self.get_by_id(id_)
             await self.session.delete(instance)
             await self.session.flush()
             self.session.expunge(instance)
             return instance
 
-    async def get(self, id_: Any, options: list[ExecutableOption] | None = None) -> ModelT:
+    async def get_by_id(self, id_: Any, options: list[ExecutableOption] | None = None) -> ModelT:
         """Get instance identified by `id_`.
 
         Args:
@@ -216,7 +221,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             The list of instances, after filtering applied.
         """
         options = options if options else self.default_options
-        
+
         select_ = self._create_select_for_model(options=options)
         select_ = self._filter_for_list(*filters, select_=select_)
         select_ = self._filter_select_by_kwargs(select_, **kwargs)
@@ -274,7 +279,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         with wrap_sqlalchemy_exception():
             id_ = self.get_id_attribute_value(data)
             # this will raise for not found, and will put the item in the session
-            await self.get(id_)
+            await self.get_by_id(id_)
             # this will merge the inbound data to the instance we just put in the session
             instance = await self._attach_to_session(data, strategy="merge")
             await self.session.flush()
@@ -358,7 +363,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             Instance attached to the session - if `"merge"` strategy, may not be same instance
             that was provided.
         """
-        match strategy:  # noqa: R503
+        match strategy:
             case "add":
                 self.session.add(model)
                 return model
@@ -421,3 +426,61 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         for key, val in kwargs.items():
             select_ = select_.where(getattr(self.model_type, key) == val)
         return select_
+
+
+class SQLAlchemyRepositorySlugMixin(SQLAlchemyRepository[SlugModelT]):
+    """Slug Repository Protocol."""
+
+    async def get_by_slug(
+        self, slug: str, options: list[ExecutableOption] | None = None
+    ) -> SlugModelT | None:
+        """Select record by slug value."""
+        return await self.get_one_or_none(slug=slug, options=options)
+
+    async def get_available_slug(
+        self, value_to_slugify: str, options: list[ExecutableOption] | None = None
+    ) -> str:
+        """Get a unique slug for the supplied value.
+
+        If the value is found to exist, a random 4 digit character is appended to the end.  There may be a better way to do this, but I wanted to limit the number of additional database calls.
+
+        Args:
+            db_session (AsyncSession): Database session.
+            value_to_slugify (str): A string that should be converted to a unique slug.
+
+        Returns:
+            str: a unique slug for the supplied value.  This is safe for URLs and other unique identifiers.
+        """
+        slug = self.slugify(value_to_slugify)
+        if await self._is_slug_unique(slug, options):
+            return slug
+        random_string = "".join(random.choices(string.ascii_lowercase + string.digits, k=4))
+        return f"{slug}-{random_string}"
+
+    async def _is_slug_unique(
+        self, slug: str, options: list[ExecutableOption] | None = None
+    ) -> bool:
+        return await self.get_one_or_none(slug=slug, options=options) is None
+
+    @staticmethod
+    def slugify(value: str, allow_unicode: bool = False) -> str:
+        """slugify.
+
+        Convert to ASCII if 'allow_unicode' is False. Convert spaces or repeated
+        dashes to single dashes. Remove characters that aren't alphanumerics,
+        underscores, or hyphens. Convert to lowercase. Also strip leading and
+        trailing whitespace, dashes, and underscores.
+
+        Args:
+            value (str): the string to slugify
+            allow_unicode (bool, optional): allow unicode characters in slug. Defaults to False.
+
+        Returns:
+            str: a slugified string of the value parameter
+        """
+        if allow_unicode:
+            value = unicodedata.normalize("NFKC", value)
+        else:
+            value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
+        value = re.sub(r"[^\w\s-]", "", value.lower())
+        return cast("str", re.sub(r"[-\s]+", "-", value).strip("-_"))

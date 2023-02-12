@@ -130,7 +130,7 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         Returns:
             Representation of instance with identifier `id_`.
         """
-        return await self.repository.get(id_)
+        return await self.repository.get_by_id(id_)
 
     async def delete(self, id_: Any) -> ModelT:
         """Wrap repository delete operation.

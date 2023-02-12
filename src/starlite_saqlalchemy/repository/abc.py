@@ -79,7 +79,7 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
         """
 
     @abstractmethod
-    async def get(self, id_: Any) -> T:
+    async def get_by_id(self, id_: Any) -> T:
         """Get instance identified by `id_`.
 
         Args:
@@ -118,7 +118,7 @@ class AbstractRepository(Generic[T], metaclass=ABCMeta):
 
     @abstractmethod
     async def list_and_count(self, *filters: FilterTypes, **kwargs: Any) -> tuple[Sequence[T], int]:
-        """
+        """List records with total count.
 
         Args:
             *filters: Types for specific filtering operations.

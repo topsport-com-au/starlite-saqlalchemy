@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Any, TypeVar
 from uuid import UUID, uuid4
 
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, String
 from sqlalchemy.dialects import postgresql as pg
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm import (
@@ -87,12 +87,33 @@ class AuditColumns:
     """Date/time of instance last update."""
 
 
+@declarative_mixin
+class SlugColumns:
+    """Slug Field Model Mixin."""
+
+    __abstract__ = True
+    slug: Mapped[str] = mapped_column(
+        String(length=100),
+        index=True,
+        nullable=False,
+        unique=True,
+        info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)},
+    )
+    """Slug field that is an alternate key that is indexed and safe for URLs"""
+
+
 meta = MetaData(naming_convention=convention)
 registry_ = registry(metadata=meta, type_annotation_map={UUID: pg.UUID, dict: pg.JSONB})
 
 
 class Base(CommonColumns, DeclarativeBase):
     """Base for all SQLAlchemy declarative models."""
+
+    registry = registry_
+
+
+class SlugBase(CommonColumns, SlugColumns, DeclarativeBase):
+    """Base for all SQLAlchemy declarative models with a slug field."""
 
     registry = registry_
 

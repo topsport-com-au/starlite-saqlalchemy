@@ -87,7 +87,7 @@ async def test_sqlalchemy_repo_get_member(
     result_mock.scalar_one_or_none = MagicMock(return_value=mock_instance)
     execute_mock = AsyncMock(return_value=result_mock)
     monkeypatch.setattr(mock_repo, "_execute", execute_mock)
-    instance = await mock_repo.get("instance-id")
+    instance = await mock_repo.get_by_id("instance-id")
     assert instance is mock_instance
     mock_repo.session.expunge.assert_called_once_with(mock_instance)
     mock_repo.session.commit.assert_not_called()
@@ -218,12 +218,12 @@ async def test_attach_to_session_unexpected_strategy_raises_valueerror(
     mock_repo: SQLAlchemyRepository,
 ) -> None:
     """Test to hit the error condition in SQLAlchemy._attach_to_session()."""
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError):
         await mock_repo._attach_to_session(MagicMock(), strategy="t-rex")  # type:ignore[arg-type]
 
 
 async def test_execute(mock_repo: SQLAlchemyRepository) -> None:
-    """Simple test of the abstraction over `AsyncSession.execute()`"""
+    """Simple test of the abstraction over `AsyncSession.execute()`."""
     select_ = mock_repo._create_select_for_model()
     await mock_repo._execute(select_)
     mock_repo.session.execute.assert_called_once_with(select_)
