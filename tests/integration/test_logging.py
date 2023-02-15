@@ -8,7 +8,6 @@ from uuid import UUID
 from httpx import AsyncClient
 
 if TYPE_CHECKING:
-
     from starlite import Starlite
     from structlog.testing import CapturingLogger
 

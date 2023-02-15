@@ -10,7 +10,6 @@ from starlite import Starlite
 from starlite_saqlalchemy import init_plugin, worker
 
 if TYPE_CHECKING:
-
     from pytest import MonkeyPatch
 
 
