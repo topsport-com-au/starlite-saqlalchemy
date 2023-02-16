@@ -10,7 +10,6 @@ import pytest
 from starlite_saqlalchemy import http
 
 if TYPE_CHECKING:
-
     from pytest import MonkeyPatch
 
 
