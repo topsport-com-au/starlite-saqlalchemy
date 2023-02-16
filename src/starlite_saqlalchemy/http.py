@@ -41,13 +41,13 @@ class Client:
             self.client.headers.update(headers)
 
     @tenacity.retry(
-        wait=tenacity.wait_random_exponential(  # type:ignore[attr-defined]
+        wait=tenacity.wait_random_exponential(
             multiplier=settings.http.EXPONENTIAL_BACKOFF_MULTIPLIER,
             exp_base=settings.http.EXPONENTIAL_BACKOFF_BASE,
             min=settings.http.BACKOFF_MIN,
             max=settings.http.BACKOFF_MAX,
         ),
-        retry=tenacity.retry_if_exception_type(httpx.TransportError),  # type:ignore[attr-defined]
+        retry=tenacity.retry_if_exception_type(httpx.TransportError),
     )
     async def request(
         self,
