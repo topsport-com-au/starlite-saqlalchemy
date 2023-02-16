@@ -12,7 +12,6 @@ from starlite_saqlalchemy.exceptions import NotFoundError
 from tests.utils import domain
 
 if TYPE_CHECKING:
-
     from starlite_saqlalchemy.testing.generic_mock_repository import (
         GenericMockRepository,
     )

@@ -16,7 +16,6 @@ from starlite_saqlalchemy.repository.filters import (
 from starlite_saqlalchemy.repository.types import FilterTypes
 
 if TYPE_CHECKING:
-
     from starlite import Request  # noqa: F401
 
 DTorNone = datetime | None
