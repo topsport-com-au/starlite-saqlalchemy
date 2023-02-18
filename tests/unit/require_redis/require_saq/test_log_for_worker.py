@@ -10,7 +10,6 @@ import structlog
 from starlite_saqlalchemy import log
 
 if TYPE_CHECKING:
-
     from pytest import MonkeyPatch
     from saq.job import Job
     from structlog.testing import CapturingLogger

@@ -166,7 +166,7 @@ class JobConfig:
 default_job_config_dict = utils.dataclass_as_dict_shallow(JobConfig(), exclude_none=True)
 
 
-def create_worker_instance(  # noqa: PLR0913
+def create_worker_instance(
     functions: Collection[Callable[..., Any] | tuple[str, Callable]],
     cron_jobs: Collection[saq.CronJob] = (),
     concurrency: int | None = None,
@@ -255,7 +255,11 @@ TEN: Final = 10
 
 
 class PeriodicHeartbeat:
-    """Class to manage agent Heartbeats while the agent is running Posts a message to a redis key with a limited TTL."""
+    """Periodic Heartbeat.
+
+    Class to manage agent Heartbeats while the agent is running Posts a
+    message to a redis key with a limited TTL.
+    """
 
     def __init__(self, job: Job) -> None:
         """Initialize heartbeat.
@@ -287,7 +291,7 @@ class PeriodicHeartbeat:
             tg.start_soon(self._periodically_publish)
             executed_func = await func
             await tg.cancel_scope.cancel()
-            return executed_func
+            return executed_func  # noqa: R504
 
     async def stop(self) -> None:
         """Stop heartbeat service."""

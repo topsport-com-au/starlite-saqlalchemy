@@ -17,7 +17,6 @@ from starlite.routes.http import HTTPRoute
 from starlite_saqlalchemy import init_plugin, sentry
 
 if TYPE_CHECKING:
-
     from pytest import MonkeyPatch
 
 

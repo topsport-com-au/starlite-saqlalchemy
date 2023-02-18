@@ -7,7 +7,12 @@ Adds a filter for health check route logs.
 from __future__ import annotations
 
 import logging
-import re
+
+try:
+    import re2 as re  # pyright: ignore
+except ImportError:
+    import re
+
 from inspect import isawaitable
 from typing import TYPE_CHECKING
 
@@ -130,7 +135,8 @@ class BeforeSendHandler:
         )
 
     async def __call__(self, message: Message, _: State, scope: Scope) -> None:
-        """Receives ASGI response messages and scope, and logs per configuration.
+        """Receives ASGI response messages and scope, and logs per
+        configuration.
 
         Args:
             message: ASGI response event.

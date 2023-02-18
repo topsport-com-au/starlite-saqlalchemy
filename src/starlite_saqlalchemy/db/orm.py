@@ -99,7 +99,8 @@ class SlugColumns:
         unique=True,
         info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)},
     )
-    """Slug field that is an alternate key that is indexed and safe for URLs"""
+    """Slug field that is an alternate key that is indexed and safe for
+    URLs."""
 
 
 meta = MetaData(naming_convention=convention)
@@ -123,8 +124,9 @@ class Base(CommonColumns, DeclarativeBase):
 
     def dict(self) -> dict[str, Any]:
         """Return a dict representation of a model."""
-        if self.__table__ is not None:  # noqa: RET503
+        if self.__table__ is not None:
             return {field.name: getattr(self, field.name) for field in self.__table__.columns}
+        return {}
 
 
 class SlugBase(CommonColumns, SlugColumns, DeclarativeBase):
@@ -144,8 +146,9 @@ class SlugBase(CommonColumns, SlugColumns, DeclarativeBase):
 
     def dict(self) -> dict[str, Any]:
         """Return a dict representation of a model."""
-        if self.__table__ is not None:  # noqa: RET503
+        if self.__table__ is not None:
             return {field.name: getattr(self, field.name) for field in self.__table__.columns}
+        return {}
 
 
 class AuditBase(AuditColumns, CommonColumns, DeclarativeBase):
@@ -165,5 +168,6 @@ class AuditBase(AuditColumns, CommonColumns, DeclarativeBase):
 
     def dict(self) -> dict[str, Any]:
         """Return a dict representation of a model."""
-        if self.__table__ is not None:  # noqa: RET503
+        if self.__table__ is not None:
             return {field.name: getattr(self, field.name) for field in self.__table__.columns}
+        return {}

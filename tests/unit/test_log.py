@@ -3,7 +3,12 @@
 from __future__ import annotations
 
 import logging
-import re
+
+try:
+    import re2 as re  # pyright: ignore
+except ImportError:
+    import re
+
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock
 
@@ -266,7 +271,7 @@ async def test_before_send_handler_exclude_body_from_log(
     http_scope: HTTPScope,
     monkeypatch: MonkeyPatch,
 ) -> None:
-    """Check inclusion/exclusion of 'body' key in `log_response()"""
+    """Check inclusion/exclusion of 'body' key in `log_response()."""
     set_starlite_scope_state(http_scope, SCOPE_STATE_RESPONSE_COMPRESSED, True)
     ret_val = {"body": "sdl;kjasdlkfjsdlkfjsdlkfj"}
     extractor_mock = MagicMock(return_value=ret_val)

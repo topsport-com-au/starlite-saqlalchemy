@@ -2,9 +2,7 @@
 from __future__ import annotations
 
 import random
-import re
 import string
-import unicodedata
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, cast
 
@@ -22,6 +20,7 @@ from starlite_saqlalchemy.repository.filters import (
     CollectionFilter,
     LimitOffset,
 )
+from starlite_saqlalchemy.utils import slugify
 
 if TYPE_CHECKING:
     from collections import abc
@@ -107,10 +106,13 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             The added instances.
         """
         with wrap_sqlalchemy_exception():
-            data = [v.dict() if isinstance(v, self.model_type) else v for v in data]
             instances: list[ModelT] = await self._execute(
-                insert(self.model_type).values(data).returning(self.model_type)
-            )  # type: ignore
+                insert(
+                    self.model_type,
+                )
+                .values([v.dict() if isinstance(v, self.model_type) else v for v in data])
+                .returning(self.model_type)  # type: ignore
+            )
             for instance in instances:
                 self.session.expunge(instance)
             return instances
@@ -128,9 +130,9 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             Count of records returned by query, ignoring pagination.
         """
         options = options if options else self.default_options
-        select_ = select(sql_func.count(self.model_type.id)).options(
+        select_ = select(sql_func.count(self.model_type.id)).options(  # type:ignore[attr-defined]
             *options
-        )  # type:ignore[attr-defined]
+        )
         for filter_ in filters:
             match filter_:
                 case LimitOffset(_, _):
@@ -166,29 +168,6 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             self.session.expunge(instance)
             return instance
 
-    async def get_by_id(
-        self, id_: Any, options: list[ExecutableOption] | None = None, **kwargs: Any
-    ) -> ModelT:
-        """Get instance identified by `id_`.
-
-        Args:
-            id_: Identifier of the instance to be retrieved.
-
-        Returns:
-            The retrieved instance.
-
-        Raises:
-            RepositoryNotFoundException: If no instance found identified by `id_`.
-        """
-        options = options if options else self.default_options
-        select_ = self._create_select_for_model(options=options)
-        with wrap_sqlalchemy_exception():
-            select_ = self._filter_select_by_kwargs(select_, **{self.id_attribute: id_})
-            instance = (await self._execute(select_)).scalar_one_or_none()
-            instance = self.check_not_found(instance)
-            self.session.expunge(instance)
-            return instance
-
     async def get_one_or_none(
         self, *filters: FilterTypes, options: list[ExecutableOption] | None = None, **kwargs: Any
     ) -> ModelT | None:
@@ -207,11 +186,25 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         select_ = self._filter_select_by_kwargs(select_, **kwargs)
 
         with wrap_sqlalchemy_exception():
-            result = await self._execute(select_)
-            instances = list(result.scalars())
-            for instance in instances:
-                self.session.expunge(instance)
-            return instances[0] if len(instances) > 0 else None
+            instance = (await self._execute(select_)).scalar_one_or_none()
+            self.session.expunge(instance)
+            return instance
+
+    async def get_by_id(
+        self, id_: Any, options: list[ExecutableOption] | None = None, **kwargs: Any
+    ) -> ModelT:
+        """Get instance identified by `id_`.
+
+        Args:
+            id_: Identifier of the instance to be retrieved.
+
+        Returns:
+            The retrieved instance.
+
+        Raises:
+            RepositoryNotFoundException: If no instance found identified by `id_`.
+        """
+        return self.check_not_found(await self.get_one_or_none(id=id_, options=options))
 
     async def list(
         self, *filters: FilterTypes, options: list[ExecutableOption] | None = None, **kwargs: Any
@@ -250,7 +243,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             Count of records returned by query, ignoring pagination.
         """
-        options = options if options else self.default_options
+        options = options if options is not None else self.default_options
         select_ = select(
             self.model_type,
             over(sql_func.count(self.model_type.id)),  # type:ignore[attr-defined]
@@ -374,8 +367,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
                 return model
             case "merge":
                 return await self.session.merge(model)
-            case _:
-                raise ValueError("Unexpected value for `strategy`, must be `'add'` or `'merge'`")
+        raise ValueError("Unexpected value for `strategy`, must be `'add'` or `'merge'`")
 
     def _create_select_for_model(self, **kwargs: Any) -> Select[tuple[ModelT]]:
         options = kwargs.get("options", self.default_options)
@@ -458,7 +450,7 @@ class SQLAlchemyRepositorySlugMixin(
         Returns:
             str: a unique slug for the supplied value.  This is safe for URLs and other unique identifiers.
         """
-        slug = self.slugify(value_to_slugify)
+        slug = slugify(value_to_slugify)
         if await self._is_slug_unique(slug, options):
             return slug
         random_string = "".join(random.choices(string.ascii_lowercase + string.digits, k=4))
@@ -468,26 +460,3 @@ class SQLAlchemyRepositorySlugMixin(
         self, slug: str, options: list[ExecutableOption] | None = None
     ) -> bool:
         return await self.get_one_or_none(slug=slug, options=options) is None
-
-    @staticmethod
-    def slugify(value: str, allow_unicode: bool = False) -> str:
-        """slugify.
-
-        Convert to ASCII if 'allow_unicode' is False. Convert spaces or repeated
-        dashes to single dashes. Remove characters that aren't alphanumerics,
-        underscores, or hyphens. Convert to lowercase. Also strip leading and
-        trailing whitespace, dashes, and underscores.
-
-        Args:
-            value (str): the string to slugify
-            allow_unicode (bool, optional): allow unicode characters in slug. Defaults to False.
-
-        Returns:
-            str: a slugified string of the value parameter
-        """
-        if allow_unicode:
-            value = unicodedata.normalize("NFKC", value)
-        else:
-            value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
-        value = re.sub(r"[^\w\s-]", "", value.lower())
-        return cast("str", re.sub(r"[-\s]+", "-", value).strip("-_"))

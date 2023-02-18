@@ -9,7 +9,6 @@ from starlite.datastructures import State
 from starlite.enums import ScopeType
 
 if TYPE_CHECKING:
-
     from starlite import Starlite
     from starlite.types import HTTPResponseBodyEvent, HTTPResponseStartEvent, HTTPScope
 

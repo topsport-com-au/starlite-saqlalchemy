@@ -3,7 +3,12 @@
 from __future__ import annotations
 
 import os
-import re
+
+try:
+    import re2 as re  # pyright: ignore
+except ImportError:
+    import re
+
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
@@ -92,9 +97,8 @@ def _patch_worker(is_unit_test: bool, monkeypatch: MonkeyPatch) -> None:
 
 @pytest.fixture(name="app")
 def fx_app(pytestconfig: Config, monkeypatch: MonkeyPatch) -> Starlite:
-    """
-    Returns:
-        An application instance, configured via plugin.
+    """Returns:
+    An application instance, configured via plugin.
     """
     test_app_str = pytestconfig.getini("test_app")
     try:
@@ -104,10 +108,7 @@ def fx_app(pytestconfig: Config, monkeypatch: MonkeyPatch) -> Starlite:
 
         app = Starlite(route_handlers=[], on_app_init=[ConfigureApp()], openapi_config=None)
     else:
-        if isinstance(app_or_callable, Starlite):
-            app = app_or_callable
-        else:
-            app = app_or_callable()
+        app = app_or_callable if isinstance(app_or_callable, Starlite) else app_or_callable()
 
     monkeypatch.setattr(app, "before_startup", [])
     return app

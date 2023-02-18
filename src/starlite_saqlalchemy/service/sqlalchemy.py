@@ -165,7 +165,7 @@ class SlugRepositoryService(RepositoryService[SlugModelT]):
     __id__ = "starlite_saqlalchemy.service.sqlalchemy.SlugRepositoryService"
     repository_type: type[AbstractRepository[SlugModelT]]
 
-    async def get_by_id(self, id_: Any) -> ModelT:
+    async def get_by_slug(self, slug_: str) -> ModelT:
         """Wrap repository scalar operation.
 
         Args:
@@ -174,4 +174,4 @@ class SlugRepositoryService(RepositoryService[SlugModelT]):
         Returns:
             Representation of instance with identifier `id_`.
         """
-        return await self.repository.get_by_slug(id_)
+        return await self.repository.get_by_slug(slug_)

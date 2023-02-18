@@ -7,7 +7,7 @@ black
 blacken-docs
 pre-commit
 pylint
-pylint-pydantic 
+pylint-pydantic
 slotscheck
 types-click
 types-passlib

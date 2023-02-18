@@ -12,7 +12,6 @@ from saq import Job
 from starlite_saqlalchemy import service, worker
 
 if TYPE_CHECKING:
-
     from pytest import MonkeyPatch
 
 

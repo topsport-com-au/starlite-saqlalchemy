@@ -72,9 +72,7 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         return data
 
     async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:
-        """
-
-        Args:
+        """Args:
             *filters: Types for specific filtering operations.
             **kwargs: Instance attribute value filters.
 
@@ -83,7 +81,7 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """
         return len(await self.list(*filters, **kwargs))
 
-    async def delete(self, id_: Any) -> ModelT:
+    async def delete(self, id_: Any, **kwargs: Any) -> ModelT:
         """Delete instance identified by `id_`.
 
         Args:
@@ -100,7 +98,7 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         finally:
             del self.collection[id_]
 
-    async def get_by_id(self, id_: Any) -> ModelT:
+    async def get_by_id(self, id_: Any, **kwargs: Any) -> ModelT:
         """Get instance identified by `id_`.
 
         Args:
@@ -129,9 +127,7 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
     async def list_and_count(
         self, *filters: FilterTypes, **kwargs: Any
     ) -> tuple[Sequence[ModelT], int]:
-        """
-
-        Args:
+        """Args:
             *filters: Types for specific filtering operations.
             **kwargs: Instance attribute value filters.
 
