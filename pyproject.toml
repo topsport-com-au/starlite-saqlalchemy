@@ -182,6 +182,8 @@ ignore = [
   'T201',
   'ERA001',
   "E999",
+  'PLR0913',
+  'TRY003',
 ]
 line-length = 120
 select = [
@@ -193,9 +195,12 @@ select = [
   'N',
   'W',
   'I',
+  'C90',
   'UP',
-  'S', # 'ANN',
+  'S', # 'ANN', BLE
   'YTT', # 'FBT',
+  'COM',
+  'DJ',
   'A',
   'C4',
   'T10',
@@ -213,6 +218,15 @@ select = [
   'PLR',
   'PLW', # 'PIE',
   'RUF',
+  'EXE',
+  'G',
+  'RSE',
+  'PTH',
+  'PD',
+  'NPY',
+  'TCH',
+  'TID',
+  'TRY',
 ]
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
@@ -224,9 +238,9 @@ max-complexity = 10
 [tool.ruff.pep8-naming]
 classmethod-decorators = [
   'classmethod',
-  'validator',
-  'root_validator',
-  'declared_attr',
+  'pydantic.validator',
+  'pydantic.root_validator',
+  'sqlalchemy.ext.declarative.declared_attr',
 ]
 
 [tool.ruff.per-file-ignores]
