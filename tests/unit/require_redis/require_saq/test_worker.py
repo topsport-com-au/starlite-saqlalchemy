@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from unittest.mock import AsyncMock
 
+import msgspec
 import pytest
 from asyncpg.pgproto import pgproto
 from pydantic import BaseModel
@@ -19,7 +20,10 @@ def test_worker_decoder_handles_pgproto_uuid() -> None:
     """Test that the decoder can handle pgproto.UUID instances."""
     pg_uuid = pgproto.UUID("0448bde2-7c69-4e6b-9c03-7b217e3b563d")
     encoded = worker.encoder.encode(pg_uuid)
-    assert encoded == b'"0448bde2-7c69-4e6b-9c03-7b217e3b563d"'
+    decoded = msgspec.msgpack.Decoder().decode(encoded)
+    # msgpack encoded
+    assert encoded == b"\xd9$0448bde2-7c69-4e6b-9c03-7b217e3b563d"
+    assert decoded == "0448bde2-7c69-4e6b-9c03-7b217e3b563d"
 
 
 def test_worker_decoder_handles_pydantic_models() -> None:
@@ -32,7 +36,9 @@ def test_worker_decoder_handles_pydantic_models() -> None:
 
     pydantic_model = Model(a="a", b=1, c=2.34)
     encoded = worker.encoder.encode(pydantic_model)
-    assert encoded == b'{"a":"a","b":1,"c":2.34}'
+    decoded = msgspec.msgpack.Decoder().decode(encoded)
+    assert encoded == b"\x83\xa1a\xa1a\xa1b\x01\xa1c\xcb@\x02\xb8Q\xeb\x85\x1e\xb8"
+    assert decoded == {"a": "a", "b": 1, "c": 2.34}
 
 
 async def test_make_service_callback(
@@ -63,7 +69,7 @@ async def test_make_service_callback_raises_runtime_error(
         )
 
 
-async def test_enqueue_service_callback(monkeypatch: "MonkeyPatch") -> None:
+async def test_enqueue_service_callback(monkeypatch: MonkeyPatch) -> None:
     """Tests that job enqueued with desired arguments."""
     enqueue_mock = AsyncMock()
     monkeypatch.setattr(worker.queue, "enqueue", enqueue_mock)
@@ -82,7 +88,7 @@ async def test_enqueue_service_callback(monkeypatch: "MonkeyPatch") -> None:
     }
 
 
-async def test_enqueue_service_callback_with_custom_job_config(monkeypatch: "MonkeyPatch") -> None:
+async def test_enqueue_service_callback_with_custom_job_config(monkeypatch: MonkeyPatch) -> None:
     """Tests that job enqueued with desired arguments."""
     enqueue_mock = AsyncMock()
     monkeypatch.setattr(worker.queue, "enqueue", enqueue_mock)
