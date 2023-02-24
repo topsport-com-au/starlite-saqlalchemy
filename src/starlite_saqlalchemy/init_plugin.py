@@ -30,13 +30,13 @@ The `PluginConfig` has switches to disable every aspect of the plugin behavior.
 """
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence  # noqa: TC003
+from collections.abc import Callable, Sequence  # noqa: TCH003
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from pydantic import BaseModel, Field, validator
 from starlite.app import DEFAULT_CACHE_CONFIG, DEFAULT_OPENAPI_CONFIG
-from starlite.types import TypeEncodersMap  # noqa: TC002
-from structlog.types import Processor  # noqa: TC002
+from starlite.types import TypeEncodersMap  # noqa: TCH002
+from structlog.types import Processor  # noqa: TCH002
 
 from starlite_saqlalchemy import (
     compression,
@@ -136,7 +136,7 @@ class PluginConfig(BaseModel):
     """
     do_sentry: bool = Field(
         default_factory=lambda: IS_SENTRY_SDK_INSTALLED
-        and not (IS_LOCAL_ENVIRONMENT or IS_TEST_ENVIRONMENT)
+        and not (IS_LOCAL_ENVIRONMENT or IS_TEST_ENVIRONMENT),
     )
     """Configure sentry.
 
@@ -206,9 +206,10 @@ class ConfigureApp:
     __slots__ = ("config",)
 
     def __init__(self, config: PluginConfig | None = None) -> None:
-        """
+        """Configure App initializer.
+
         Args:
-            config: Plugin configuration object.
+        config: Plugin configuration object.
         """
         self.config = config if config is not None else PluginConfig()
         # We must configure sentry before app is instantiated
@@ -280,7 +281,9 @@ class ConfigureApp:
             app_config.cache_config = cache.config
 
     def configure_collection_dependencies(self, app_config: AppConfig) -> None:
-        """Add the required [`Provide`][starlite.datastructures.Provide]
+        """Configure collection dependencies.
+
+        Add the required [`Provide`][starlite.datastructures.Provide]
         instances to the app dependency mapping.
 
         If a dependency has already been provided with the same key we do not overwrite it.
@@ -314,7 +317,9 @@ class ConfigureApp:
             app_config.debug = settings.app.DEBUG
 
     def configure_exception_handlers(self, app_config: AppConfig) -> None:
-        """Add the handlers that translate service and repository exceptions
+        """Configure exception handlers.
+
+        Add the handlers that translate service and repository exceptions
         into HTTP exceptions.
 
         Does not overwrite handlers that may already exist for the exception types.
@@ -426,7 +431,7 @@ class ConfigureApp:
             )
 
             self.config.worker_functions.append(
-                (make_service_callback.__qualname__, make_service_callback)
+                (make_service_callback.__qualname__, make_service_callback),
             )
 
             worker_kwargs: dict[str, Any] = {"functions": self.config.worker_functions}

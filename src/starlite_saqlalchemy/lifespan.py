@@ -1,11 +1,15 @@
 """Application lifespan handlers."""
 # pylint: disable=broad-except,import-outside-toplevel
+from __future__ import annotations
+
 import asyncio
 import logging
-
-import starlite
+from typing import TYPE_CHECKING
 
 from starlite_saqlalchemy import constants, settings
+
+if TYPE_CHECKING:
+    import starlite
 
 logger = logging.getLogger(__name__)
 

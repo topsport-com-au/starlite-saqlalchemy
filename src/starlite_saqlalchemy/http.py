@@ -28,10 +28,11 @@ class Client:
     """
 
     def __init__(self, base_url: str, headers: dict[str, str] | None = None) -> None:
-        """
+        """HTTP Client initializer.
+
         Args:
-            base_url: e.g., http://localhost
-            headers: Headers that are applied to every request
+        base_url: e.g., http://localhost
+        headers: Headers that are applied to every request.
         """
         self.base_url = base_url
         self.client = httpx.AsyncClient(base_url=base_url)
@@ -41,13 +42,13 @@ class Client:
             self.client.headers.update(headers)
 
     @tenacity.retry(
-        wait=tenacity.wait_random_exponential(  # type:ignore[attr-defined]
+        wait=tenacity.wait_random_exponential(
             multiplier=settings.http.EXPONENTIAL_BACKOFF_MULTIPLIER,
             exp_base=settings.http.EXPONENTIAL_BACKOFF_BASE,
             min=settings.http.BACKOFF_MIN,
             max=settings.http.BACKOFF_MAX,
         ),
-        retry=tenacity.retry_if_exception_type(httpx.TransportError),  # type:ignore[attr-defined]
+        retry=tenacity.retry_if_exception_type(httpx.TransportError),
     )
     async def request(
         self,
@@ -78,7 +79,11 @@ class Client:
         """
         try:
             response = await self.client.request(
-                method, path, params=params, content=content, headers=headers
+                method,
+                path,
+                params=params,
+                content=content,
+                headers=headers,
             )
             response.raise_for_status()
         except httpx.HTTPError as exc:

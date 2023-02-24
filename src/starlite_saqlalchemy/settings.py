@@ -196,7 +196,8 @@ class DatabaseSettings(BaseSettings):
     POOL_TIMEOUT: int = 30
     """See [`timeout`][sqlalchemy.pool.QueuePool]."""
     URL: PostgresDsn = parse_obj_as(
-        PostgresDsn, "postgresql+asyncpg://postgres:mysecretpassword@localhost:5432/postgres"
+        PostgresDsn,
+        "postgresql+asyncpg://postgres:mysecretpassword@localhost:5432/postgres",
     )
 
 

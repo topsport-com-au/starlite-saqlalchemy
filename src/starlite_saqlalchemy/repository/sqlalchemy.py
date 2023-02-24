@@ -111,14 +111,17 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
                     self.model_type,
                 )
                 .values([v.dict() if isinstance(v, self.model_type) else v for v in data])
-                .returning(self.model_type)  # type: ignore
+                .returning(self.model_type),  # type: ignore
             )
             for instance in instances:
                 self.session.expunge(instance)
             return instances
 
     async def count(
-        self, *filters: FilterTypes, options: list[ExecutableOption] | None = None, **kwargs: Any
+        self,
+        *filters: FilterTypes,
+        options: list[ExecutableOption] | None = None,
+        **kwargs: Any,
     ) -> int:
         """
 
@@ -131,7 +134,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """
         options = options if options else self.default_options
         select_ = select(sql_func.count(self.model_type.id)).options(  # type:ignore[attr-defined]
-            *options
+            *options,
         )
         for filter_ in filters:
             match filter_:
@@ -140,7 +143,10 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
                     # we do not apply this filter to the count since we need the total rows
                 case BeforeAfter(field_name, before, after):
                     select_ = self._filter_on_datetime_field(
-                        field_name, before, after, select_=select_
+                        field_name,
+                        before,
+                        after,
+                        select_=select_,
                     )
                 case CollectionFilter(field_name, values):
                     select_ = self._filter_in_collection(field_name, values, select_=select_)
@@ -169,7 +175,10 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             return instance
 
     async def get_one_or_none(
-        self, *filters: FilterTypes, options: list[ExecutableOption] | None = None, **kwargs: Any
+        self,
+        *filters: FilterTypes,
+        options: list[ExecutableOption] | None = None,
+        **kwargs: Any,
     ) -> ModelT | None:
         """Get an object instance, optionally filtered.
 
@@ -191,7 +200,10 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             return instance
 
     async def get_by_id(
-        self, id_: Any, options: list[ExecutableOption] | None = None, **kwargs: Any
+        self,
+        id_: Any,
+        options: list[ExecutableOption] | None = None,
+        **kwargs: Any,
     ) -> ModelT:
         """Get instance identified by `id_`.
 
@@ -207,7 +219,10 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         return self.check_not_found(await self.get_one_or_none(id=id_, options=options))
 
     async def list(
-        self, *filters: FilterTypes, options: list[ExecutableOption] | None = None, **kwargs: Any
+        self,
+        *filters: FilterTypes,
+        options: list[ExecutableOption] | None = None,
+        **kwargs: Any,
     ) -> abc.Sequence[ModelT]:
         """Get a list of instances, optionally filtered.
 
@@ -232,7 +247,10 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             return instances
 
     async def list_and_count(
-        self, *filters: FilterTypes, options: list[ExecutableOption] | None = None, **kwargs: Any
+        self,
+        *filters: FilterTypes,
+        options: list[ExecutableOption] | None = None,
+        **kwargs: Any,
     ) -> tuple[abc.Sequence[ModelT], int]:
         """
 
@@ -342,12 +360,18 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
     # the following is all sqlalchemy implementation detail, and shouldn't be directly accessed
 
     def _apply_limit_offset_pagination(
-        self, limit: int, offset: int, *, select_: SelectT
+        self,
+        limit: int,
+        offset: int,
+        *,
+        select_: SelectT,
     ) -> SelectT:
         return select_.limit(limit).offset(offset)
 
     async def _attach_to_session(
-        self, model: ModelT, strategy: Literal["add", "merge"] = "add"
+        self,
+        model: ModelT,
+        strategy: Literal["add", "merge"] = "add",
     ) -> ModelT:
         """Attach detached instance to the session.
 
@@ -393,7 +417,10 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
                     select_ = self._apply_limit_offset_pagination(limit, offset, select_=select_)
                 case BeforeAfter(field_name, before, after):
                     select_ = self._filter_on_datetime_field(
-                        field_name, before, after, select_=select_
+                        field_name,
+                        before,
+                        after,
+                        select_=select_,
                     )
                 case CollectionFilter(field_name, values):
                     select_ = self._filter_in_collection(field_name, values, select_=select_)
@@ -402,7 +429,11 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         return select_
 
     def _filter_in_collection(
-        self, field_name: str, values: abc.Collection[Any], *, select_: SelectT
+        self,
+        field_name: str,
+        values: abc.Collection[Any],
+        *,
+        select_: SelectT,
     ) -> SelectT:
         if not values:
             return select_
@@ -410,7 +441,12 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         return select_.where(getattr(self.model_type, field_name).in_(values))
 
     def _filter_on_datetime_field(
-        self, field_name: str, before: datetime | None, after: datetime | None, *, select_: SelectT
+        self,
+        field_name: str,
+        before: datetime | None,
+        after: datetime | None,
+        *,
+        select_: SelectT,
     ) -> SelectT:
         field = getattr(self.model_type, field_name)
         if before is not None:
@@ -426,18 +462,25 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
 
 
 class SQLAlchemyRepositorySlugMixin(
-    SQLAlchemyRepository[SlugModelT], AbstractSlugRepository[SlugModelT], Generic[SlugModelT]
+    SQLAlchemyRepository[SlugModelT],
+    AbstractSlugRepository[SlugModelT],
+    Generic[SlugModelT],
 ):
     """Slug Repository Protocol."""
 
     async def get_by_slug(
-        self, slug: str, options: list[ExecutableOption] | None = None, **kwargs: Any
+        self,
+        slug: str,
+        options: list[ExecutableOption] | None = None,
+        **kwargs: Any,
     ) -> SlugModelT | None:
         """Select record by slug value."""
         return await self.get_one_or_none(slug=slug, options=options)
 
     async def get_available_slug(
-        self, value_to_slugify: str, options: list[ExecutableOption] | None = None
+        self,
+        value_to_slugify: str,
+        options: list[ExecutableOption] | None = None,
     ) -> str:
         """Get a unique slug for the supplied value.
 
@@ -457,6 +500,8 @@ class SQLAlchemyRepositorySlugMixin(
         return f"{slug}-{random_string}"
 
     async def _is_slug_unique(
-        self, slug: str, options: list[ExecutableOption] | None = None
+        self,
+        slug: str,
+        options: list[ExecutableOption] | None = None,
     ) -> bool:
         return await self.get_one_or_none(slug=slug, options=options) is None

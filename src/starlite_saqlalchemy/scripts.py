@@ -11,7 +11,7 @@ def determine_should_reload() -> bool:
 
 
 def determine_reload_dirs(should_reload: bool) -> list[str] | None:
-    """
+    """Determine reload directories.
 
     Args:
         should_reload: is reloading enabled?
