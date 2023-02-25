@@ -181,7 +181,7 @@ class SlugRepositoryService(RepositoryService[SlugModelT]):
     repository_type: type[AbstractSlugRepository[SlugModelT]]
     repository: AbstractSlugRepository
 
-    async def get_by_slug(self, slug_: str) -> ModelT | None:
+    async def get_by_slug(self, slug_: str) -> SlugModelT | None:
         """Wrap repository scalar operation.
 
         Args:
