@@ -36,7 +36,7 @@ async def create_author(data: WriteDTO, service: Service) -> ReadDTO:
 @get(DETAIL_ROUTE)
 async def get_author(service: Service, author_id: UUID) -> ReadDTO:
     """Get Author by ID."""
-    return ReadDTO.from_orm(await service.get(author_id))
+    return ReadDTO.from_orm(await service.get_by_id(author_id))
 
 
 @put(DETAIL_ROUTE)
