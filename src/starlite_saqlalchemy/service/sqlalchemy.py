@@ -126,7 +126,7 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         self.repository.set_id_attribute_value(id_, data)
         return await self.repository.upsert(data)
 
-    async def get_by_id(self, id_: Any) -> ModelT:
+    async def get_by_id(self, id_: Any, **kwargs: Any) -> ModelT:
         """Wrap repository scalar operation.
 
         Args:
@@ -135,9 +135,9 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         Returns:
             Representation of instance with identifier `id_`.
         """
-        return await self.repository.get_by_id(id_)
+        return await self.repository.get_by_id(id_, **kwargs)
 
-    async def get_one_or_none(self, id_: Any) -> ModelT | None:
+    async def get_one_or_none(self, *filters: FilterTypes, **kwargs: Any) -> ModelT | None:
         """Wrap repository scalar operation.
 
         Args:
@@ -146,7 +146,7 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         Returns:
             Representation of instance with identifier `id_`.
         """
-        return await self.repository.get_one_or_none(**{self.repository.id_attribute: id_})
+        return await self.repository.get_one_or_none(*filters, **kwargs)
 
     async def delete(self, id_: Any) -> ModelT:
         """Wrap repository delete operation.
@@ -164,7 +164,7 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
     async def new(cls: type[RepoServiceT]) -> AsyncIterator[RepoServiceT]:
         """Context manager that returns instance of service object.
 
-        Handles construction of the database session.
+        Handles construction of the database session._create_select_for_model
 
         Returns:
             The service object instance.
