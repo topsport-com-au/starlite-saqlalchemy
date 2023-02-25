@@ -110,7 +110,7 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """
         return len(await self.list(*filters, **kwargs))
 
-    async def delete(self, id_: Any, **kwargs: Any) -> ModelT:
+    async def delete(self, id_: Any, **kwargs: Any) -> ModelT:  # pylint: disable=unused-argument
         """Delete instance identified by `id_`.
 
         Args:

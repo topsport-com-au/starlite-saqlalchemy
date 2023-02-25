@@ -113,8 +113,8 @@ class ToDictMixin:
 
     def dict(self) -> dict[str, Any]:
         """Return a dict representation of a model."""
-        if hasattr(self, "__tablename__"):
-            return {field.name: getattr(self, field.name) for field in self.__tablename__.columns()}
+        if self.__table__:  # type: ignore[attr-defined]
+            return {field.name: getattr(self, field.name) for field in self.__table__.columns}  # type: ignore[attr-defined]
         return {}
 
 
