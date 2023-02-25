@@ -65,11 +65,12 @@ async def test_sqlalchemy_repo_add(mock_repo: SQLAlchemyRepository) -> None:
 
 
 async def test_sqlalchemy_repo_delete(
-    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
+    mock_repo: SQLAlchemyRepository,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Test expected method calls for delete operation."""
     mock_instance = MagicMock()
-    monkeypatch.setattr(mock_repo, "get", AsyncMock(return_value=mock_instance))
+    monkeypatch.setattr(mock_repo, "get_by_id", AsyncMock(return_value=mock_instance))
     instance = await mock_repo.delete("instance-id")
     assert instance is mock_instance
     mock_repo.session.delete.assert_called_once_with(mock_instance)
@@ -79,7 +80,8 @@ async def test_sqlalchemy_repo_delete(
 
 
 async def test_sqlalchemy_repo_get_member(
-    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
+    mock_repo: SQLAlchemyRepository,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Test expected method calls for member get operation."""
     mock_instance = MagicMock()
@@ -94,7 +96,8 @@ async def test_sqlalchemy_repo_get_member(
 
 
 async def test_sqlalchemy_repo_list(
-    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
+    mock_repo: SQLAlchemyRepository,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Test expected method calls for list operation."""
     mock_instances = [MagicMock(), MagicMock()]
@@ -109,7 +112,8 @@ async def test_sqlalchemy_repo_list(
 
 
 async def test_sqlalchemy_repo_list_with_pagination(
-    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
+    mock_repo: SQLAlchemyRepository,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Test list operation with pagination."""
     result_mock = MagicMock()
@@ -125,7 +129,8 @@ async def test_sqlalchemy_repo_list_with_pagination(
 
 
 async def test_sqlalchemy_repo_count(
-    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
+    mock_repo: SQLAlchemyRepository,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Test count operation with pagination."""
     result_mock = MagicMock()
@@ -140,7 +145,8 @@ async def test_sqlalchemy_repo_count(
 
 
 async def test_sqlalchemy_repo_list_with_before_after_filter(
-    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
+    mock_repo: SQLAlchemyRepository,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Test list operation with BeforeAfter filter."""
     field_name = "updated"
@@ -159,7 +165,8 @@ async def test_sqlalchemy_repo_list_with_before_after_filter(
 
 
 async def test_sqlalchemy_repo_list_with_collection_filter(
-    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
+    mock_repo: SQLAlchemyRepository,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Test behavior of list operation given CollectionFilter."""
     field_name = "id"
@@ -182,7 +189,8 @@ async def test_sqlalchemy_repo_unknown_filter_type_raises(mock_repo: SQLAlchemyR
 
 
 async def test_sqlalchemy_repo_update(
-    mock_repo: SQLAlchemyRepository, monkeypatch: MonkeyPatch
+    mock_repo: SQLAlchemyRepository,
+    monkeypatch: MonkeyPatch,
 ) -> None:
     """Test the sequence of repo calls for update operation."""
     id_ = 3
@@ -190,7 +198,7 @@ async def test_sqlalchemy_repo_update(
     get_id_value_mock = MagicMock(return_value=id_)
     monkeypatch.setattr(mock_repo, "get_id_attribute_value", get_id_value_mock)
     get_mock = AsyncMock()
-    monkeypatch.setattr(mock_repo, "get", get_mock)
+    monkeypatch.setattr(mock_repo, "get_by_id", get_mock)
     mock_repo.session.merge.return_value = mock_instance
     instance = await mock_repo.update(mock_instance)
     assert instance is mock_instance
@@ -218,7 +226,7 @@ async def test_attach_to_session_unexpected_strategy_raises_valueerror(
     mock_repo: SQLAlchemyRepository,
 ) -> None:
     """Test to hit the error condition in SQLAlchemy._attach_to_session()."""
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError):
         await mock_repo._attach_to_session(MagicMock(), strategy="t-rex")  # type:ignore[arg-type]
 
 
@@ -245,14 +253,19 @@ def test_filter_in_collection_noop_if_collection_empty(mock_repo: SQLAlchemyRepo
     ],
 )
 def test__filter_on_datetime_field(
-    before: datetime, after: datetime, mock_repo: SQLAlchemyRepository
+    before: datetime,
+    after: datetime,
+    mock_repo: SQLAlchemyRepository,
 ) -> None:
-    """Test through branches of _filter_on_datetime_field()"""
+    """Test through branches of _filter_on_datetime_field()."""
     field_mock = MagicMock()
     field_mock.__gt__ = field_mock.__lt__ = lambda self, other: True
     mock_repo.model_type.updated = field_mock
     mock_repo._filter_on_datetime_field(
-        "updated", before, after, select_=mock_repo._create_select_for_model()
+        "updated",
+        before,
+        after,
+        select_=mock_repo._create_select_for_model(),
     )
 
 
@@ -267,7 +280,8 @@ def test_filter_collection_by_kwargs_raises_repository_exception_for_attribute_e
     mock_repo: SQLAlchemyRepository,
 ) -> None:
     """Test that we raise a repository exception if an attribute name is
-    incorrect."""
+    incorrect.
+    """
     select_ = mock_repo._create_select_for_model()
     select_.filter_by = MagicMock(  # type:ignore[assignment]
         side_effect=InvalidRequestError,

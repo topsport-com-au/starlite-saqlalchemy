@@ -10,6 +10,7 @@ import contextlib
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from starlite_saqlalchemy.db import async_session_factory
+from starlite_saqlalchemy.repository.abc import AbstractSlugRepository
 from starlite_saqlalchemy.repository.sqlalchemy import ModelT, SlugModelT
 
 from .generic import Service
@@ -85,7 +86,9 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         return await self.repository.list(*filters, **kwargs)
 
     async def list_and_count(
-        self, *filters: FilterTypes, **kwargs: Any
+        self,
+        *filters: FilterTypes,
+        **kwargs: Any,
     ) -> tuple[Sequence[ModelT], int]:
         """List of records and total count returned by query.
 
@@ -134,6 +137,17 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         """
         return await self.repository.get_by_id(id_)
 
+    async def get_one_or_none(self, id_: Any) -> ModelT | None:
+        """Wrap repository scalar operation.
+
+        Args:
+            id_: Identifier of instance to be retrieved.
+
+        Returns:
+            Representation of instance with identifier `id_`.
+        """
+        return await self.repository.get_one_or_none(**{self.repository.id_attribute: id_})
+
     async def delete(self, id_: Any) -> ModelT:
         """Wrap repository delete operation.
 
@@ -163,9 +177,17 @@ class SlugRepositoryService(RepositoryService[SlugModelT]):
     """Methods for models with a slug field."""
 
     __id__ = "starlite_saqlalchemy.service.sqlalchemy.SlugRepositoryService"
-    repository_type: type[AbstractRepository[SlugModelT]]
+    repository_type: type[AbstractSlugRepository[SlugModelT]]
 
-    async def get_by_slug(self, slug_: str) -> ModelT:
+    def __init__(self, **repo_kwargs: Any) -> None:
+        """Configure the service object.
+
+        Args:
+            **repo_kwargs: passed as keyword args to repo instantiation.
+        """
+        self.repository: AbstractSlugRepository = self.repository_type(**repo_kwargs)
+
+    async def get_by_slug(self, slug_: str) -> ModelT | None:
         """Wrap repository scalar operation.
 
         Args:

@@ -27,7 +27,7 @@ def _patch_author_service(
 async def test_service_create() -> None:
     """Test repository create action."""
     resp = await domain.authors.Service().create(
-        domain.authors.Author(name="someone", dob=date.min)
+        domain.authors.Author(name="someone", dob=date.min),
     )
     assert resp.name == "someone"
     assert resp.dob == date.min
@@ -71,12 +71,21 @@ async def test_service_upsert_create() -> None:
     assert resp.name == "New Author"
 
 
-async def test_service_get() -> None:
+async def test_service_get_by_id() -> None:
     """Test repository get action."""
     service_obj = domain.authors.Service()
     authors = await service_obj.list()
     author = authors[0]
-    retrieved = await service_obj.get(author.id)
+    retrieved = await service_obj.get_by_id(author.id)
+    assert author is retrieved
+
+
+async def test_service_get_one_or_none() -> None:
+    """Test repository get action."""
+    service_obj = domain.authors.Service()
+    authors = await service_obj.list()
+    author = authors[0]
+    retrieved = await service_obj.get_one_or_none(author.id)
     assert author is retrieved
 
 

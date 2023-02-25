@@ -32,6 +32,7 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
     model_type: type[ModelT]
 
     def __init__(self, id_factory: Callable[[], Any] = uuid4, **_: Any) -> None:
+        """Mock Repo initialize."""
         super().__init__()
         self._id_factory = id_factory
 
@@ -43,7 +44,9 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
             item: The type that the class has been parametrized with.
         """
         return type(  # pyright:ignore
-            f"{cls.__name__}[{item.__name__}]", (cls,), {"collection": {}, "model_type": item}
+            f"{cls.__name__}[{item.__name__}]",
+            (cls,),
+            {"collection": {}, "model_type": item},
         )
 
     def _find_or_raise_not_found(self, id_: Any) -> ModelT:
@@ -71,8 +74,34 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         self.collection[data.id] = data
         return data
 
+    async def add_many(self, data: list[ModelT], allow_id: bool = False) -> Sequence[ModelT]:
+        """Add multiple `data` to the collection.
+
+        Args:
+            data: Instance to be added to the collection.
+            allow_id: disable the identified object check.
+
+        Returns:
+            The added instance.
+        """
+        now = datetime.now()
+        for data_row in data:
+            if allow_id is False and self.get_id_attribute_value(data_row) is not None:
+                raise ConflictError("`add()` received identified item.")
+
+            if hasattr(data, "updated") and hasattr(data, "created"):
+                # maybe the @declarative_mixin decorator doesn't play nice with pyright?
+                data.updated = data.created = now  # pyright: ignore
+        if allow_id is False:
+            id_ = self._id_factory()
+            self.set_id_attribute_value(id_, data_row)
+            self.collection[data_row.id] = data_row
+        return data
+
     async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:
-        """Args:
+        """Count of rows returned by query.
+
+        Args:
             *filters: Types for specific filtering operations.
             **kwargs: Instance attribute value filters.
 
@@ -112,6 +141,19 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """
         return self._find_or_raise_not_found(id_)
 
+    async def get_one_or_none(self, *filters: FilterTypes, **kwargs: Any) -> ModelT:
+        """Get instance identified by `id_`.
+
+        Args:
+            *filters: Types for specific filtering operations.
+            **kwargs: Instance attribute value filters.
+
+        Returns:
+            The retrieved instance or None
+        """
+        data = await self.list(*filters, **kwargs)
+        return data[0] if len(data) > 0 else None  # type: ignore
+
     async def list(self, *filters: FilterTypes, **kwargs: Any) -> Sequence[ModelT]:
         """Get a list of instances, optionally filtered.
 
@@ -125,9 +167,13 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         return tuple(self.collection.values())
 
     async def list_and_count(
-        self, *filters: FilterTypes, **kwargs: Any
+        self,
+        *filters: FilterTypes,
+        **kwargs: Any,
     ) -> tuple[Sequence[ModelT], int]:
-        """Args:
+        """Get a list of instances, optionally filtered with a total row count.
+
+        Args:
             *filters: Types for specific filtering operations.
             **kwargs: Instance attribute value filters.
 
@@ -191,6 +237,7 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """Filter the collection by kwargs.
 
         Args:
+            collection: The object to filter
             **kwargs: key/value pairs such that objects remaining in the collection after filtering
                 have the property that their attribute named `key` has value equal to `value`.
         """

@@ -245,7 +245,7 @@ classmethod-decorators = [
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = ['F401', 'D104']
-"tests/*.py" = ['D103', 'S101', 'D104']
+"tests/*.py" = ['D103', 'S101', 'D104', 'D107', 'D205']
 
 [tool.ruff.isort]
 known-first-party = ['starlite_saqlalchemy', 'pytest_starlite_saqlalchemy', 'tests']
