@@ -280,8 +280,7 @@ def test_filter_collection_by_kwargs_raises_repository_exception_for_attribute_e
     mock_repo: SQLAlchemyRepository,
 ) -> None:
     """Test that we raise a repository exception if an attribute name is
-    incorrect.
-    """
+    incorrect."""
     select_ = mock_repo._create_select_for_model()
     select_.filter_by = MagicMock(  # type:ignore[assignment]
         side_effect=InvalidRequestError,

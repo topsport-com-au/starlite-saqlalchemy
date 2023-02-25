@@ -30,13 +30,10 @@ The `PluginConfig` has switches to disable every aspect of the plugin behavior.
 """
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence  # noqa: TCH003
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from pydantic import BaseModel, Field, validator
 from starlite.app import DEFAULT_CACHE_CONFIG, DEFAULT_OPENAPI_CONFIG
-from starlite.types import TypeEncodersMap  # noqa: TCH002
-from structlog.types import Processor  # noqa: TCH002
 
 from starlite_saqlalchemy import (
     compression,
@@ -68,8 +65,11 @@ from starlite_saqlalchemy.health import (
 from starlite_saqlalchemy.type_encoders import type_encoders_map
 
 if TYPE_CHECKING:
-    from starlite.config.app import AppConfig
+    from collections.abc import Callable, Sequence
 
+    from starlite.config.app import AppConfig
+    from starlite.types import TypeEncodersMap
+    from structlog.types import Processor
 
 T = TypeVar("T")
 
