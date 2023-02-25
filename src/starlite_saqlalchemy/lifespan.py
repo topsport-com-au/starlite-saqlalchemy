@@ -36,11 +36,12 @@ async def _db_ready() -> None:
 async def _redis_ready() -> None:
     """Wait for redis to become responsive."""
     if constants.IS_REDIS_INSTALLED:
-        from starlite_saqlalchemy import redis
+        from starlite_saqlalchemy.worker import redis_client
 
         while True:
             try:
-                await redis.client.ping()
+                client = redis_client.client()
+                await client.ping()
             except Exception as exc:
                 logger.info("Waiting  for Redis: %s", exc)
                 await asyncio.sleep(5)

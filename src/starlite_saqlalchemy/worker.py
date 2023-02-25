@@ -15,7 +15,7 @@ import saq
 from redis.asyncio import Redis
 from starlite.utils.serialization import default_serializer
 
-from starlite_saqlalchemy import constants, redis, settings, type_encoders, utils
+from starlite_saqlalchemy import constants, settings, type_encoders, utils
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable, Collection
@@ -44,7 +44,7 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 encoder = msgspec.msgpack.Encoder(
-    enc_hook=partial(default_serializer, type_encoders=type_encoders.type_encoders_map)
+    enc_hook=partial(default_serializer, type_encoders=type_encoders.type_encoders_map),
 )
 
 redis_client: Redis[bytes] = Redis.from_url(
@@ -111,7 +111,7 @@ class Worker(saq.Worker):
         loop.create_task(self.start())
 
 
-queue = Queue(redis.client)
+queue = Queue(redis_client)
 """Async worker queue.
 
 [Queue][starlite_saqlalchemy.worker.Queue] instance instantiated with
@@ -204,7 +204,11 @@ def create_worker_instance(
 
 
 async def make_service_callback(
-    _ctx: Context, *, service_type_id: str, service_method_name: str, **kwargs: Any
+    _ctx: Context,
+    *,
+    service_type_id: str,
+    service_method_name: str,
+    **kwargs: Any,
 ) -> None:
     """Make an async service callback.
 
@@ -221,7 +225,10 @@ async def make_service_callback(
 
 
 async def enqueue_background_task_for_service(
-    service_obj: Service, method_name: str, job_config: JobConfig | None = None, **kwargs: Any
+    service_obj: Service,
+    method_name: str,
+    job_config: JobConfig | None = None,
+    **kwargs: Any,
 ) -> None:
     """Enqueue an async callback for the operation and data.
 
@@ -270,7 +277,7 @@ class PeriodicHeartbeat:
         self._running: bool = True
         self.job = job
         self.heartbeat_enabled: bool = bool(
-            job.timeout and job.timeout > 0 and job.heartbeat and job.heartbeat > 0
+            job.timeout and job.timeout > 0 and job.heartbeat and job.heartbeat > 0,
         )
         if self.heartbeat_enabled and job.heartbeat <= TEN:
             self.heartbeat = 1
@@ -291,7 +298,7 @@ class PeriodicHeartbeat:
             tg.start_soon(self._periodically_publish)
             executed_func = await func
             await tg.cancel_scope.cancel()
-            return executed_func  # noqa: R504
+            return executed_func
 
     async def stop(self) -> None:
         """Stop heartbeat service."""

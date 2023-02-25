@@ -18,3 +18,4 @@ per-file-ignores =
     tests/integration/test_tests.py:TC002,SCS108
     tests/unit/lib/test_dependencies.py:TC,SCS108
     tests/utils/*:TC
+    src/starlite_saqlalchemy/worker.py:R504

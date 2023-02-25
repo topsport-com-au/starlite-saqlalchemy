@@ -251,10 +251,6 @@ class ConfigureApp:
         """
         app_config.before_startup = lifespan.before_startup_handler
         app_config.on_shutdown.append(http.on_shutdown)
-        if IS_REDIS_INSTALLED:
-            from starlite_saqlalchemy import redis
-
-            app_config.on_shutdown.append(redis.client.close)
 
     def configure_after_exception(self, app_config: AppConfig) -> None:
         """Add the logging after exception hook handler.
