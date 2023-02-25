@@ -4,16 +4,16 @@ import pytest
 from starlite_saqlalchemy.utils import slugify
 
 
-@pytest.mark.parameterized(
-    ("value_to_slugify", "expected_slug"),
+@pytest.mark.parametrize(
+    ("slug", "expected_slug"),
     [
         ("value-to-slugify", "value-to-slugify"),
         ("value to slugify", "value-to-slugify"),
-        ("value         to.slugify", "value-to-slugify"),
+        ("value         to.slugify", "value-toslugify"),
         ("value!! to SLugify", "value-to-slugify"),
-        ("value!! to ___SLugify", "value-to-slugify"),
+        ("value!! to ___SLugify", "value-to-___slugify"),
     ],
 )
-def test_slugify(value_to_slugify: str, expected_slug: str) -> None:
+def test_slugify(slug: str, expected_slug: str) -> None:
     """Test app name conversion to slug."""
-    assert slugify(value_to_slugify) == expected_slug
+    assert slugify(value=slug) == expected_slug

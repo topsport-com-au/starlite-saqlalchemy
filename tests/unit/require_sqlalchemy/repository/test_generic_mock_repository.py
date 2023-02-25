@@ -56,9 +56,12 @@ def test_generic_mock_repository_filter_collection_by_kwargs_and_semantics(
     author_repository: GenericMockRepository[Author],
 ) -> None:
     """Test that filtering by kwargs has `AND` semantics when multiple kwargs,
-    not `OR`."""
+    not `OR`.
+    """
     author_repository.filter_collection_by_kwargs(
-        author_repository.collection, name="Agatha Christie", dob="1828-09-09"
+        author_repository.collection,
+        name="Agatha Christie",
+        dob="1828-09-09",
     )
     assert len(author_repository.collection) == 0
 
@@ -67,18 +70,21 @@ def test_generic_mock_repository_raises_repository_exception_if_named_attribute_
     author_repository: GenericMockRepository[Author],
 ) -> None:
     """Test that a repo exception is raised if a named attribute doesn't
-    exist."""
+    exist.
+    """
     with pytest.raises(StarliteSaqlalchemyError):
         author_repository.filter_collection_by_kwargs(author_repository.collection, cricket="ball")
 
 
 async def test_sets_created_updated_on_add() -> None:
     """Test that the repository updates the 'created' and 'updated' timestamps
-    if necessary."""
+    if necessary.
+    """
 
     class Model(orm.AuditBase):
         """Inheriting from AuditBase gives the model 'created' and 'updated'
-        columns."""
+        columns.
+        """
 
         ...
 
@@ -93,8 +99,8 @@ async def test_sets_created_updated_on_add() -> None:
 
 async def test_sets_updated_on_update(author_repository: GenericMockRepository[Author]) -> None:
     """Test that the repository updates the 'updated' timestamp if
-    necessary."""
-
+    necessary.
+    """
     instance = list(author_repository.collection.values())[0]
     original_updated = instance.updated
     instance = await author_repository.update(instance)
@@ -103,11 +109,13 @@ async def test_sets_updated_on_update(author_repository: GenericMockRepository[A
 
 async def test_does_not_set_created_updated() -> None:
     """Test that the repository does not update the 'updated' timestamps when
-    appropriate."""
+    appropriate.
+    """
 
     class Model(orm.Base):
         """Inheriting from Base means the model has no created/updated
-        timestamp columns."""
+        timestamp columns.
+        """
 
         ...
 
