@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 @pytest.fixture(name="mock_response")
 def fx_mock_response() -> MagicMock:
     """Mock response for returning from mock client requests."""
-    return MagicMock(spec_set=dir(httpx.Response) + ["status_code"], status_code=HTTP_200_OK)
+    return MagicMock(spec_set=[*dir(httpx.Response), "status_code"], status_code=HTTP_200_OK)
 
 
 @pytest.fixture(name="mock_request")
@@ -39,7 +39,9 @@ def fx_mock_request(mock_response: MagicMock) -> MagicMock:
 
 @pytest.fixture(name="mock_client")
 def fx_mock_client(
-    client: TestClient, mock_request: MagicMock, monkeypatch: MonkeyPatch
+    client: TestClient,
+    mock_request: MagicMock,
+    monkeypatch: MonkeyPatch,
 ) -> TestClient:
     """Patches the test client with a mock 'request' method."""
     monkeypatch.setattr(client, "request", mock_request)
@@ -67,10 +69,10 @@ def fx_tester(
 
 
 async def test_tester_get_collection_request_service_method_patch(
-    tester: testing.ControllerTest, mock_response: MagicMock
+    tester: testing.ControllerTest,
+    mock_response: MagicMock,
 ) -> None:
     """Test that the "list" service method has been patched."""
-
     mock_response.json.return_value = tester.raw_collection
     tester.test_get_collection()
     assert "<locals>._list" in str(AuthorService.list)
@@ -78,7 +80,8 @@ async def test_tester_get_collection_request_service_method_patch(
 
 
 def test_tester_get_collection_raises_assertion_error_on_status_code(
-    tester: testing.ControllerTest, mock_response: MagicMock
+    tester: testing.ControllerTest,
+    mock_response: MagicMock,
 ) -> None:
     """Test raising behavior when response status doesn't match expected."""
     mock_response.status_code = HTTP_404_NOT_FOUND
@@ -87,7 +90,8 @@ def test_tester_get_collection_raises_assertion_error_on_status_code(
 
 
 def test_tester_get_collection_raises_assertion_error_on_unexpected_json_response(
-    tester: testing.ControllerTest, mock_response: MagicMock
+    tester: testing.ControllerTest,
+    mock_response: MagicMock,
 ) -> None:
     """Test raising behavior when json response doesn't match expected."""
     mock_response.json.return_value = []
@@ -96,7 +100,9 @@ def test_tester_get_collection_raises_assertion_error_on_unexpected_json_respons
 
 
 def test_tester_get_collection_request_called_with_query_params(
-    tester: testing.ControllerTest, mock_request: MagicMock, mock_response: MagicMock
+    tester: testing.ControllerTest,
+    mock_request: MagicMock,
+    mock_response: MagicMock,
 ) -> None:
     """Test makes request with query parameters."""
     mock_response.json.return_value = tester.raw_collection
@@ -118,7 +124,10 @@ def test_tester_test_member_request_post_request(
 
 @pytest.mark.parametrize(("method", "service_method"), [("POST", "create"), ("PUT", "update")])
 def test_tester_json_in_request_kwargs(
-    method: str, service_method: str, tester: testing.ControllerTest, mock_request: MagicMock
+    method: str,
+    service_method: str,
+    tester: testing.ControllerTest,
+    mock_request: MagicMock,
 ) -> None:
     """Test adds "json" kwarg to requests for POST and PUT."""
     tester.test_member_request(method, service_method, 200)
@@ -128,9 +137,9 @@ def test_tester_json_in_request_kwargs(
 
 async def test_tester_member_request_service_method_patch(tester: testing.ControllerTest) -> None:
     """Test that the appropriate service method gets patched."""
-    tester.test_member_request("GET", "get", 200)
-    assert "<locals>._method" in str(AuthorService.get)
-    assert await AuthorService(session=None).get(123) == tester.collection[0]
+    tester.test_member_request("GET", "get_by_id", 200)
+    assert "<locals>._method" in str(AuthorService.get_by_id)
+    assert await AuthorService(session=None).get_by_id(123) == tester.collection[0]
 
 
 @pytest.mark.parametrize("params", [{"a": "b"}, None])
@@ -158,9 +167,10 @@ def test_tester_run_method(params: dict[str, Any] | None) -> None:
 
 
 def test_tester_ignores_405_response(
-    tester: testing.ControllerTest, mock_response: MagicMock
+    tester: testing.ControllerTest,
+    mock_response: MagicMock,
 ) -> None:
     """Test that 405 responses don't raise from asserts."""
     mock_response.status_code = HTTP_405_METHOD_NOT_ALLOWED
     tester.test_get_collection()
-    tester.test_member_request("GET", "get", HTTP_200_OK)
+    tester.test_member_request("GET", "get_by_id", HTTP_200_OK)

@@ -10,7 +10,6 @@ import contextlib
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from starlite_saqlalchemy.db import async_session_factory
-from starlite_saqlalchemy.repository.abc import AbstractSlugRepository
 from starlite_saqlalchemy.repository.sqlalchemy import ModelT, SlugModelT
 
 from .generic import Service
@@ -18,9 +17,11 @@ from .generic import Service
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Sequence
 
-    from starlite_saqlalchemy.repository.abc import AbstractRepository
+    from starlite_saqlalchemy.repository.abc import (
+        AbstractRepository,
+        AbstractSlugRepository,
+    )
     from starlite_saqlalchemy.repository.types import FilterTypes
-
 
 RepoServiceT = TypeVar("RepoServiceT", bound="RepositoryService")
 

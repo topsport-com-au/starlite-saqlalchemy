@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from unittest.mock import AsyncMock, MagicMock, call
 
 import pytest
@@ -34,7 +34,7 @@ def mock_repo() -> SQLAlchemyRepository:
 
         model_type = MagicMock()  # pyright:ignore[reportGeneralTypeIssues]
 
-        def _create_select_for_model(self) -> MagicMock:
+        def _create_select_for_model(self, **kwargs: Any) -> MagicMock:
             return MagicMock()
 
     return Repo(session=AsyncMock(spec=AsyncSession))
@@ -122,7 +122,7 @@ async def test_sqlalchemy_repo_list_with_pagination(
     select_ = MagicMock()
     select_.limit.return_value = select_
     select_.offset.return_value = select_
-    monkeypatch.setattr(mock_repo, "_create_select_for_model", lambda: select_)
+    monkeypatch.setattr(mock_repo, "_create_select_for_model", lambda **kwargs: select_)
     await mock_repo.list(LimitOffset(2, 3))
     select_.limit.assert_called_once_with(2)
     select_.limit().offset.assert_called_once_with(3)
@@ -158,7 +158,7 @@ async def test_sqlalchemy_repo_list_with_before_after_filter(
     monkeypatch.setattr(mock_repo, "_execute", execute_mock)
     select_ = MagicMock()
     select_.where.return_value = select_
-    monkeypatch.setattr(mock_repo, "_create_select_for_model", lambda: select_)
+    monkeypatch.setattr(mock_repo, "_create_select_for_model", lambda **kwargs: select_)
     await mock_repo.list(BeforeAfter(field_name, datetime.max, datetime.min))
     assert select_.where.call_count == 2
     assert select_.where.has_calls([call("gt"), call("lt")])
@@ -175,7 +175,7 @@ async def test_sqlalchemy_repo_list_with_collection_filter(
     monkeypatch.setattr(mock_repo, "_execute", execute_mock)
     select_ = MagicMock()
     select_.where.return_value = select_
-    monkeypatch.setattr(mock_repo, "_create_select_for_model", lambda: select_)
+    monkeypatch.setattr(mock_repo, "_create_select_for_model", lambda **kwargs: select_)
     values = [1, 2, 3]
     await mock_repo.list(CollectionFilter(field_name, values))
     select_.where.assert_called_once()

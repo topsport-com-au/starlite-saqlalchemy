@@ -85,7 +85,7 @@ async def test_service_get_one_or_none() -> None:
     service_obj = domain.authors.Service()
     authors = await service_obj.list()
     author = authors[0]
-    retrieved = await service_obj.get_one_or_none(author.id)
+    retrieved = await service_obj.get_one_or_none(id=author.id)
     assert author is retrieved
 
 

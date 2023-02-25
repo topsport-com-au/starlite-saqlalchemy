@@ -123,7 +123,7 @@ class Service(Generic[T]):
         """
         return data
 
-    async def get_by_id(self, id_: Any) -> T:
+    async def get_by_id(self, id_: Any, **kwargs: Any) -> T:
         """Retrieve a representation of `T` with that is identified by `id_`.
 
         Args:
@@ -134,7 +134,7 @@ class Service(Generic[T]):
         """
         raise NotFoundError
 
-    async def get_one_or_none(self, id_: Any) -> T:
+    async def get_one_or_none(self, **kwargs: Any) -> T | None:
         """Retrieve a representation of `T` with that is identified by `id_`.
 
         Args:
@@ -143,7 +143,7 @@ class Service(Generic[T]):
         Returns:
             Representation of instance with identifier `id_`.
         """
-        raise NotFoundError
+        ...
 
     async def delete(self, id_: Any) -> T:
         """Delete `T` that is identified by `id_`.

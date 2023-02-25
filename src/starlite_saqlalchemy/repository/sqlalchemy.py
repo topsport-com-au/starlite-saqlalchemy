@@ -131,7 +131,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             Count of records returned by query, ignoring pagination.
         """
-        options: list[ExecutableOption] = kwargs.get("options") or self.default_options
+        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
         select_ = select(sql_func.count(self.model_type.id)).options(  # type:ignore[attr-defined]
             *options,
         )
@@ -187,7 +187,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             The list of instances, after filtering applied.
         """
-        options: list[ExecutableOption] = kwargs.get("options") or self.default_options
+        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
         select_ = self._create_select_for_model(options=options)
         select_ = self._filter_for_list(*filters, select_=select_)
         select_ = self._filter_select_by_kwargs(select_, **kwargs)
@@ -213,8 +213,8 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Raises:
             RepositoryNotFoundException: If no instance found identified by `id_`.
         """
-        options: list[ExecutableOption] = kwargs.get("options") or self.default_options
-        return self.check_not_found(await self.get_one_or_none(id=id_, options=options))
+        kwargs.update({self.id_attribute: id_})
+        return self.check_not_found(await self.get_one_or_none(**kwargs))
 
     async def list(
         self,
@@ -230,7 +230,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             The list of instances, after filtering applied.
         """
-        options: list[ExecutableOption] = kwargs.get("options") or self.default_options
+        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
 
         select_ = self._create_select_for_model(options=options)
         select_ = self._filter_for_list(*filters, select_=select_)
@@ -257,7 +257,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             Count of records returned by query, ignoring pagination.
         """
-        options: list[ExecutableOption] = kwargs.get("options") or self.default_options
+        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
         select_ = select(
             self.model_type,
             over(sql_func.count(self.model_type.id)),  # type:ignore[attr-defined]
@@ -390,7 +390,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         raise ValueError("Unexpected value for `strategy`, must be `'add'` or `'merge'`")
 
     def _create_select_for_model(self, **kwargs: Any) -> Select[tuple[ModelT]]:
-        options = kwargs.get("options", self.default_options)
+        options = kwargs.pop("options", self.default_options)
         return select(self.model_type).options(*options)
 
     async def _execute(self, select_: Select[RowT]) -> Result[RowT]:
@@ -470,7 +470,7 @@ class SQLAlchemyRepositorySlugMixin(
         **kwargs: Any,
     ) -> SlugModelT | None:
         """Select record by slug value."""
-        options: list[ExecutableOption] = kwargs.get("options") or self.default_options
+        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
         return await self.get_one_or_none(slug=slug, options=options)
 
     async def get_available_slug(
@@ -489,7 +489,7 @@ class SQLAlchemyRepositorySlugMixin(
         Returns:
             str: a unique slug for the supplied value.  This is safe for URLs and other unique identifiers.
         """
-        options: list[ExecutableOption] = kwargs.get("options") or self.default_options
+        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
         slug = slugify(value_to_slugify)
         if await self._is_slug_unique(slug, options=options):
             return slug
@@ -501,5 +501,5 @@ class SQLAlchemyRepositorySlugMixin(
         slug: str,
         **kwargs: Any,
     ) -> bool:
-        options: list[ExecutableOption] = kwargs.get("options") or self.default_options
+        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
         return await self.get_one_or_none(slug=slug, options=options) is None
