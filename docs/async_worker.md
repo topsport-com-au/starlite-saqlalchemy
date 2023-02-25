@@ -36,7 +36,9 @@ class Service(service.RepositoryService[Author]):
     async def create(self, data: Author) -> Author:
         created = await super().create(data)
         await worker.enqueue_background_task_for_service(
-            "send_author_created_email", self , raw_author=ReadDTO.from_orm(created).dict()
+            "send_author_created_email",
+            self,
+            raw_author=ReadDTO.from_orm(created).dict(),
         )
         return created
 
