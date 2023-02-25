@@ -294,10 +294,10 @@ class PeriodicHeartbeat:
                 self.job.id,
                 self.heartbeat,
             )
-        async with anyio.create_task_group() as tg:
-            tg.start_soon(self._periodically_publish)
+        async with anyio.create_task_group() as task_group:
+            task_group.start_soon(self._periodically_publish)
             executed_func = await func
-            await tg.cancel_scope.cancel()
+            await task_group.cancel_scope.cancel()
             return executed_func
 
     async def stop(self) -> None:

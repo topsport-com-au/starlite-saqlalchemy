@@ -143,7 +143,6 @@ class Service(Generic[T]):
         Returns:
             Representation of instance with identifier `id_`.
         """
-        ...
 
     async def delete(self, id_: Any) -> T:
         """Delete `T` that is identified by `id_`.

@@ -179,14 +179,7 @@ class SlugRepositoryService(RepositoryService[SlugModelT]):
 
     __id__ = "starlite_saqlalchemy.service.sqlalchemy.SlugRepositoryService"
     repository_type: type[AbstractSlugRepository[SlugModelT]]
-
-    def __init__(self, **repo_kwargs: Any) -> None:
-        """Configure the service object.
-
-        Args:
-            **repo_kwargs: passed as keyword args to repo instantiation.
-        """
-        self.repository: AbstractSlugRepository = self.repository_type(**repo_kwargs)
+    repository: AbstractSlugRepository
 
     async def get_by_slug(self, slug_: str) -> ModelT | None:
         """Wrap repository scalar operation.

@@ -92,10 +92,10 @@ class GenericMockRepository(AbstractRepository[ModelT], Generic[ModelT]):
             if hasattr(data, "updated") and hasattr(data, "created"):
                 # maybe the @declarative_mixin decorator doesn't play nice with pyright?
                 data.updated = data.created = now  # pyright: ignore
-        if allow_id is False:
-            id_ = self._id_factory()
-            self.set_id_attribute_value(id_, data_row)
-            self.collection[data_row.id] = data_row
+            if allow_id is False:
+                id_ = self._id_factory()
+                self.set_id_attribute_value(id_, data_row)
+                self.collection[data_row.id] = data_row
         return data
 
     async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:

@@ -7,12 +7,7 @@ Adds a filter for health check route logs.
 from __future__ import annotations
 
 import logging
-
-try:
-    import re2 as re  # pyright: ignore
-except ImportError:
-    import re
-
+import re
 from inspect import isawaitable
 from typing import TYPE_CHECKING
 
@@ -230,7 +225,7 @@ class BeforeSendHandler:
         """
         data: dict[str, Any] = {}
         extracted_data = self.response_extractor(
-            messages=(scope["state"][HTTP_RESPONSE_START], scope["state"][HTTP_RESPONSE_BODY])
+            messages=(scope["state"][HTTP_RESPONSE_START], scope["state"][HTTP_RESPONSE_BODY]),
         )
         missing = object()
         response_body_compressed = get_starlite_scope_state(scope, SCOPE_STATE_RESPONSE_COMPRESSED)
