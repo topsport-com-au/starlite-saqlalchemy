@@ -4,4 +4,5 @@ sentry-sdk >= "1.13.0"
 hiredis
 redis
 saq >= "0.9.1"
-sqlalchemy == 2.0.0rc3
+sqlalchemy == 2.0.4
+greenlet

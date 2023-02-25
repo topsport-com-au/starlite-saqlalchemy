@@ -132,7 +132,11 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             Count of records returned by query, ignoring pagination.
         """
         options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
-        select_ = select(sql_func.count(self.model_type.id)).options(  # type:ignore[attr-defined]
+        select_ = select(
+            sql_func.count(  # pylint: disable=not-callable
+                self.model_type.id,  # type:ignore[attr-defined]
+            ),
+        ).options(
             *options,
         )
         for filter_ in filters:
@@ -152,7 +156,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
                 case _:
                     raise StarliteSaqlalchemyError(f"Unexpected filter: {filter}")
         results = await self._execute(select_)
-        return results.scalar_one()  # type: ignore[no-any-return]
+        return results.scalar_one()
 
     async def delete(self, id_: Any) -> ModelT:
         """Delete instance identified by `id_`.
@@ -260,7 +264,11 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
         select_ = select(
             self.model_type,
-            over(sql_func.count(self.model_type.id)),  # type:ignore[attr-defined]
+            over(
+                sql_func.count(  # pylint: disable=not-callable
+                    self.model_type.id,  # type:ignore[attr-defined]
+                ),
+            ),
         ).options(*options)
         select_ = self._filter_for_list(*filters, select_=select_)
         select_ = self._filter_select_by_kwargs(select_, **kwargs)

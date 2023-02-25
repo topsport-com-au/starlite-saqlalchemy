@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 async def test_health_logging_skipped(app: Starlite, cap_logger: CapturingLogger) -> None:
     """Integration test for PUT route."""
     async with AsyncClient(app=app, base_url="http://testserver") as client:
-        response = await client.get("/api/health")
+        response = await client.get("/health")
         assert response.status_code == 200
 
     assert [] == cap_logger.calls
@@ -62,5 +62,5 @@ async def test_logging(app: Starlite, cap_logger: CapturingLogger) -> None:
                 "level": "info",
                 "timestamp": ANY,
             },
-        )
+        ),
     ]
