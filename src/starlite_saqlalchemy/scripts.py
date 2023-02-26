@@ -1,8 +1,18 @@
 """Application startup script."""
-import uvicorn
+import asyncio
+import signal
+from typing import TYPE_CHECKING, Any
 
-from starlite_saqlalchemy import settings
+import uvicorn
+import uvloop
+
+from starlite_saqlalchemy import log, settings
 from starlite_saqlalchemy.constants import IS_LOCAL_ENVIRONMENT
+from starlite_saqlalchemy.worker import (
+    create_worker_instance,
+    make_service_callback,
+    queue,
+)
 
 
 def determine_should_reload() -> bool:
@@ -36,3 +46,42 @@ def run_app() -> None:
         reload_dirs=reload_dirs,
         timeout_keep_alive=settings.server.KEEPALIVE,
     )
+
+
+def run_worker() -> None:
+    """Run a worker."""
+    log.config.configure()
+    worker_kwargs: dict[str, Any] = {
+        "functions": [(make_service_callback.__qualname__, make_service_callback)],
+    }
+    worker_kwargs["before_process"] = log.worker.before_process
+    worker_kwargs["after_process"] = log.worker.after_process
+    worker_instance = create_worker_instance(**worker_kwargs)
+
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+    loop = asyncio.new_event_loop()
+    for signals in (signal.SIGINT, signal.SIGTERM):
+        loop.add_signal_handler(
+            signals,
+            lambda: asyncio.create_task(worker_instance.stop()),
+        )
+
+    if settings.worker.WEB_ENABLED:
+        import aiohttp.web  # pyright:ignore[reportMissingImports]
+        from saq.web import create_app
+
+        if TYPE_CHECKING:
+            from aiohttp.web_app import (  # pyright:ignore[reportMissingImports]
+                Application,
+            )
+
+        async def shutdown(_app: Application) -> None:
+            await worker_instance.stop()
+
+        app = create_app([queue])
+        app.on_shutdown.append(shutdown)
+
+        loop.create_task(worker_instance.start())
+        aiohttp.web.run_app(app, port=settings.worker.WEB_PORT, loop=loop)
+    else:
+        loop.run_until_complete(worker_instance.start())

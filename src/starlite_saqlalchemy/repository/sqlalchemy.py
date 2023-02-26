@@ -156,7 +156,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
                 case _:
                     raise StarliteSaqlalchemyError(f"Unexpected filter: {filter}")
         results = await self._execute(select_)
-        return results.scalar_one()
+        return cast("int", results.scalar_one())
 
     async def delete(self, id_: Any) -> ModelT:
         """Delete instance identified by `id_`.

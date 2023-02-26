@@ -322,6 +322,10 @@ class WorkerSettings(BaseSettings):
 
     Default is set to 10.
     """
+    WEB_ENABLED: bool = False
+    """If true, the worker admin UI is launched on worker startup.."""
+    WEB_PORT: int = 8081
+    """Port to use for the worker web UI."""
 
 
 # `.parse_obj()` thing is a workaround for pyright and pydantic interplay, see:
