@@ -60,7 +60,7 @@ asyncpg = "*"
 httpx = "*"
 msgspec = "*"
 pydantic = "*"
-python = "^3.10"
+python = ">=3.10,<4.0"
 python-dotenv = "*"
 starlite = "~=1.51.2"
 structlog = "*"
@@ -74,7 +74,6 @@ redis = {version = "*", optional = true}
 saq = {version = "^0.9.1", optional = true}
 sentry-sdk = {version = "*", optional = true}
 sqlalchemy = {version = ">=2.0.4", optional = true}
-
 
 [tool.poetry.extras]
 all = ["redis", "hiredis", "saq", "sentry-sdk", "sqlalchemy"]
