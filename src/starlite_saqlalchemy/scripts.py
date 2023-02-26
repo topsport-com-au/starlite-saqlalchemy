@@ -1,4 +1,6 @@
 """Application startup script."""
+from __future__ import annotations
+
 import asyncio
 import signal
 from typing import TYPE_CHECKING, Any
@@ -67,11 +69,11 @@ def run_worker() -> None:
         )
 
     if settings.worker.WEB_ENABLED:
-        import aiohttp.web  # pyright:ignore[reportMissingImports]
-        from saq.web import create_app
+        import aiohttp.web  # pyright:ignore[reportMissingImports] # pylint: disable=import-outside-toplevel,import-error
+        from saq.web import create_app  # pylint: disable=import-outside-toplevel
 
         if TYPE_CHECKING:
-            from aiohttp.web_app import (  # pyright:ignore[reportMissingImports]
+            from aiohttp.web_app import (  # pyright:ignore[reportMissingImports] # pylint: disable=import-outside-toplevel
                 Application,
             )
 
