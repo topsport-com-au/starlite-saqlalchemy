@@ -491,7 +491,6 @@ class SQLAlchemyRepositorySlugMixin(
         If the value is found to exist, a random 4 digit character is appended to the end.  There may be a better way to do this, but I wanted to limit the number of additional database calls.
 
         Args:
-            db_session (AsyncSession): Database session.
             value_to_slugify (str): A string that should be converted to a unique slug.
 
         Returns:
