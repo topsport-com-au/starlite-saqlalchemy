@@ -71,7 +71,7 @@ async def wait_until_responsive(
         await asyncio.sleep(pause)
         now = timeit.default_timer()
 
-    raise Exception("Timeout reached while waiting on service!")
+    raise ConnectionError("Timeout reached while waiting on service!")
 
 
 async def redis_responsive(host: str) -> bool:
@@ -105,11 +105,10 @@ async def db_responsive(host: str) -> bool:
         )
     except (ConnectionError, asyncpg.CannotConnectNowError):
         return False
-    else:
-        try:
-            return (await conn.fetchrow("SELECT 1"))[0] == 1  # type:ignore[index,no-any-return]
-        finally:
-            await conn.close()
+    try:
+        return (await conn.fetchrow("SELECT 1"))[0] == 1  # type:ignore[index,no-any-return]
+    finally:
+        await conn.close()
 
 
 @pytest.fixture(scope="session", autouse=True)

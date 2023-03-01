@@ -81,7 +81,7 @@ class FromMapped(BaseModel, Generic[AnyDeclarative]):
             else:
                 dto_config = pos_arg
         else:
-            raise ValueError("Unexpected type annotation for `FromMapped`.")
+            raise ValueError(f"Unexpected type annotation for `FromMapped` for: {item = }.")
         return cls._factory(
             cls.__name__,
             cast("type[AnyDeclarative]", model),
