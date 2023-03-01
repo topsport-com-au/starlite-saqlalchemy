@@ -311,3 +311,45 @@ def test_dto_mapped_union_relationship() -> None:
     assert field.default is None
     assert issubclass(field.type_, BaseModel)
     assert "val" in field.type_.__fields__
+
+
+@pytest.mark.xfail(reason="not yet supported")
+def test_dto_factory_self_referencing_relationships(
+    create_module: "Callable[[str, str], ModuleType]",
+) -> None:
+    """Test that dto generated from module with forward ref annotations
+    works."""
+    create_module(
+        """
+from __future__ import annotations
+from typing import Annotated
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from starlite_saqlalchemy import dto
+from starlite_saqlalchemy.db import orm
+
+class A(orm.Base):
+    b_id: Mapped[int] = mapped_column(ForeignKey("b.id"))
+    b: Mapped["B"] = relationship(back_populates="a")
+
+DTO = dto.FromMapped[Annotated[A, dto.DTOConfig(purpose="read")]]
+""",
+        "module_a",
+    )
+    create_module(
+        """
+from __future__ import annotations
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from starlite_saqlalchemy.db import orm
+
+class B(orm.Base):
+    a_id: Mapped[int] = mapped_column(ForeignKey("a.id"))
+    a: Mapped["A"] = relationship(back_populates="b")
+""",
+        "module_b",
+    )

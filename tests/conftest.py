@@ -59,14 +59,15 @@ def fx_raw_books(raw_authors: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 @pytest.fixture(name="create_module")
-def fx_create_module(tmp_path: Path, monkeypatch: MonkeyPatch) -> Callable[[str], ModuleType]:
+def fx_create_module(tmp_path: Path, monkeypatch: MonkeyPatch) -> Callable[[str, str], ModuleType]:
     """Utility fixture for dynamic module creation."""
 
-    def wrapped(source: str) -> ModuleType:
+    def wrapped(source: str, module_name: str | None = None) -> ModuleType:
         """
 
         Args:
             source: Source code as a string.
+            module_name: Not required, name of the module.
 
         Returns:
             An imported module.
@@ -77,7 +78,7 @@ def fx_create_module(tmp_path: Path, monkeypatch: MonkeyPatch) -> Callable[[str]
             assert val is not None
             return val
 
-        module_name = uuid4().hex
+        module_name = module_name or uuid4().hex
         path = tmp_path / f"{module_name}.py"
         path.write_text(source)
         # https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
