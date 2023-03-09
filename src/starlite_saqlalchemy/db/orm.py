@@ -1,6 +1,7 @@
 """Application ORM configuration."""
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from typing import Any, TypeVar
 from uuid import UUID, uuid4
@@ -53,24 +54,13 @@ def touch_updated_timestamp(session: Session, *_: Any) -> None:
 
 
 @declarative_mixin
-class CommonColumns:
-    """Common functionality shared between all declarative models."""
+class UUIDPrimaryKey:
+    """UUID Primary Key Field Mixin."""
 
     __abstract__ = True
-    __name__: str
 
-    id: Mapped[UUID] = mapped_column(
-        default=uuid4,
-        primary_key=True,
-        info={DTO_KEY: dto.DTOField(mark=dto.Mark.READ_ONLY)},
-    )
-    """Primary key column."""
-
-    # noinspection PyMethodParameters
-    @declared_attr.directive
-    def __tablename__(cls) -> str:  # pylint: disable=no-self-argument
-        """Infer table name from class name."""
-        return cls.__name__.lower()
+    id: Mapped[UUID] = mapped_column(default=uuid4, primary_key=True)
+    """UUID Primary key column."""
 
 
 @declarative_mixin
@@ -92,7 +82,7 @@ class AuditColumns:
 
 
 @declarative_mixin
-class SlugColumns:
+class SlugKey:
     """Slug Field Model Mixin."""
 
     __abstract__ = True
@@ -108,33 +98,51 @@ class SlugColumns:
 
 
 @declarative_mixin
-class ToDictMixin:
-    """Adds a `dict` method to the model."""
+class CommonTableAttributes:
+    """Common attributes for SQLALchemy tables."""
 
-    def dict(self) -> dict[str, Any]:
-        """Return a dict representation of a model."""
-        if self.__table__:  # type: ignore[attr-defined]
-            return {field.name: getattr(self, field.name) for field in self.__table__.columns}  # type: ignore[attr-defined]
-        return {}
+    __abstract__ = True
+    __name__: str
+    __table__: Any
+
+    # noinspection PyMethodParameters
+    @declared_attr.directive
+    def __tablename__(cls) -> str:  # pylint: disable=no-self-argument
+        """Infer table name from class name."""
+        regexp = re.compile("((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))")
+        return regexp.sub(r"_\1", cls.__name__).lower()
+
+    def to_dict(self, exclude: set[str] | None = None) -> dict[str, Any]:
+        """Convert model to dictionary.
+
+        Returns:
+            dict[str, Any]: A dict representation of the model
+        """
+        exclude = set(exclude) if exclude else set()
+        return {
+            field.name: getattr(self, field.name)
+            for field in self.__table__.columns
+            if field.name not in exclude
+        }
 
 
 meta = MetaData(naming_convention=convention)
 registry_ = registry(metadata=meta, type_annotation_map={UUID: pg.UUID, dict: pg.JSONB})
 
 
-class Base(CommonColumns, DeclarativeBase, ToDictMixin):
+class Base(CommonTableAttributes, UUIDPrimaryKey, DeclarativeBase):
     """Base for all SQLAlchemy declarative models."""
 
     registry = registry_
 
 
-class SlugBase(CommonColumns, SlugColumns, DeclarativeBase, ToDictMixin):
+class SlugBase(SlugKey, CommonTableAttributes, UUIDPrimaryKey, DeclarativeBase):
     """Base for all SQLAlchemy declarative models with a slug field."""
 
     registry = registry_
 
 
-class AuditBase(AuditColumns, CommonColumns, DeclarativeBase, ToDictMixin):
+class AuditBase(AuditColumns, CommonTableAttributes, UUIDPrimaryKey, DeclarativeBase):
     """Base for declarative models with audit columns."""
 
     registry = registry_
