@@ -138,8 +138,8 @@ def test_tester_json_in_request_kwargs(
 async def test_tester_member_request_service_method_patch(tester: testing.ControllerTest) -> None:
     """Test that the appropriate service method gets patched."""
     tester.test_member_request("GET", "get_by_id", 200)
-    assert "<locals>._method" in str(AuthorService.get_by_id)
-    assert await AuthorService(session=None).get_by_id(123) == tester.collection[0]
+    assert "<locals>._method" in str(AuthorService.get)
+    assert await AuthorService(session=None).get(123) == tester.collection[0]
 
 
 @pytest.mark.parametrize("params", [{"a": "b"}, None])

@@ -155,7 +155,7 @@ exclude = [
   "venv",
   '__pycache__',
 ]
-fix = true
+fix = false
 ignore = [
   'B008',
   'EM102',

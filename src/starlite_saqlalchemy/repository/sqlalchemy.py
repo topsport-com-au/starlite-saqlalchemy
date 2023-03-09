@@ -5,16 +5,14 @@ import random
 import string
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, cast
+from uuid import UUID, uuid4
 
-from sqlalchemy import insert, over, select, text
+from sqlalchemy import delete, insert, over, select, text, update
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.sql import func as sql_func
 
 from starlite_saqlalchemy.exceptions import ConflictError, StarliteSaqlalchemyError
-from starlite_saqlalchemy.repository.abc import (
-    AbstractRepository,
-    AbstractSlugRepository,
-)
+from starlite_saqlalchemy.repository.abc import AbstractRepository
 from starlite_saqlalchemy.repository.filters import (
     BeforeAfter,
     CollectionFilter,
@@ -29,36 +27,35 @@ if TYPE_CHECKING:
     from sqlalchemy import Select
     from sqlalchemy.engine import Result
     from sqlalchemy.ext.asyncio import AsyncSession
-    from sqlalchemy.sql.base import ExecutableOption
 
     from starlite_saqlalchemy.db import orm
     from starlite_saqlalchemy.repository.types import FilterTypes
 
-__all__ = [
+__all__ = (
     "SQLAlchemyRepository",
     "ModelT",
-]
+)
 
 T = TypeVar("T")
 ModelT = TypeVar("ModelT", bound="orm.Base | orm.AuditBase | orm.SlugBase")
 SlugModelT = TypeVar("SlugModelT", bound="orm.SlugBase")
-RowT = TypeVar("RowT", bound=tuple[Any, ...])
 SQLARepoT = TypeVar("SQLARepoT", bound="SQLAlchemyRepository")
 SelectT = TypeVar("SelectT", bound="Select[Any]")
+RowT = TypeVar("RowT", bound=tuple[Any, ...])
 
 
 @contextmanager
 def wrap_sqlalchemy_exception() -> Any:
-    """Do something within context to raise a `RepositoryException` chained
-    from an original `SQLAlchemyError`.
+    """Do something within context to raise a `RepositoryError` chained from an
+    original `SQLAlchemyError`.
 
-        >>> try:
-        ...     with wrap_sqlalchemy_exception():
-        ...         raise SQLAlchemyError("Original Exception")
-        ... except StarliteSaqlalchemyError as exc:
-        ...     print(f"caught repository exception from {type(exc.__context__)}")
-        ...
-        caught repository exception from <class 'sqlalchemy.exc.SQLAlchemyError'>
+    >>> try:
+    ...     with wrap_sqlalchemy_exception():
+    ...         raise SQLAlchemyError("Original Exception")
+    ... except RepositoryError as exc:
+    ...     print(f"caught repository exception from {type(exc.__context__)}")
+    ...
+    caught repository exception from <class 'sqlalchemy.exc.SQLAlchemyError'>
     """
     try:
         yield
@@ -71,14 +68,23 @@ def wrap_sqlalchemy_exception() -> Any:
 class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
     """SQLAlchemy based implementation of the repository interface."""
 
-    def __init__(self, *, session: AsyncSession, **kwargs: Any) -> None:
-        """
+    def __init__(
+        self,
+        *,
+        session: AsyncSession,
+        base_select: Select[tuple[ModelT]] | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """Repository pattern for SQLAlchemy models.
+
         Args:
             session: Session managing the unit-of-work for the operation.
+            base_select: To facilitate customization of the underlying select query.
+            **kwargs: Any additional arguments
         """
-        self.default_options: list[ExecutableOption] = kwargs.pop("options", [])
         super().__init__(**kwargs)
         self.session = session
+        self.statement = base_select or select(self.model_type)
 
     async def add(self, data: ModelT) -> ModelT:
         """Add `data` to the collection.
@@ -96,163 +102,175 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             self.session.expunge(instance)
             return instance
 
-    async def add_many(self, data: list[ModelT]) -> abc.Sequence[ModelT]:
+    async def add_many(self, data: list[ModelT]) -> list[ModelT]:
         """Add Many `data` to the collection.
 
         Args:
             data: list of Instances to be added to the collection.
 
+        This function has an optimized bulk insert based on the configured SQL dialect:
+        - For backends supporting `RETURNING` with `executemany`, a single bulk insert with returning clause is executed.
+        - For other backends, it does a bulk insert and then selects the inserted records
+
         Returns:
             The added instances.
         """
+        data_to_insert: list[dict[str, Any]] = [v.to_dict() if isinstance(v, self.model_type) else v for v in data]  # type: ignore
         with wrap_sqlalchemy_exception():
-            instances: list[ModelT] = await self._execute(
-                insert(
-                    self.model_type,
+            if self.session.bind.dialect.insert_executemany_returning:
+                instances = list(
+                    await self.session.scalars(  # type: ignore
+                        insert(self.model_type).returning(self.model_type),
+                        data_to_insert,  # pyright: reportGeneralTypeIssues=false
+                    ),
                 )
-                .values([v.dict() if isinstance(v, self.model_type) else v for v in data])
-                .returning(self.model_type),  # type: ignore
+                for instance in instances:
+                    self.session.expunge(instance)
+                return instances
+            # when bulk insert with returning isn't supported, we ensure there is a unique ID on each record so that we can refresh the records after insert.
+            # ensure we have a UUID ID on each record so that we can refresh the data before returning
+            new_primary_keys: list[UUID] = []
+            for datum in data_to_insert:
+                if datum.get(self.id_attribute, None) is None:
+                    datum.update({self.id_attribute: uuid4()})
+                new_primary_keys.append(datum.get(self.id_attribute))  # type: ignore[arg-type]
+
+            await self.session.execute(
+                insert(self.model_type),
+                data_to_insert,
             )
-            for instance in instances:
-                self.session.expunge(instance)
-            return instances
+            # select the records we just inserted.
+            return await self.list(
+                CollectionFilter(field_name=self.id_attribute, values=new_primary_keys),
+            )
 
-    async def count(
-        self,
-        *filters: FilterTypes,
-        **kwargs: Any,
-    ) -> int:
-        """
+    async def delete(self, item_id: Any) -> ModelT:
+        """Delete instance identified by `item_id`.
 
         Args:
-            *filters: Types for specific filtering operations.
-            **kwargs: Instance attribute value filters.
-
-        Returns:
-            Count of records returned by query, ignoring pagination.
-        """
-        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
-        select_ = select(
-            sql_func.count(  # pylint: disable=not-callable
-                self.model_type.id,  # type:ignore[attr-defined]
-            ),
-        ).options(
-            *options,
-        )
-        for filter_ in filters:
-            match filter_:
-                case LimitOffset(_, _):
-                    pass
-                    # we do not apply this filter to the count since we need the total rows
-                case BeforeAfter(field_name, before, after):
-                    select_ = self._filter_on_datetime_field(
-                        field_name,
-                        before,
-                        after,
-                        select_=select_,
-                    )
-                case CollectionFilter(field_name, values):
-                    select_ = self._filter_in_collection(field_name, values, select_=select_)
-                case _:
-                    raise StarliteSaqlalchemyError(f"Unexpected filter: {filter}")
-        results = await self._execute(select_)
-        return results.scalar_one()
-
-    async def delete(self, id_: Any) -> ModelT:
-        """Delete instance identified by `id_`.
-
-        Args:
-            id_: Identifier of instance to be deleted.
+            item_id: Identifier of instance to be deleted.
 
         Returns:
             The deleted instance.
 
         Raises:
-            RepositoryNotFoundException: If no instance found identified by `id_`.
+            RepositoryNotFoundException: If no instance found identified by `item_id`.
         """
         with wrap_sqlalchemy_exception():
-            instance = await self.get_by_id(id_)
+            instance = await self.get(item_id)
             await self.session.delete(instance)
             await self.session.flush()
             self.session.expunge(instance)
             return instance
 
-    async def get_one_or_none(
-        self,
-        *filters: FilterTypes,
-        **kwargs: Any,
-    ) -> ModelT | None:
-        """Get an object instance, optionally filtered.
+    async def delete_many(self, item_ids: list[Any]) -> list[ModelT]:
+        """Delete instance identified by `item_id`.
 
         Args:
-            *filters: Types for specific filtering operations.
-            **kwargs: Instance attribute value filters.
+            item_id: Identifier of instance to be deleted.
 
         Returns:
-            The list of instances, after filtering applied.
+            The deleted instance.
         """
-        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
-        select_ = self._create_select_for_model(options=options)
-        select_ = self._filter_for_list(*filters, select_=select_)
-        select_ = self._filter_select_by_kwargs(select_, **kwargs)
-
         with wrap_sqlalchemy_exception():
-            instance = (await self._execute(select_)).scalar_one_or_none()
-            self.session.expunge(instance)
-            return instance
+            if self.session.bind.dialect.delete_executemany_returning:
+                instances = list(
+                    await self.session.scalars(
+                        delete(self.model_type)
+                        .where(getattr(self.model_type, self.id_attribute).in_(item_ids))
+                        .returning(self.model_type),
+                    ),
+                )
+                await self.session.flush()
+                for instance in instances:
+                    self.session.expunge(instance)
+                return instances
 
-    async def get_by_id(
-        self,
-        id_: Any,
-        **kwargs: Any,
-    ) -> ModelT:
-        """Get instance identified by `id_`.
+            instances = await self.list(
+                CollectionFilter(field_name=self.id_attribute, values=item_ids),
+            )
+            await self.session.execute(
+                delete(self.model_type).where(
+                    getattr(self.model_type, self.id_attribute).in_(item_ids),
+                ),
+            )
+            await self.session.flush()
+            # no need to expunge.  The list did this already.
+            return instances  # noqa: R504
+
+    async def get(self, item_id: Any, **kwargs: Any) -> ModelT:
+        """Get instance identified by `item_id`.
 
         Args:
-            id_: Identifier of the instance to be retrieved.
+            item_id: Identifier of the instance to be retrieved.
 
         Returns:
             The retrieved instance.
 
         Raises:
-            RepositoryNotFoundException: If no instance found identified by `id_`.
+            RepositoryNotFoundException: If no instance found identified by `item_id`.
         """
-        kwargs.update({self.id_attribute: id_})
-        return self.check_not_found(await self.get_one_or_none(**kwargs))
+        with wrap_sqlalchemy_exception():
+            statement = self._filter_select_by_kwargs(
+                statement=self.statement,
+                **{self.id_attribute: item_id},
+            )
+            instance = (await self._execute(statement)).scalar_one_or_none()
+            instance = self.check_not_found(instance)
+            self.session.expunge(instance)
+            return instance
 
-    async def list(
-        self,
-        *filters: FilterTypes,
-        **kwargs: Any,
-    ) -> abc.Sequence[ModelT]:
-        """Get a list of instances, optionally filtered.
+    async def get_one(self, **kwargs: Any) -> ModelT:
+        """Get instance identified by ``kwargs``.
 
         Args:
-            *filters: Types for specific filtering operations.
-            **kwargs: Instance attribute value filters.
+            **kwargs: Identifier of the instance to be retrieved.
 
         Returns:
-            The list of instances, after filtering applied.
+            The retrieved instance.
+
+        Raises:
+            RepositoryNotFoundException: If no instance found identified by `item_id`.
         """
-        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
-
-        select_ = self._create_select_for_model(options=options)
-        select_ = self._filter_for_list(*filters, select_=select_)
-        select_ = self._filter_select_by_kwargs(select_, **kwargs)
-
         with wrap_sqlalchemy_exception():
-            result = await self._execute(select_)
-            instances = list(result.scalars())
-            for instance in instances:
-                self.session.expunge(instance)
-            return instances
+            statement = self._filter_select_by_kwargs(statement=self.statement, **kwargs)
+            instance = (await self._execute(statement)).scalar_one_or_none()
+            instance = self.check_not_found(instance)
+            self.session.expunge(instance)
+            return instance
 
-    async def list_and_count(
-        self,
-        *filters: FilterTypes,
-        **kwargs: Any,
-    ) -> tuple[abc.Sequence[ModelT], int]:
+    async def get_one_or_none(self, **kwargs: Any) -> ModelT | None:
+        """Get instance identified by ``kwargs`` or None if not found.
+
+        Args:
+            **kwargs: Identifier of the instance to be retrieved.
+
+        Returns:
+            The retrieved instance or None
         """
+        with wrap_sqlalchemy_exception():
+            statement = self._filter_select_by_kwargs(statement=self.statement, **kwargs)
+            instance = (await self._execute(statement)).scalar_one_or_none()
+            if instance:
+                self.session.expunge(instance)
+            return instance or None
+
+    async def get_or_create(self, **kwargs: Any) -> tuple[ModelT, bool]:
+        """Get instance identified by ``kwargs`` or create if it doesn't exist.
+
+        Args:
+            **kwargs: Identifier of the instance to be retrieved.
+
+        Returns:
+            a tuple that includes the instance and whether or not it needed to be created.
+        """
+        existing = await self.get_one_or_none(**kwargs)
+        if existing:
+            return (existing, False)
+        return (await self.add(self.model_type(**kwargs)), True)  # type: ignore[arg-type]
+
+    async def count(self, *filters: FilterTypes, **kwargs: Any) -> int:
+        """Get the count of records returned by a query.
 
         Args:
             *filters: Types for specific filtering operations.
@@ -261,27 +279,16 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         Returns:
             Count of records returned by query, ignoring pagination.
         """
-        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
-        select_ = select(
-            self.model_type,
-            over(
-                sql_func.count(  # pylint: disable=not-callable
-                    self.model_type.id,  # type:ignore[attr-defined]
-                ),
+        statement = self.statement.with_only_columns(
+            sql_func.count(  # pylint: disable=not-callable
+                self.model_type.id,  # type:ignore[attr-defined]
             ),
-        ).options(*options)
-        select_ = self._filter_for_list(*filters, select_=select_)
-        select_ = self._filter_select_by_kwargs(select_, **kwargs)
-        with wrap_sqlalchemy_exception():
-            result = await self._execute(select_)
-            count: int = 0
-            instances: list[ModelT] = []
-            for i, (instance, count_value) in enumerate(result):
-                self.session.expunge(instance)
-                instances.append(instance)
-                if i == 0:
-                    count = count_value
-            return instances, count
+            maintain_column_froms=True,
+        ).order_by(None)
+        statement = self._apply_filters(*filters, apply_pagination=False, statement=statement)
+        statement = self._filter_select_by_kwargs(statement, **kwargs)
+        results = await self._execute(statement)
+        return results.scalar_one()  # type: ignore
 
     async def update(self, data: ModelT) -> ModelT:
         """Update instance with the attribute values present on `data`.
@@ -297,15 +304,112 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             RepositoryNotFoundException: If no instance found with same identifier as `data`.
         """
         with wrap_sqlalchemy_exception():
-            id_ = self.get_id_attribute_value(data)
+            item_id = self.get_id_attribute_value(data)
             # this will raise for not found, and will put the item in the session
-            await self.get_by_id(id_)
+            await self.get(item_id)
             # this will merge the inbound data to the instance we just put in the session
             instance = await self._attach_to_session(data, strategy="merge")
             await self.session.flush()
             await self.session.refresh(instance)
             self.session.expunge(instance)
             return instance
+
+    async def update_many(self, data: list[ModelT]) -> list[ModelT]:
+        """Update one or more instances with the attribute values present
+        on`data`.
+
+        This function has an optimized bulk insert based on the configured SQL dialect:
+        - For backends supporting `RETURNING` with `executemany`, a single bulk insert with returning clause is executed.
+        - For other backends, it does a bulk insert and then selects the inserted records
+
+        Args:
+            data: A list of instances to update.  Each should have a value for `self.id_attribute` that exists in the
+                collection.
+
+        Returns:
+            The updated instances.
+
+        Raises:
+            RepositoryNotFoundException: If no instance found with same identifier as `data`.
+        """
+        data_to_update: list[dict[str, Any]] = [v.to_dict() if isinstance(v, self.model_type) else v for v in data]  # type: ignore
+        with wrap_sqlalchemy_exception():
+            if self.session.bind.dialect.update_executemany_returning:
+                instances = list(
+                    await self.session.scalars(  # type: ignore
+                        update(self.model_type).returning(self.model_type),
+                        data_to_update,  # pyright: reportGeneralTypeIssues=false
+                    ),
+                )
+                await self.session.flush()
+                for instance in instances:
+                    self.session.expunge(instance)
+                return instances
+            updated_primary_keys: list[UUID] = []
+            for datum in data_to_update:
+                updated_primary_keys.append(datum.get("id"))  # type: ignore[arg-type]
+
+            await self.session.execute(
+                update(self.model_type),
+                data_to_update,
+            )
+            await self.session.flush()
+            # select the records we just updated.
+            return await self.list(CollectionFilter(field_name="id", values=updated_primary_keys))
+
+    async def list_and_count(
+        self,
+        *filters: FilterTypes,
+        **kwargs: Any,
+    ) -> tuple[list[ModelT], int]:
+        """List records with total count.
+
+        Args:
+            *filters: Types for specific filtering operations.
+            **kwargs: Instance attribute value filters.
+
+        Returns:
+            Count of records returned by query, ignoring pagination.
+        """
+        statement = self.statement.add_columns(
+            over(
+                sql_func.count(  # pylint: disable=not-callable
+                    self.model_type.id,  # type:ignore[attr-defined]
+                ),
+            ),
+        )
+        statement = self._apply_filters(*filters, statement=statement)
+        statement = self._filter_select_by_kwargs(statement, **kwargs)
+        with wrap_sqlalchemy_exception():
+            result = await self._execute(statement)
+            count: int = 0
+            instances: list[ModelT] = []
+            for i, (instance, count_value) in enumerate(result):
+                self.session.expunge(instance)
+                instances.append(instance)
+                if i == 0:
+                    count = count_value
+            return instances, count
+
+    async def list(self, *filters: FilterTypes, **kwargs: Any) -> list[ModelT]:
+        """Get a list of instances, optionally filtered.
+
+        Args:
+            *filters: Types for specific filtering operations.
+            **kwargs: Instance attribute value filters.
+
+        Returns:
+            The list of instances, after filtering applied.
+        """
+        statement = self._apply_filters(*filters, statement=self.statement)
+        statement = self._filter_select_by_kwargs(statement, **kwargs)
+
+        with wrap_sqlalchemy_exception():
+            result = await self._execute(statement)
+            instances = list(result.scalars())
+            for instance in instances:
+                self.session.expunge(instance)
+            return instances
 
     async def upsert(self, data: ModelT) -> ModelT:
         """Update or create instance.
@@ -340,7 +444,7 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         """Filter the collection by kwargs.
 
         Args:
-            collection: select to filter
+            collection: the statement to filter.
             **kwargs: key/value pairs such that objects remaining in the collection after filtering
                 have the property that their attribute named `key` has value equal to `value`.
         """
@@ -348,17 +452,19 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             return collection.filter_by(**kwargs)
 
     @classmethod
-    async def check_health(cls, session: AsyncSession) -> bool:
+    async def check_health(cls, session: AsyncSession, query: str | None) -> bool:
         """Perform a health check on the database.
 
         Args:
             session: through which we run a check statement
+            query: override the default health check SQL statement
 
         Returns:
             `True` if healthy.
         """
+        query = query or "SELECT 1"
         return (  # type:ignore[no-any-return]  # pragma: no cover
-            await session.execute(text("SELECT 1"))
+            await session.execute(text(query))
         ).scalar_one() == 1
 
     # the following is all sqlalchemy implementation detail, and shouldn't be directly accessed
@@ -367,10 +473,9 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
         self,
         limit: int,
         offset: int,
-        *,
-        select_: SelectT,
+        statement: SelectT,
     ) -> SelectT:
-        return select_.limit(limit).offset(offset)
+        return statement.limit(limit).offset(offset)
 
     async def _attach_to_session(
         self,
@@ -389,86 +494,94 @@ class SQLAlchemyRepository(AbstractRepository[ModelT], Generic[ModelT]):
             Instance attached to the session - if `"merge"` strategy, may not be same instance
             that was provided.
         """
-        match strategy:
-            case "add":
-                self.session.add(model)
-                return model
-            case "merge":
-                return await self.session.merge(model)
+        if strategy == "add":
+            self.session.add(model)
+            return model
+        if strategy == "merge":
+            return await self.session.merge(model)
         raise ValueError("Unexpected value for `strategy`, must be `'add'` or `'merge'`")
 
-    def _create_select_for_model(self, **kwargs: Any) -> Select[tuple[ModelT]]:
-        options = kwargs.pop("options", self.default_options)
-        return select(self.model_type).options(*options)
+    async def _execute(self, statement: Select[RowT]) -> Result[RowT]:
+        return cast("Result[RowT]", await self.session.execute(statement))
 
-    async def _execute(self, select_: Select[RowT]) -> Result[RowT]:
-        return cast("Result[RowT]", await self.session.execute(select_))
+    def _apply_filters(
+        self,
+        *filters: FilterTypes,
+        apply_pagination: bool = True,
+        statement: SelectT,
+    ) -> SelectT:
+        """Apply filters to a select statement.
 
-    def _filter_for_list(self, *filters: FilterTypes, select_: SelectT) -> SelectT:
-        """
         Args:
             *filters: filter types to apply to the query
+            apply_pagination: applies pagination filters if true
+            select: select statement to apply filters
 
         Keyword Args:
-            select_: select to apply filters against
+            select: select to apply filters against
 
         Returns:
             The select with filters applied.
         """
         for filter_ in filters:
-            match filter_:
-                case LimitOffset(limit, offset):
-                    select_ = self._apply_limit_offset_pagination(limit, offset, select_=select_)
-                case BeforeAfter(field_name, before, after):
-                    select_ = self._filter_on_datetime_field(
-                        field_name,
-                        before,
-                        after,
-                        select_=select_,
+            if isinstance(filter_, LimitOffset):
+                if apply_pagination:
+                    statement = self._apply_limit_offset_pagination(
+                        filter_.limit,
+                        filter_.offset,
+                        statement=statement,
                     )
-                case CollectionFilter(field_name, values):
-                    select_ = self._filter_in_collection(field_name, values, select_=select_)
-                case _:
-                    raise StarliteSaqlalchemyError(f"Unexpected filter: {filter}")
-        return select_
+                else:
+                    pass
+            elif isinstance(filter_, BeforeAfter):
+                statement = self._filter_on_datetime_field(
+                    filter_.field_name,
+                    filter_.before,
+                    filter_.after,
+                    statement=statement,
+                )
+            elif isinstance(filter_, CollectionFilter):
+                statement = self._filter_in_collection(
+                    filter_.field_name,
+                    filter_.values,
+                    statement=statement,
+                )
+            else:
+                raise StarliteSaqlalchemyError(f"Unexpected filter: {filter_}")
+        return statement
 
     def _filter_in_collection(
         self,
         field_name: str,
         values: abc.Collection[Any],
-        *,
-        select_: SelectT,
+        statement: SelectT,
     ) -> SelectT:
         if not values:
-            return select_
-
-        return select_.where(getattr(self.model_type, field_name).in_(values))
+            return statement
+        return statement.where(getattr(self.model_type, field_name).in_(values))
 
     def _filter_on_datetime_field(
         self,
         field_name: str,
         before: datetime | None,
         after: datetime | None,
-        *,
-        select_: SelectT,
+        statement: SelectT,
     ) -> SelectT:
         field = getattr(self.model_type, field_name)
         if before is not None:
-            select_ = select_.where(field < before)
+            statement = statement.where(field < before)
         if after is not None:
-            return select_.where(field > before)
-        return select_
+            statement = statement.where(field > before)
+        return statement  # noqa: R504
 
-    def _filter_select_by_kwargs(self, select_: SelectT, **kwargs: Any) -> SelectT:
+    def _filter_select_by_kwargs(self, statement: SelectT, **kwargs: Any) -> SelectT:
         for key, val in kwargs.items():
-            select_ = select_.where(getattr(self.model_type, key) == val)
-        return select_
+            statement = statement.where(getattr(self.model_type, key) == val)
+        return statement
 
 
 class SQLAlchemyRepositorySlugMixin(
     SQLAlchemyRepository[SlugModelT],
-    AbstractSlugRepository[SlugModelT],
-    Generic[SlugModelT],
 ):
     """Slug Repository Protocol."""
 
@@ -478,8 +591,7 @@ class SQLAlchemyRepositorySlugMixin(
         **kwargs: Any,
     ) -> SlugModelT | None:
         """Select record by slug value."""
-        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
-        return await self.get_one_or_none(slug=slug, options=options)
+        return await self.get_one_or_none(slug=slug)
 
     async def get_available_slug(
         self,
@@ -496,9 +608,8 @@ class SQLAlchemyRepositorySlugMixin(
         Returns:
             str: a unique slug for the supplied value.  This is safe for URLs and other unique identifiers.
         """
-        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
         slug = slugify(value_to_slugify)
-        if await self._is_slug_unique(slug, options=options):
+        if await self._is_slug_unique(slug):
             return slug
         random_string = "".join(random.choices(string.ascii_lowercase + string.digits, k=4))
         return f"{slug}-{random_string}"
@@ -508,5 +619,4 @@ class SQLAlchemyRepositorySlugMixin(
         slug: str,
         **kwargs: Any,
     ) -> bool:
-        options: list[ExecutableOption] = kwargs.pop("options", None) or self.default_options
-        return await self.get_one_or_none(slug=slug, options=options) is None
+        return await self.get_one_or_none(slug=slug) is None

@@ -76,7 +76,7 @@ async def test_service_get_by_id() -> None:
     service_obj = domain.authors.Service()
     authors = await service_obj.list()
     author = authors[0]
-    retrieved = await service_obj.get_by_id(author.id)
+    retrieved = await service_obj.get(author.id)
     assert author is retrieved
 
 
@@ -115,6 +115,6 @@ async def test_service_method_default_behavior() -> None:
     assert await service_obj.update("abc", data) is data
     assert await service_obj.upsert("abc", data) is data
     with pytest.raises(NotFoundError):
-        await service_obj.get_by_id("abc")
+        await service_obj.get("abc")
     with pytest.raises(NotFoundError):
         await service_obj.delete("abc")

@@ -123,7 +123,7 @@ class Service(Generic[T]):
         """
         return data
 
-    async def get_by_id(self, id_: Any, **kwargs: Any) -> T:
+    async def get(self, id_: Any, **kwargs: Any) -> T:
         """Retrieve a representation of `T` with that is identified by `id_`.
 
         Args:

@@ -17,10 +17,7 @@ from .generic import Service
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Sequence
 
-    from starlite_saqlalchemy.repository.abc import (
-        AbstractRepository,
-        AbstractSlugRepository,
-    )
+    from starlite_saqlalchemy.repository.abc import AbstractRepository
     from starlite_saqlalchemy.repository.types import FilterTypes
 
 RepoServiceT = TypeVar("RepoServiceT", bound="RepositoryService")
@@ -127,7 +124,7 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         self.repository.set_id_attribute_value(id_, data)
         return await self.repository.upsert(data)
 
-    async def get_by_id(self, id_: Any, **kwargs: Any) -> ModelT:
+    async def get(self, id_: Any, **kwargs: Any) -> ModelT:
         """Wrap repository scalar operation.
 
         Args:
@@ -136,7 +133,7 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         Returns:
             Representation of instance with identifier `id_`.
         """
-        return await self.repository.get_by_id(id_, **kwargs)
+        return await self.repository.get(id_, **kwargs)
 
     async def get_one_or_none(self, *filters: FilterTypes, **kwargs: Any) -> ModelT | None:
         """Wrap repository scalar operation.
@@ -178,8 +175,7 @@ class SlugRepositoryService(RepositoryService[SlugModelT]):
     """Methods for models with a slug field."""
 
     __id__ = "starlite_saqlalchemy.service.sqlalchemy.SlugRepositoryService"
-    repository_type: type[AbstractSlugRepository[SlugModelT]]
-    repository: AbstractSlugRepository
+    repository_type: type[AbstractRepository[SlugModelT]]
 
     async def get_by_slug(self, slug_: str) -> SlugModelT | None:
         """Wrap repository scalar operation.
@@ -190,4 +186,4 @@ class SlugRepositoryService(RepositoryService[SlugModelT]):
         Returns:
             Representation of instance with identifier `id_`.
         """
-        return await self.repository.get_by_slug(slug_)
+        return await self.repository.get_one_or_none(slug=slug_)
