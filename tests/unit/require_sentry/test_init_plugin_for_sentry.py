@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
 import pytest
+import sentry_sdk
 from sentry_sdk.integrations.starlite import SentryStarliteASGIMiddleware
 from sentry_sdk.integrations.starlite import (
     exception_handler as sentry_after_exception_handler,
@@ -18,6 +19,13 @@ from starlite_saqlalchemy import init_plugin, sentry
 
 if TYPE_CHECKING:
     from pytest import MonkeyPatch
+    from sentry_sdk._types import TracesSampler
+
+    from starlite_saqlalchemy.sentry import SamplingContext
+
+
+def _custom_traces_sampler(_: SamplingContext) -> float:
+    return 0.42
 
 
 @pytest.mark.parametrize(
@@ -57,3 +65,21 @@ def test_do_sentry() -> None:
     Starlite.__init__ = old_init  # type: ignore
     HTTPRoute.handle = old_route_handle  # type: ignore
     BaseRouteHandler.resolve_middleware = old_resolve_middleware  # type: ignore
+
+
+@pytest.mark.parametrize(
+    ("traces_sampler", "exp_traces_sampler"),
+    [(None, sentry.sentry_traces_sampler), (_custom_traces_sampler, _custom_traces_sampler)],
+)
+def test_sentry_init(
+    traces_sampler: TracesSampler | None,
+    exp_traces_sampler: TracesSampler | None,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    sentry_init_mock = MagicMock()
+    monkeypatch.setattr(sentry_sdk, "init", sentry_init_mock)
+    init_plugin.ConfigureApp(
+        config=init_plugin.PluginConfig(do_sentry=True, sentry_traces_sampler=traces_sampler)
+    )
+    sentry_init_mock.assert_called_once()
+    assert sentry_init_mock.call_args.kwargs["traces_sampler"] is exp_traces_sampler

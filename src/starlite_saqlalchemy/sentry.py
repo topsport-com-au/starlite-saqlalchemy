@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from typing import Any
 
+    from sentry_sdk._types import TracesSampler
     from starlite.types import HTTPScope
 
 
@@ -32,7 +33,7 @@ def sentry_traces_sampler(sampling_context: Mapping[str, Any]) -> float:
     return settings.sentry.TRACES_SAMPLE_RATE
 
 
-def configure() -> None:
+def configure(traces_sampler: TracesSampler | None = None) -> None:
     """Configure sentry on app startup.
 
     See [SentrySettings][starlite_saqlalchemy.settings.SentrySettings].
@@ -42,5 +43,5 @@ def configure() -> None:
         environment=settings.app.ENVIRONMENT,
         release=settings.app.BUILD_NUMBER,
         integrations=[StarliteIntegration(), SqlalchemyIntegration()],
-        traces_sampler=sentry_traces_sampler,
+        traces_sampler=sentry_traces_sampler if traces_sampler is None else traces_sampler,
     )
