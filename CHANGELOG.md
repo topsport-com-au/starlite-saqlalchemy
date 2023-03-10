@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.30.0 (2023-03-10)
+### Feature
+* **sentry:** Override traces sampler ([#297](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/297)) ([`d199741`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/d19974138cbcf76d29ca0fd3fcd6d1deb2597dc8))
+
+### Documentation
+* Update CONTRIBUTING.md ([#275](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/275)) ([`a28c681`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/a28c6810e81fd5085ec9f10f8747eb5d31289f36))
+
 ## v0.29.0 (2023-01-20)
 ### Feature
 * Optional audit columns on base class ([#264](https://github.com/topsport-com-au/starlite-saqlalchemy/issues/264)) ([`5f4e883`](https://github.com/topsport-com-au/starlite-saqlalchemy/commit/5f4e88342e3778b9bf4aa665fb9bef87fc251782))
