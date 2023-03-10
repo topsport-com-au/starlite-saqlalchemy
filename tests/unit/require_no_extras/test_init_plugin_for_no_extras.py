@@ -79,4 +79,4 @@ def test_extra_dependencies_not_installed(enabled_config: str, error_pattern: st
         **{enabled_config: True},
     }
     with pytest.raises(ValidationError, match=error_pattern):
-        init_plugin.PluginConfig(**kwargs)
+        init_plugin.PluginConfig(**kwargs)  # type:ignore[arg-type]

@@ -104,7 +104,7 @@ class PluginConfig(BaseModel):
     Add configuration for gzip compression to
     [`AppConfig.compression_config`][starlite.config.app.AppConfig.compression_config].
     """
-    do_collection_dependencies = True
+    do_collection_dependencies: bool = True
     """Add collection route dependencies.
 
     Add the [`Provide`][starlite.datastructures.Provide]'s for collection route dependencies to
