@@ -23,8 +23,7 @@ def test_config_switches() -> None:
         do_after_exception=False,
         do_cache=False,
         do_compression=False,
-        # pyright reckons this parameter doesn't exist, I beg to differ
-        do_collection_dependencies=False,  # pyright:ignore
+        do_collection_dependencies=False,
         do_exception_handlers=False,
         do_health_check=False,
         do_logging=False,

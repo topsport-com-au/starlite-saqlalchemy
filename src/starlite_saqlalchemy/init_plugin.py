@@ -104,7 +104,7 @@ class PluginConfig(BaseModel):
     Add configuration for gzip compression to
     [`AppConfig.compression_config`][starlite.config.app.AppConfig.compression_config].
     """
-    do_collection_dependencies = True
+    do_collection_dependencies: bool = True
     """Add collection route dependencies.
 
     Add the [`Provide`][starlite.datastructures.Provide]'s for collection route dependencies to
@@ -143,6 +143,8 @@ class PluginConfig(BaseModel):
     Configure the application to initialize Sentry on startup. Adds a handler to
     [`AppConfig.on_startup`][starlite.config.app.AppConfig.on_startup].
     """
+    sentry_traces_sampler: Callable[[dict], float] | None = None
+    """Override sentry traces sampler."""
     do_set_debug: bool = True
     """Configure Starlite debug mode.
 
@@ -379,7 +381,7 @@ class ConfigureApp:
         if self.config.do_sentry:
             from starlite_saqlalchemy import sentry
 
-            sentry.configure()
+            sentry.configure(traces_sampler=self.config.sentry_traces_sampler)
 
     def configure_sqlalchemy_plugin(self, app_config: AppConfig) -> None:
         """Configure `SQLAlchemy` for the application.

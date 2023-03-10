@@ -239,7 +239,7 @@ def test_filter_collection_by_kwargs_raises_repository_exception_for_attribute_e
 ) -> None:
     """Test that we raise a repository exception if an attribute name is
     incorrect."""
-    mock_repo._select.filter_by = MagicMock(  # type:ignore[assignment]
+    mock_repo._select.filter_by = MagicMock(  # type:ignore[method-assign]
         side_effect=InvalidRequestError,
     )
     with pytest.raises(StarliteSaqlalchemyError):
