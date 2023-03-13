@@ -29,7 +29,7 @@ repos:
       - id: black
         args: [--config=./pyproject.toml]
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.2
+    rev: v2.2.4
     hooks:
       - id: codespell
         additional_dependencies:
@@ -44,7 +44,7 @@ repos:
       - id: prettier
         exclude: docs
   - repo: https://github.com/pycqa/bandit
-    rev: 1.7.4
+    rev: 1.7.5
     hooks:
       - id: bandit
         exclude: "test_*"
