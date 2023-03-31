@@ -103,4 +103,4 @@ class AuditBase(AuditColumns, CommonColumns, DeclarativeBase):
     registry = registry_
 
 
-dto.from_mapped.pydantic_dto_factory.add_registry(Base.registry)
+dto.pydantic.pydantic_dto_factory.add_registry(registry_)
