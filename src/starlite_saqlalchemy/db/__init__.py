@@ -57,11 +57,14 @@ See [`async_sessionmaker()`][sqlalchemy.ext.asyncio.async_sessionmaker].
 def _sqla_on_connect(dbapi_connection: Any, _: Any) -> Any:  # pragma: no cover
     """Handle msgspec binary output.
 
-    SQLAlchemy expects that the json serializer returns `str` and calls `.encode()` on the value to
-    turn it to bytes before writing to the JSONB column. This changes the behaviour of the dialect
-    to expect a binary value from the serializer.
+    SQLAlchemy expects that the json serializer returns `str` and calls
+    `.encode()` on the value to turn it to bytes before writing to the
+    JSONB column. This changes the behaviour of the dialect to expect a
+    binary value from the serializer.
 
-    See Also https://github.com/sqlalchemy/sqlalchemy/blob/14bfbadfdf9260a1c40f63b31641b27fe9de12a0/lib/sqlalchemy/dialects/postgresql/asyncpg.py#L934  pylint: disable=line-too-long
+    See Also
+    https://github.com/sqlalchemy/sqlalchemy/blob/14bfbadfdf9260a1c40f63b31641b27fe9de12a0/lib/sqlalchemy/dialects/postgresql/asyncpg.py#L934
+    pylint: disable=line-too-long
     """
 
     def encoder(bin_value: bytes) -> bytes:
