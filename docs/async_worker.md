@@ -17,7 +17,7 @@ Let's add a background task that sends an email whenever a new `Author` is creat
 
 ```python
 from typing import Any
-
+from starlite_saqlalchemy import worker
 from starlite_saqlalchemy import service
 from starlite_saqlalchemy.repository.sqlalchemy import SQLAlchemyRepository
 
@@ -35,8 +35,10 @@ class Service(service.RepositoryService[Author]):
 
     async def create(self, data: Author) -> Author:
         created = await super().create(data)
-        await self.enqueue_background_task(
-            "send_author_created_email", raw_author=ReadDTO.from_orm(created).dict()
+        await worker.enqueue_background_task_for_service(
+            "send_author_created_email",
+            self,
+            raw_author=ReadDTO.from_orm(created).dict(),
         )
         return created
 
