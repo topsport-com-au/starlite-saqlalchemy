@@ -45,8 +45,8 @@ class EventFilter:
     Add an instance to the processor chain.
 
     Examples     structlog.configure(         ...,         processors=[
-    ...,             EventFilter(["color_message"]),             ...,
-    ]     )
+    ...,             EventFilter(["color_message"]),             ..., ]
+    )
     """
 
     def __init__(self, filter_keys: Iterable[str]) -> None:
