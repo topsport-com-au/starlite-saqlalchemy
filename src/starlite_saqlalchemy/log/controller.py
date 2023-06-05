@@ -1,6 +1,7 @@
 """Logging config for the application.
 
-Ensures that the app, sqlalchemy, saq and uvicorn loggers all log through the queue listener.
+Ensures that the app, sqlalchemy, saq and uvicorn loggers all log
+through the queue listener.
 
 Adds a filter for health check route logs.
 """
