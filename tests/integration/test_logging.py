@@ -22,7 +22,7 @@ async def test_health_logging_skipped(app: Starlite, cap_logger: CapturingLogger
     assert [] == cap_logger.calls
 
 
-async def test_logging(app: "Starlite", cap_logger: CapturingLogger) -> None:
+async def test_logging(app: Starlite, cap_logger: CapturingLogger) -> None:
     """Integration test for logging."""
 
     async with AsyncClient(app=app, base_url="http://testserver") as client:

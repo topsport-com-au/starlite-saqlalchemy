@@ -50,7 +50,7 @@ class RepositoryService(Service[ModelT], Generic[ModelT]):
         """
         return await self.repository.add(data)
 
-    async def list(self, *filters: "FilterTypes", **kwargs: Any) -> list[ModelT]:
+    async def list(self, *filters: FilterTypes, **kwargs: Any) -> list[ModelT]:
         """Wrap repository scalars operation.
 
         Args:
