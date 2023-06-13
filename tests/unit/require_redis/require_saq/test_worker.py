@@ -63,7 +63,7 @@ async def test_make_service_callback_raises_runtime_error(
         )
 
 
-async def test_enqueue_service_callback(monkeypatch: "MonkeyPatch") -> None:
+async def test_enqueue_service_callback(monkeypatch: MonkeyPatch) -> None:
     """Tests that job enqueued with desired arguments."""
     enqueue_mock = AsyncMock()
     monkeypatch.setattr(worker.queue, "enqueue", enqueue_mock)
@@ -82,7 +82,7 @@ async def test_enqueue_service_callback(monkeypatch: "MonkeyPatch") -> None:
     }
 
 
-async def test_enqueue_service_callback_with_custom_job_config(monkeypatch: "MonkeyPatch") -> None:
+async def test_enqueue_service_callback_with_custom_job_config(monkeypatch: MonkeyPatch) -> None:
     """Tests that job enqueued with desired arguments."""
     enqueue_mock = AsyncMock()
     monkeypatch.setattr(worker.queue, "enqueue", enqueue_mock)
