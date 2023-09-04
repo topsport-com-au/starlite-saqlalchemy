@@ -41,6 +41,12 @@ def _patch_bases(monkeypatch: MonkeyPatch) -> None:
 
     monkeypatch.setattr(orm, "Base", NewBase)
     monkeypatch.setattr(orm, "AuditBase", NewAuditBase)
+    from starlite_saqlalchemy.dto.pydantic import pydantic_dto_factory
+
+    pydantic_dto_factory.clear_mapped_classes()
+    pydantic_dto_factory.add_registry(orm.registry_)
+    pydantic_dto_factory.add_registry(NewBase.registry)
+    pydantic_dto_factory.add_registry(NewAuditBase.registry)
 
 
 @pytest.fixture(name="authors")
