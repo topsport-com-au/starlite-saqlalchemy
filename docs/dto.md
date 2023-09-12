@@ -48,7 +48,7 @@ DTOs.
 Here's a quick example.
 
 ```py title="Simple Example"
---8<-- "examples/dto/minimal.py"
+--8 < --"examples/dto/minimal.py"
 ```
 
 Read the comments in the example for a description of everything that is going on, however notice
@@ -58,7 +58,7 @@ modifiable by clients.
 Let's have another go:
 
 ```py title="Simple Example with Read Only Fields"
---8<-- "examples/dto/minimal_configure_fields.py"
+--8 < --"examples/dto/minimal_configure_fields.py"
 ```
 
 That's better! Now, we'll only parse "name" and "dob" fields out of client input.
@@ -116,7 +116,7 @@ e.g., `dto.field(dto.Mark.PRIVATE)` and `dto.field("private")` are equivalent.
 The following example demonstrates all field configurations available via the `field()` function.
 
 ```py title="DTOField Configuration Example"
---8<-- "examples/dto/complete_field_example.py"
+--8 < --"examples/dto/complete_field_example.py"
 ```
 
 ### SQLAlchemy info dictionary

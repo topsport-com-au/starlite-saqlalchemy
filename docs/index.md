@@ -14,7 +14,7 @@ An API application pattern standing on the shoulders of:
 ## Usage Example
 
 ```py title="Simple Example"
---8<-- "examples/basic_example.py"
+--8 < --"examples/basic_example.py"
 ```
 
 Check out the [Usage](config/) section to see all the features this configures on the application!
